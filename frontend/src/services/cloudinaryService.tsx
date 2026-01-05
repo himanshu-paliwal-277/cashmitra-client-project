@@ -1,4 +1,6 @@
 // Image upload service using backend proxy
+import { getRoleFromPath, getStorageKeys } from '../utils/jwt.utils';
+
 const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5000/api/v1';
 
 interface TransformationOptions {
@@ -59,9 +61,6 @@ class CloudinaryService {
    * Get the appropriate auth token based on current user context
    */
   getAuthToken(): string | null {
-    // Import at runtime to avoid circular dependencies
-    const { getRoleFromPath, getStorageKeys } = require('../utils/jwt.utils');
-
     // Determine role from current window location
     const currentRole = getRoleFromPath(window.location.pathname);
     const storageKeys = getStorageKeys(currentRole);

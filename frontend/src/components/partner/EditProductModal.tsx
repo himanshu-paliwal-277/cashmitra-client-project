@@ -118,9 +118,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
 
     // Condition options for different states
     conditionOptions: [
-      { label: 'Excellent', price: 0 },
-      { label: 'Good', price: 0 },
-      { label: 'Fair', price: 0 },
+      { label: 'Excellent', price: 0, ram: '', storage: '', color: '', stock: 0 },
+      { label: 'Good', price: 0, ram: '', storage: '', color: '', stock: 0 },
+      { label: 'Fair', price: 0, ram: '', storage: '', color: '', stock: 0 },
     ],
 
     // Key specifications (will be converted to object in backend)
@@ -316,9 +316,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
         variants: product.variants || [],
         addOns: product.addOns || [],
         conditionOptions: product.conditionOptions || [
-          { label: 'Excellent', price: 0 },
-          { label: 'Good', price: -1000 },
-          { label: 'Fair', price: -2000 },
+          { label: 'Excellent', price: 0, ram: '', storage: '', color: '', stock: 0 },
+          { label: 'Good', price: -1000, ram: '', storage: '', color: '', stock: 0 },
+          { label: 'Fair', price: -2000, ram: '', storage: '', color: '', stock: 0 },
         ],
 
         topSpecs: Array.isArray(product.topSpecs) ? product.topSpecs : [],
@@ -626,16 +626,24 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
         .filter((result: any) => result.success && result.data?.url)
         .map((result: any) => result.data.url);
 
-      setFormData((prev: any) => ({
-        ...prev,
-        images: [...prev.images, ...newImages],
-      }));
+      if (newImages.length > 0) {
+        setFormData((prev: any) => ({
+          ...prev,
+          images: [...prev.images, ...newImages],
+        }));
+        setSuccess(`${newImages.length} image(s) uploaded successfully!`);
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setErrors({ images: 'No images were uploaded successfully' });
+      }
 
-      setSuccess(`${newImages.length} image(s) uploaded successfully!`);
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (error) {
+      // Reset the file input
+      e.target.value = '';
+    } catch (error: any) {
       console.error('Error uploading images:', error);
-      setErrors({ images: 'Failed to upload images' });
+      setErrors({ images: error.message || 'Failed to upload images' });
+      // Reset the file input
+      e.target.value = '';
     } finally {
       setLoading(false);
     }
@@ -1473,8 +1481,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     {formData.conditionOptions?.map((condition: any, index: number) => (
                       <div
                         key={index}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 border border-gray-200 rounded-lg"
+                        className="p-4 border border-gray-200 rounded-lg"
                       >
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             Condition Label
@@ -1541,6 +1550,109 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                             Remove
                           </button>
                         </div>
+                        </div>
+
+                        {/* Variant Fields: RAM, Storage, Color, Stock */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3 pt-3 border-t border-gray-300">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              RAM
+                            </label>
+                            <select
+                              value={condition.ram || ''}
+                              onChange={e => {
+                                const newConditions = [...formData.conditionOptions];
+                                newConditions[index] = { ...condition, ram: e.target.value };
+                                setFormData((prev: any) => ({
+                                  ...prev,
+                                  conditionOptions: newConditions,
+                                }));
+                              }}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                              <option value="">Select RAM</option>
+                              <option value="2GB">2GB</option>
+                              <option value="3GB">3GB</option>
+                              <option value="4GB">4GB</option>
+                              <option value="6GB">6GB</option>
+                              <option value="8GB">8GB</option>
+                              <option value="12GB">12GB</option>
+                              <option value="16GB">16GB</option>
+                              <option value="18GB">18GB</option>
+                              <option value="24GB">24GB</option>
+                              <option value="32GB">32GB</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Storage
+                            </label>
+                            <select
+                              value={condition.storage || ''}
+                              onChange={e => {
+                                const newConditions = [...formData.conditionOptions];
+                                newConditions[index] = { ...condition, storage: e.target.value };
+                                setFormData((prev: any) => ({
+                                  ...prev,
+                                  conditionOptions: newConditions,
+                                }));
+                              }}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                              <option value="">Select Storage</option>
+                              <option value="16GB">16GB</option>
+                              <option value="32GB">32GB</option>
+                              <option value="64GB">64GB</option>
+                              <option value="128GB">128GB</option>
+                              <option value="256GB">256GB</option>
+                              <option value="512GB">512GB</option>
+                              <option value="1TB">1TB</option>
+                              <option value="2TB">2TB</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Color
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="e.g., Black, White"
+                              value={condition.color || ''}
+                              onChange={e => {
+                                const newConditions = [...formData.conditionOptions];
+                                newConditions[index] = { ...condition, color: e.target.value };
+                                setFormData((prev: any) => ({
+                                  ...prev,
+                                  conditionOptions: newConditions,
+                                }));
+                              }}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Stock
+                            </label>
+                            <input
+                              type="number"
+                              placeholder="Available quantity"
+                              value={condition.stock || 0}
+                              onChange={e => {
+                                const newConditions = [...formData.conditionOptions];
+                                newConditions[index] = {
+                                  ...condition,
+                                  stock: parseInt(e.target.value) || 0,
+                                };
+                                setFormData((prev: any) => ({
+                                  ...prev,
+                                  conditionOptions: newConditions,
+                                }));
+                              }}
+                              min="0"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                          </div>
+                        </div>
                       </div>
                     ))}
                     <button
@@ -1548,7 +1660,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                       onClick={() =>
                         setFormData((prev: any) => ({
                           ...prev,
-                          conditionOptions: [...prev.conditionOptions, { label: '', price: 0 }],
+                          conditionOptions: [...prev.conditionOptions, { label: '', price: 0, ram: '', storage: '', color: '', stock: 0 }],
                         }))
                       }
                       className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
@@ -1771,27 +1883,45 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">RAM</label>
-                        <input
-                          type="text"
+                        <select
                           name="productDetails.memory.ram"
                           value={formData.productDetails.memory.ram}
                           onChange={handleInputChange}
-                          placeholder="6GB"
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
+                        >
+                          <option value="">Select RAM</option>
+                          <option value="2GB">2GB</option>
+                          <option value="3GB">3GB</option>
+                          <option value="4GB">4GB</option>
+                          <option value="6GB">6GB</option>
+                          <option value="8GB">8GB</option>
+                          <option value="12GB">12GB</option>
+                          <option value="16GB">16GB</option>
+                          <option value="18GB">18GB</option>
+                          <option value="24GB">24GB</option>
+                          <option value="32GB">32GB</option>
+                        </select>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Storage
                         </label>
-                        <input
-                          type="text"
+                        <select
                           name="productDetails.memory.storage"
                           value={formData.productDetails.memory.storage}
                           onChange={handleInputChange}
-                          placeholder="128GB"
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
+                        >
+                          <option value="">Select Storage</option>
+                          <option value="16GB">16GB</option>
+                          <option value="32GB">32GB</option>
+                          <option value="64GB">64GB</option>
+                          <option value="128GB">128GB</option>
+                          <option value="256GB">256GB</option>
+                          <option value="512GB">512GB</option>
+                          <option value="1TB">1TB</option>
+                          <option value="2TB">2TB</option>
+                        </select>
                       </div>
                       <div>
                         <label className="flex items-center gap-2 cursor-pointer">

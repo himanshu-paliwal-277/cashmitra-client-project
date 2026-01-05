@@ -67,6 +67,10 @@ const BuyProductSchema = new mongoose.Schema(
       {
         label: String,
         price: Number,
+        ram: String,
+        storage: String,
+        color: String,
+        stock: { type: Number, default: 0 },
       },
     ],
 
