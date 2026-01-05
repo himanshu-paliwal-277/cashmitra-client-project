@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { API_BASE_URL } from '../utils/api';
-import { decodeToken, getRoleFromToken, isTokenExpired } from '../utils/jwt.utils';
+import { decodeToken, getRoleFromToken, isTokenExpired, getRoleFromPath, getStorageKeys } from '../utils/jwt.utils';
 
 // Define types
 interface User {
@@ -51,19 +52,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentOrder, setCurrentOrder] = useState<any>(null);
+  const location = useLocation();
 
-  // Check for existing token on app load
+  // Migrate old token to customer-specific key (backward compatibility)
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const userData = localStorage.getItem('userData');
+    const oldToken = localStorage.getItem('token');
+    const oldUserData = localStorage.getItem('userData');
+
+    if (oldToken && !localStorage.getItem('customerToken')) {
+      // Migrate old token to customerToken
+      localStorage.setItem('customerToken', oldToken);
+      if (oldUserData) {
+        localStorage.setItem('customerUserData', oldUserData);
+      }
+      // Don't remove old keys yet to allow other auth contexts to migrate
+    }
+  }, []);
+
+  // Check for existing token on app load and path change
+  useEffect(() => {
+    const currentRole = getRoleFromPath(location.pathname);
+
+    // Only load customer auth in customer context (not admin/partner/agent routes)
+    if (currentRole !== 'customer') {
+      setLoading(false);
+      return;
+    }
+
+    const storageKeys = getStorageKeys('customer');
+    const storedToken = localStorage.getItem(storageKeys.token);
+    const userData = localStorage.getItem(storageKeys.userData);
 
     if (storedToken && userData) {
       try {
         // Check if token is expired
         if (isTokenExpired(storedToken)) {
-          console.log('Token expired - clearing auth data');
-          localStorage.removeItem('token');
-          localStorage.removeItem('userData');
+          console.log('Customer token expired - clearing auth data');
+          localStorage.removeItem(storageKeys.token);
+          localStorage.removeItem(storageKeys.userData);
           setLoading(false);
           return;
         }
@@ -80,13 +106,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(parsedUser);
         setToken(storedToken);
       } catch (err) {
-        console.error('Error parsing user data:', err);
-        localStorage.removeItem('token');
-        localStorage.removeItem('userData');
+        console.error('Error parsing customer user data:', err);
+        localStorage.removeItem(storageKeys.token);
+        localStorage.removeItem(storageKeys.userData);
       }
     }
     setLoading(false);
-  }, []);
+  }, [location.pathname]);
 
   const login = async (email: string, password: string): Promise<AuthResponse> => {
     try {
@@ -107,9 +133,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw new Error(data.message || 'Login failed');
       }
 
-      // Store token and user data with consistent naming
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userData', JSON.stringify(data));
+      // Store token and user data with customer-specific keys
+      const storageKeys = getStorageKeys('customer');
+      localStorage.setItem(storageKeys.token, data.token);
+      localStorage.setItem(storageKeys.userData, JSON.stringify(data));
 
       setUser(data);
       setToken(data.token);
@@ -148,9 +175,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw new Error(data.message || 'Signup failed');
       }
 
-      // Auto-login after successful signup with consistent naming
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userData', JSON.stringify(data));
+      // Auto-login after successful signup with customer-specific keys
+      const storageKeys = getStorageKeys('customer');
+      localStorage.setItem(storageKeys.token, data.token);
+      localStorage.setItem(storageKeys.userData, JSON.stringify(data));
 
       setUser(data);
       setToken(data.token);
@@ -164,8 +192,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = (): void => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userData');
+    // Only clear customer-specific data
+    const storageKeys = getStorageKeys('customer');
+    localStorage.removeItem(storageKeys.token);
+    localStorage.removeItem(storageKeys.userData);
     setUser(null);
     setToken(null);
     setError(null);
@@ -175,7 +205,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const updateUser = (updatedUserData: any): void => {
     const updatedUser = { ...user, ...updatedUserData } as User;
     setUser(updatedUser);
-    localStorage.setItem('userData', JSON.stringify(updatedUser));
+    const storageKeys = getStorageKeys('customer');
+    localStorage.setItem(storageKeys.userData, JSON.stringify(updatedUser));
   };
 
   const getAuthToken = (): string | null => {

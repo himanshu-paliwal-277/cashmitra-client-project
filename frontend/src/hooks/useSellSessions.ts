@@ -20,7 +20,7 @@ const useSellSessions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('customerToken');
       const response = await api.post('/sell-sessions', sessionData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -43,7 +43,7 @@ const useSellSessions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('customerToken');
       const response = await api.get('/sell-sessions/my-sessions', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -65,7 +65,7 @@ const useSellSessions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('customerToken');
       const response = await api.get(`/sell-sessions/${sessionId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -87,7 +87,7 @@ const useSellSessions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('customerToken');
       const response = await api.put(`/sell-sessions/${sessionId}/answers`, answersData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -110,7 +110,7 @@ const useSellSessions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('customerToken');
       const response = await api.put(`/sell-sessions/${sessionId}/defects`, defectsData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -133,7 +133,7 @@ const useSellSessions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('customerToken');
       const response = await api.put(`/sell-sessions/${sessionId}/accessories`, accessoriesData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -156,7 +156,7 @@ const useSellSessions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('customerToken');
       const response = await api.get(`/sell-sessions/${sessionId}/price`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -178,7 +178,7 @@ const useSellSessions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('customerToken');
       const response = await api.patch(
         `/sell-sessions/${sessionId}/extend`,
         {},
@@ -205,7 +205,7 @@ const useSellSessions = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('customerToken');
         await api.delete(`/sell-sessions/${sessionId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -235,7 +235,7 @@ const useSellSessions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('customerToken');
       const queryParams = new URLSearchParams();
 
       Object.entries(params).forEach(([key, value]) => {
@@ -265,7 +265,7 @@ const useSellSessions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('customerToken');
       const response = await api.patch(
         `/sell-sessions/admin/${sessionId}/status`,
         { isActive },
@@ -291,7 +291,7 @@ const useSellSessions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('customerToken');
       const response = await api.post(
         '/sell-sessions/admin/cleanup',
         {},
@@ -344,7 +344,7 @@ const useSellSessions = () => {
 
   // Initialize - fetch user sessions on mount
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('customerToken');
     if (token) {
       getUserSessions();
     }

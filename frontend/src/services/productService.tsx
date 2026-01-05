@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getRoleFromPath, getStorageKeys } from '../utils/jwt.utils';
 
 // Prefer local API for development to test new endpoints
 const API_URL =
@@ -14,7 +15,10 @@ const api = axios.create({
 // Add a request interceptor to include auth token for protected routes
 api.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('token'); // User token, not admin token
+    // Determine role from current window location
+    const currentRole = getRoleFromPath(window.location.pathname);
+    const storageKeys = getStorageKeys(currentRole);
+    const token = localStorage.getItem(storageKeys.token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

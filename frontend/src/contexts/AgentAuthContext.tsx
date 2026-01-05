@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { getStorageKeys } from '../utils/jwt.utils';
 
 interface Agent {
   _id: string;
@@ -33,8 +34,21 @@ export const AgentAuthProvider = ({ children }: { children: React.ReactNode }) =
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const token = localStorage.getItem('agentToken');
-        const storedAgent = localStorage.getItem('agentUser');
+        const storageKeys = getStorageKeys('agent');
+        let token = localStorage.getItem(storageKeys.token);
+        let storedAgent = localStorage.getItem(storageKeys.userData);
+
+        // Backward compatibility: migrate from old agentToken/agentUser keys
+        if (!token) {
+          const oldToken = localStorage.getItem('agentToken');
+          const oldAgent = localStorage.getItem('agentUser');
+          if (oldToken && oldAgent) {
+            localStorage.setItem(storageKeys.token, oldToken);
+            localStorage.setItem(storageKeys.userData, oldAgent);
+            token = oldToken;
+            storedAgent = oldAgent;
+          }
+        }
 
         if (token && storedAgent) {
           // Parse stored agent data
@@ -45,8 +59,9 @@ export const AgentAuthProvider = ({ children }: { children: React.ReactNode }) =
       } catch (error) {
         console.error('Authentication check failed:', error);
         // Clear potentially corrupted auth data
-        localStorage.removeItem('agentToken');
-        localStorage.removeItem('agentUser');
+        const storageKeys = getStorageKeys('agent');
+        localStorage.removeItem(storageKeys.token);
+        localStorage.removeItem(storageKeys.userData);
       } finally {
         setLoading(false);
       }
@@ -75,9 +90,10 @@ export const AgentAuthProvider = ({ children }: { children: React.ReactNode }) =
         profileImage,
       };
 
-      // Store in localStorage
-      localStorage.setItem('agentToken', token);
-      localStorage.setItem('agentUser', JSON.stringify(agentData));
+      // Store in localStorage with agent-specific keys
+      const storageKeys = getStorageKeys('agent');
+      localStorage.setItem(storageKeys.token, token);
+      localStorage.setItem(storageKeys.userData, JSON.stringify(agentData));
 
       // Update state
       setAgent(agentData);
@@ -95,9 +111,10 @@ export const AgentAuthProvider = ({ children }: { children: React.ReactNode }) =
   };
 
   const logout = () => {
-    // Clear auth data from localStorage
-    localStorage.removeItem('agentToken');
-    localStorage.removeItem('agentUser');
+    // Clear agent-specific auth data from localStorage
+    const storageKeys = getStorageKeys('agent');
+    localStorage.removeItem(storageKeys.token);
+    localStorage.removeItem(storageKeys.userData);
 
     // Reset state
     setAgent(null);
@@ -107,7 +124,8 @@ export const AgentAuthProvider = ({ children }: { children: React.ReactNode }) =
   };
 
   const getAuthHeader = () => {
-    const token = localStorage.getItem('agentToken');
+    const storageKeys = getStorageKeys('agent');
+    const token = localStorage.getItem(storageKeys.token);
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 

@@ -59,13 +59,13 @@ class CloudinaryService {
    * Get the appropriate auth token based on current user context
    */
   getAuthToken(): string | null {
-    // Check for tokens in order of priority
-    return (
-      localStorage.getItem('token') ||
-      localStorage.getItem('token') ||
-      localStorage.getItem('authToken') ||
-      localStorage.getItem('vendorToken')
-    );
+    // Import at runtime to avoid circular dependencies
+    const { getRoleFromPath, getStorageKeys } = require('../utils/jwt.utils');
+
+    // Determine role from current window location
+    const currentRole = getRoleFromPath(window.location.pathname);
+    const storageKeys = getStorageKeys(currentRole);
+    return localStorage.getItem(storageKeys.token);
   }
 
   /**

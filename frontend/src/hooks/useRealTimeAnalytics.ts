@@ -43,7 +43,7 @@ const useRealTimeAnalytics = (timeRange = '7d', options = {}) => {
 
         const response = await fetch(`/api/realtime/analytics?timeRange=${range}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
             'Content-Type': 'application/json',
           },
         });

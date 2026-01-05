@@ -17,7 +17,7 @@ const ProtectedRoute = () => {
   }
 
   // Check if there's a token but user is not admin (customer/partner logged in)
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('customerToken') || localStorage.getItem('partnerToken');
   const userData = localStorage.getItem('userData');
 
   if (token && userData) {

@@ -151,7 +151,7 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
 
         const response = await fetch(`/api/realtime/orders?${queryParams}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
             'Content-Type': 'application/json',
           },
         });

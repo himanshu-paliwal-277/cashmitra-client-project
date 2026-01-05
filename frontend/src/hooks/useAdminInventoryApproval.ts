@@ -17,7 +17,7 @@ const useAdminInventoryApproval = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       const response = await fetch('/api/admin/inventory', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -61,7 +61,7 @@ const useAdminInventoryApproval = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await fetch(`/api/admin/inventory/${itemId}/status`, {
           method: 'PUT',
           headers: {
@@ -119,7 +119,7 @@ const useAdminInventoryApproval = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await fetch(`/api/admin/inventory/${itemId}`, {
           method: 'DELETE',
           headers: {

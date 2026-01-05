@@ -14,7 +14,7 @@ const PartnerLayout = () => {
 
   // Check if non-partner user is accessing partner pages and redirect
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('customerToken') || localStorage.getItem('adminToken');
     const userData = localStorage.getItem('userData');
 
     if (token && userData) {

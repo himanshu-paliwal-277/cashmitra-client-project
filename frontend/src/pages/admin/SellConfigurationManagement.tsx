@@ -58,7 +58,7 @@ const SellConfigurationManagement = () => {
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       const response = await api.get(`/sell-config/${selectedProduct}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -77,7 +77,7 @@ const SellConfigurationManagement = () => {
       setSaving(true);
       setSaveStatus('saving');
       setError(null);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
 
       // Send only the necessary fields, not the populated productId
       const payload = {
@@ -105,7 +105,7 @@ const SellConfigurationManagement = () => {
     if (confirm('Reset configuration to default values?')) {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await api.post(
           `/sell-config/${selectedProduct}/reset`,
           {},
@@ -128,7 +128,7 @@ const SellConfigurationManagement = () => {
     if (!config?.rules) return;
     try {
       setTestLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       const response = await api.post(
         `/sell-config/${selectedProduct}/test-pricing`,
         {
