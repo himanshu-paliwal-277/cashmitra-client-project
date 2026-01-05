@@ -41,7 +41,7 @@ const QuestionModal = ({
     variantIds: [],
     section: '',
     order: 1,
-    key: '',
+    // key: '',
     title: '',
     description: '',
     uiType: 'radio',
@@ -79,7 +79,7 @@ const QuestionModal = ({
         variantIds: question.variantIds || [],
         section: question.section || '',
         order: question.order || 1,
-        key: question.key || '',
+        // key: question.key || '',
         title: question.title || '',
         description: question.description || '',
         uiType: question.uiType || 'radio',
@@ -109,7 +109,7 @@ const QuestionModal = ({
         variantIds: [],
         section: '',
         order: 1,
-        key: '',
+        // key: '',
         title: '',
         description: '',
         uiType: 'radio',
@@ -246,10 +246,10 @@ const QuestionModal = ({
       setError('Question title is required');
       return;
     }
-    if (!formData.key.trim()) {
-      setError('Question key is required');
-      return;
-    }
+    // if (!formData.key.trim()) {
+    //   setError('Question key is required');
+    //   return;
+    // }
     if (!formData.section.trim()) {
       setError('Section is required');
       return;
@@ -388,44 +388,6 @@ const QuestionModal = ({
 
               {expandedSections.basic && (
                 <div className="p-6 space-y-6 bg-white">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Question Key *
-                        <span className="ml-1 text-xs text-gray-500">(Unique identifier)</span>
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                        value={formData.key}
-                        onChange={(e: any) => handleInputChange('key', e.target.value)}
-                        placeholder="e.g., screen_condition"
-                        required
-                        disabled={isViewMode}
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Use lowercase with underscores (e.g., screen_condition)
-                      </p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Display Order
-                        <span className="ml-1 text-xs text-gray-500">(Question sequence)</span>
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                        value={formData.order}
-                        onChange={(e: any) =>
-                          handleInputChange('order', parseInt(e.target.value) || 1)
-                        }
-                        min="1"
-                        disabled={isViewMode}
-                      />
-                    </div>
-                  </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Question Title *
@@ -455,6 +417,44 @@ const QuestionModal = ({
                       placeholder="Please select the current condition of your device screen"
                       disabled={isViewMode}
                     />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Question Key *
+                        <span className="ml-1 text-xs text-gray-500">(Unique identifier)</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                        value={formData.key}
+                        onChange={(e: any) => handleInputChange('key', e.target.value)}
+                        placeholder="e.g., screen_condition"
+                        required
+                        disabled={isViewMode}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Use lowercase with underscores (e.g., screen_condition)
+                      </p>
+                    </div> */}
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Display Order
+                        <span className="ml-1 text-xs text-gray-500">(Question sequence)</span>
+                      </label>
+                      <input
+                        type="number"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                        value={formData.order}
+                        onChange={(e: any) =>
+                          handleInputChange('order', parseInt(e.target.value) || 1)
+                        }
+                        min="1"
+                        disabled={isViewMode}
+                      />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1027,9 +1027,9 @@ const QuestionModal = ({
 
           {/* Enhanced Footer with Better Visibility */}
           <div className="flex-shrink-0 border-t border-gray-200 bg-white">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6">
+            <div className="flex flex-col sm:flex-row justify-end items-start sm:items-center gap-4 p-6">
               {/* Progress/Status Info */}
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              {/* <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Info size={16} className="text-blue-500" />
                 <span>
                   {isViewMode
@@ -1038,7 +1038,7 @@ const QuestionModal = ({
                       ? 'Editing existing question'
                       : 'Creating new question'}
                 </span>
-              </div>
+              </div> */}
 
               {/* Action Buttons */}
               <div className="flex gap-3 w-full sm:w-auto">
@@ -1082,7 +1082,7 @@ const QuestionModal = ({
             </div>
 
             {/* Additional Help Text for Non-View Mode */}
-            {!isViewMode && (
+            {/* {!isViewMode && (
               <div className="px-6 pb-4">
                 <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
                   <AlertCircle size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
@@ -1097,7 +1097,7 @@ const QuestionModal = ({
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </form>
       </div>
