@@ -64,6 +64,7 @@ const SavedAddresses = lazy(() => import('./pages/customer/account/SavedAddresse
 const PartnerLogin = lazy(() => import('./pages/partner/Login'));
 const PartnerKYC = lazy(() => import('./pages/partner/KYC'));
 const PartnerWalletRecharge = lazy(() => import('./pages/partner/WalletRecharge'));
+const PartnerCommissionPayment = lazy(() => import('./pages/partner/CommissionPayment'));
 const PartnerAgentManagement = lazy(() => import('./pages/partner/AgentManagement'));
 const PartnerProtectedRoute = lazy(() => import('./components/partner/PartnerProtectedRoute'));
 const PartnerLayout = lazy(() => import('./components/partner/layout/PartnerLayout'));
@@ -94,7 +95,8 @@ const SellOrders = lazy(() => import('./pages/admin/SellOrders'));
 const BuyOrders = lazy(() => import('./pages/admin/BuyOrders'));
 const Pricing = lazy(() => import('./pages/admin/Pricing'));
 const Finance = lazy(() => import('./pages/admin/Finance'));
-const RechargeRequests = lazy(() => import('./pages/admin/RechargeRequests'));
+const CommissionSettings = lazy(() => import('./pages/admin/CommissionSettings'));
+const WalletRequests = lazy(() => import('./pages/admin/WalletRequests'));
 const PayoutManagement = lazy(() => import('./pages/admin/PayoutManagement'));
 const PartnerWalletManagement = lazy(() => import('./pages/admin/PartnerWalletManagement'));
 const AdminAgentManagement = lazy(() => import('./pages/admin/AgentManagement'));
@@ -202,7 +204,8 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           {/* <Route path="condition-adjustments" element={<Pricing />} /> */}
           {/* <Route path="promotions" element={<Pricing />} /> */}
           <Route path="finance" element={<Finance />} />
-          <Route path="recharge-requests" element={<RechargeRequests />} />
+          <Route path="commission-settings" element={<CommissionSettings />} />
+          <Route path="wallet-requests" element={<WalletRequests />} />
           <Route path="commission-rules" element={<Finance />} />
           <Route path="partner-wallets" element={<PartnerWalletManagement />} />
           {/* <Route path="wallet-payouts" element={<PayoutManagement />} /> */}
@@ -222,6 +225,7 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           {/* <Route path="payouts" element={<PartnerPayouts />} /> */}
           <Route path="kyc" element={<PartnerKYC />} />
           <Route path="wallet-recharge" element={<PartnerWalletRecharge />} />
+          <Route path="commission-payment" element={<PartnerCommissionPayment />} />
           <Route path="agents" element={<PartnerAgentManagement />} />
         </Route>
       </Route>

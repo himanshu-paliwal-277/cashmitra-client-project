@@ -123,6 +123,54 @@ const sellOrderSchema = new mongoose.Schema(
       type: Number,
       min: [0, 'Actual amount cannot be negative'],
     },
+    commission: {
+      totalRate: {
+        type: Number,
+        required: true,
+        min: 0,
+        max: 100,
+        comment: 'Commission rate for this sell order',
+      },
+      totalAmount: {
+        type: Number,
+        required: true,
+        min: 0,
+        comment: 'Total commission amount for this sell order',
+      },
+      breakdown: [
+        {
+          category: {
+            type: String,
+            enum: ['mobile', 'tablet', 'laptop', 'accessories'],
+            required: true,
+          },
+          rate: {
+            type: Number,
+            required: true,
+            min: 0,
+            max: 100,
+          },
+          amount: {
+            type: Number,
+            required: true,
+            min: 0,
+          },
+          itemCount: {
+            type: Number,
+            required: true,
+            min: 1,
+            default: 1,
+          },
+        },
+      ],
+      isApplied: {
+        type: Boolean,
+        default: false,
+      },
+      appliedAt: {
+        type: Date,
+      },
+    },
     notes: {
       type: String,
       trim: true,
@@ -199,12 +247,141 @@ sellOrderSchema.pre('save', async function (next) {
   next();
 });
 
-sellOrderSchema.methods.confirm = function () {
+sellOrderSchema.methods.confirm = async function () {
+  // Apply commission when order is confirmed
+  if (
+    this.assigned_partner_id &&
+    (!this.commission || !this.commission.isApplied)
+  ) {
+    try {
+      const {
+        applyCommissionForItems,
+        applyCommissionToPartner,
+        getCategoryFromProduct,
+      } = await import('../utils/commission.utils.js');
+
+      // For sell orders, use the pre-calculated commission from order creation
+      if (this.commission && this.commission.totalAmount) {
+        console.log(
+          `🔄 Applying commission for confirmed sell order ${this._id}:`,
+          {
+            partnerId: this.assigned_partner_id.toString(),
+            orderValue: this.quoteAmount,
+            commissionAmount: this.commission.totalAmount,
+          }
+        );
+
+        // Apply commission using the pre-calculated data
+        await applyCommissionForItems(
+          this.assigned_partner_id,
+          {
+            totalAmount: this.commission.totalAmount,
+            totalRate: this.commission.totalRate,
+            breakdown: this.commission.breakdown,
+          },
+          this._id,
+          'SellOrder'
+        );
+
+        // Mark commission as applied
+        this.commission.isApplied = true;
+        this.commission.appliedAt = new Date();
+      } else {
+        // Fallback: calculate commission if not pre-calculated
+        const product = this.sessionId?.productId;
+        const category = getCategoryFromProduct(product);
+        const orderValue = this.quoteAmount;
+
+        console.log(
+          `🔄 Calculating and applying commission for confirmed sell order ${this._id}:`,
+          {
+            partnerId: this.assigned_partner_id.toString(),
+            orderValue,
+            category,
+          }
+        );
+
+        const commissionResult = await applyCommissionToPartner(
+          this.assigned_partner_id,
+          orderValue,
+          category,
+          'sell',
+          this._id,
+          'SellOrder'
+        );
+
+        // Update order with commission details
+        this.commission = {
+          totalRate: commissionResult.commission.rate,
+          totalAmount: commissionResult.commission.amount,
+          breakdown: [
+            {
+              category: commissionResult.commission.category,
+              rate: commissionResult.commission.rate,
+              amount: commissionResult.commission.amount,
+              itemCount: 1,
+            },
+          ],
+          isApplied: true,
+          appliedAt: new Date(),
+        };
+      }
+
+      console.log(
+        `✅ Commission applied successfully for confirmed sell order ${this._id}`
+      );
+    } catch (commissionError) {
+      console.error(
+        'Commission application error during sell order confirmation:',
+        commissionError
+      );
+      // Don't fail the confirmation, but log the error
+    }
+  }
+
   this.status = 'confirmed';
   return this.save();
 };
 
-sellOrderSchema.methods.cancel = function (reason) {
+sellOrderSchema.methods.cancel = async function (reason) {
+  // Rollback commission if it was applied
+  if (
+    this.commission &&
+    this.commission.isApplied &&
+    this.assigned_partner_id
+  ) {
+    try {
+      const { rollbackCommissionForItems } =
+        await import('../utils/commission.utils.js');
+
+      console.log(
+        `🔄 Rolling back commission for cancelled sell order ${this._id}`
+      );
+
+      await rollbackCommissionForItems(
+        this.assigned_partner_id,
+        this.commission.totalAmount,
+        this._id,
+        'SellOrder',
+        reason || 'Sell order cancelled by user'
+      );
+
+      // Mark commission as not applied
+      this.commission.isApplied = false;
+      this.commission.appliedAt = undefined;
+
+      console.log(
+        `✅ Commission rolled back for cancelled sell order ${this._id}`
+      );
+    } catch (rollbackError) {
+      console.error(
+        'Commission rollback error during sell order cancellation:',
+        rollbackError
+      );
+      // Don't fail the cancellation, but log the error
+    }
+  }
+
   this.status = 'cancelled';
   this.cancelledAt = new Date();
   this.cancellationReason = reason;

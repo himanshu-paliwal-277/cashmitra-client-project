@@ -62,6 +62,17 @@ interface AvailableOrder {
     };
   };
   quoteAmount: number;
+  commission?: {
+    totalRate: number;
+    totalAmount: number;
+    breakdown: Array<{
+      category: string;
+      rate: number;
+      amount: number;
+      itemCount: number;
+    }>;
+    isApplied: boolean;
+  };
   createdAt: string;
   distanceFromPartner: number;
   distanceFormatted: string;
@@ -375,6 +386,12 @@ const AvailableOrders: React.FC = () => {
                         Base: ₹{order.sessionId.finalPrice.toLocaleString()}
                       </div>
                     )}
+                  {/* Commission Information */}
+                  {order.commission && (
+                    <div className="text-xs text-blue-600 mt-1 font-medium">
+                      Commission: ₹{order.commission.totalAmount} ({order.commission.totalRate}%)
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -533,6 +550,51 @@ const AvailableOrders: React.FC = () => {
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Commission Information */}
+              {order.commission && (
+                <div className="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                  <h4 className="font-medium text-green-900 mb-3 flex items-center gap-2">
+                    <DollarSign size={16} />
+                    Commission Information
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-green-700">Commission Rate:</span>
+                      <span className="font-medium ml-2 text-green-800">
+                        {order.commission.totalRate}%
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-green-700">Commission Amount:</span>
+                      <span className="font-medium ml-2 text-green-800">
+                        ₹{order.commission.totalAmount}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-green-700">Category:</span>
+                      <span className="font-medium ml-2 text-green-800 capitalize">
+                        {order.commission.breakdown[0]?.category || 'N/A'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-green-700">Status:</span>
+                      <span
+                        className={`font-medium ml-2 ${order.commission.isApplied ? 'text-green-800' : 'text-orange-600'}`}
+                      >
+                        {order.commission.isApplied ? 'Applied' : 'Pending'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-3 p-3 bg-green-100 rounded-lg">
+                    <p className="text-sm text-green-800">
+                      <strong>Note:</strong> Commission will be added to your balance when you claim
+                      and complete this order. If you reject or cancel the order, the commission
+                      will be rolled back.
+                    </p>
+                  </div>
                 </div>
               )}
 

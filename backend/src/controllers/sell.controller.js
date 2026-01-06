@@ -6,6 +6,7 @@ import { SellProduct } from '../models/sellProduct.model.js';
 import { SellSuperCategory } from '../models/sellSuperCategory.model.js';
 import { Transaction } from '../models/transaction.model.js';
 import { Wallet } from '../models/wallet.model.js';
+import { calculateCommissionForItems } from '../utils/commission.utils.js';
 
 export const getProductCategories = async (req, res) => {
   try {
@@ -355,8 +356,48 @@ export const createSellOrder = async (req, res) => {
         .json({ message: 'No partner shop available in your area' });
     }
 
-    const commissionRate = 10;
-    const commissionAmount = (price * commissionRate) / 100;
+    // Calculate commission using the dynamic commission system
+    let commissionData;
+    try {
+      // Determine category from the actual product being sold
+      const productCategory = product.category || 'mobile'; // Fallback to mobile if category is missing
+
+      const itemsWithProducts = [
+        {
+          product: {
+            name: product.model || 'Sell Product',
+            brand: product.brand || 'Unknown',
+            category: productCategory,
+          },
+          price: price,
+          quantity: 1,
+        },
+      ];
+
+      commissionData = await calculateCommissionForItems(
+        itemsWithProducts,
+        'sell',
+        partnerShop._id
+      );
+    } catch (error) {
+      console.error('Commission calculation error:', error);
+      // Fallback to default commission structure
+      const fallbackRate = 3; // 3% for sell orders
+      const fallbackAmount = (price * fallbackRate) / 100;
+      commissionData = {
+        totalRate: fallbackRate,
+        totalAmount: Math.round(fallbackAmount), // Round to whole number
+        breakdown: [
+          {
+            category: product.category || 'mobile',
+            rate: fallbackRate,
+            amount: Math.round(fallbackAmount), // Round to whole number
+            itemCount: 1,
+          },
+        ],
+        isApplied: false,
+      };
+    }
 
     const order = new Order({
       orderType: 'sell',
@@ -371,10 +412,7 @@ export const createSellOrder = async (req, res) => {
         },
       ],
       totalAmount: price,
-      commission: {
-        rate: commissionRate,
-        amount: commissionAmount,
-      },
+      commission: commissionData,
       paymentDetails: {
         method: paymentMethod,
         status: 'pending',
@@ -406,8 +444,8 @@ export const createSellOrder = async (req, res) => {
       status: 'pending',
       metadata: {
         commission: {
-          rate: commissionRate,
-          amount: commissionAmount,
+          rate: commissionData.totalRate,
+          amount: commissionData.totalAmount,
         },
         productDetails: {
           category: product.category,
@@ -740,6 +778,49 @@ export const submitAssessment = async (req, res) => {
 
     const finalPrice = Math.round(basePrice * conditionMultiplier);
 
+    // Calculate commission using the dynamic commission system
+    let commissionData;
+    try {
+      // Use the category from the assessment request
+      const productCategory = category || 'mobile'; // Fallback to mobile if category is missing
+
+      const itemsWithProducts = [
+        {
+          product: {
+            name: model || 'Assessment Product',
+            brand: brand || 'Unknown',
+            category: productCategory,
+          },
+          price: finalPrice,
+          quantity: 1,
+        },
+      ];
+
+      commissionData = await calculateCommissionForItems(
+        itemsWithProducts,
+        'sell',
+        null // No partner assigned yet
+      );
+    } catch (error) {
+      console.error('Commission calculation error:', error);
+      // Fallback to default commission structure
+      const fallbackRate = 3; // 3% for sell orders
+      const fallbackAmount = (finalPrice * fallbackRate) / 100;
+      commissionData = {
+        totalRate: fallbackRate,
+        totalAmount: Math.round(fallbackAmount), // Round to whole number
+        breakdown: [
+          {
+            category: category || 'mobile',
+            rate: fallbackRate,
+            amount: Math.round(fallbackAmount), // Round to whole number
+            itemCount: 1,
+          },
+        ],
+        isApplied: false,
+      };
+    }
+
     const order = new Order({
       assessmentId,
       orderType: 'sell',
@@ -759,10 +840,7 @@ export const submitAssessment = async (req, res) => {
         },
       ],
       totalAmount: finalPrice,
-      commission: {
-        rate: 0.05,
-        amount: Math.round(finalPrice * 0.05),
-      },
+      commission: commissionData,
       paymentDetails: {
         method: 'UPI',
         status: 'pending',

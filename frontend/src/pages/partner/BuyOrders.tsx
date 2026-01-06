@@ -54,8 +54,25 @@ interface BuyOrder {
     unitPrice?: number;
     totalPrice?: number;
     status?: string;
+    commission?: {
+      rate: number;
+      amount: number;
+      category: string;
+    };
   }>;
   totalAmount: number;
+  commission?: {
+    totalRate: number;
+    totalAmount: number;
+    breakdown: Array<{
+      category: string;
+      rate: number;
+      amount: number;
+      itemCount: number;
+    }>;
+    isApplied: boolean;
+    appliedAt?: string;
+  };
   status: string;
   shippingAddress: any;
   paymentMethod?: string;
@@ -419,6 +436,9 @@ const BuyOrders = () => {
                   Amount
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Commission
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -476,11 +496,28 @@ const BuyOrders = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      ₹{order.totalAmount.toLocaleString()}
+                      ₹{(order.totalAmount || 0).toLocaleString()}
                     </div>
                     <div className="text-sm text-gray-500">
                       {order.paymentMethod || order.paymentDetails?.method || 'N/A'}
                     </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {order.commission && order.commission.totalAmount !== undefined ? (
+                      <div>
+                        <div className="text-sm font-medium text-red-600">
+                          ₹{order.commission.totalAmount.toLocaleString()}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {order.commission.totalRate
+                            ? order.commission.totalRate.toFixed(2)
+                            : '0.00'}
+                          % • {order.commission.isApplied ? 'Applied' : 'Pending'}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-400">No commission</div>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
@@ -715,7 +752,9 @@ const BuyOrderDetailsModal: React.FC<BuyOrderDetailsModalProps> = ({
                   <Calendar className="w-5 h-5 text-gray-400" />
                   <div>
                     <p className="text-sm text-gray-500">Order Date</p>
-                    <p className="font-medium">{new Date(order.createdAt).toLocaleString()}</p>
+                    <p className="font-medium">
+                      {order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A'}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -815,6 +854,12 @@ const BuyOrderDetailsModal: React.FC<BuyOrderDetailsModalProps> = ({
                     <h4 className="font-medium text-gray-900">{item.product.name}</h4>
                     <p className="text-sm text-gray-500">{item.product.brand}</p>
                     <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
+                    {item.commission && (
+                      <p className="text-sm text-red-600">
+                        Commission: ₹{item.commission.amount} ({item.commission.rate}% -{' '}
+                        {item.commission.category})
+                      </p>
+                    )}
                   </div>
                   <div className="text-right">
                     <p className="font-medium text-gray-900">
@@ -832,14 +877,81 @@ const BuyOrderDetailsModal: React.FC<BuyOrderDetailsModalProps> = ({
               ))}
             </div>
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center mb-2">
                 <span className="text-lg font-semibold">Total Amount:</span>
                 <span className="text-xl font-bold text-blue-600">
-                  ₹{order.totalAmount.toLocaleString()}
+                  ₹{(order.totalAmount || 0).toLocaleString()}
                 </span>
               </div>
+              {order.commission && order.commission.totalAmount !== undefined && (
+                <div className="flex justify-between items-center text-red-600 border-t pt-2">
+                  <span className="font-medium">
+                    Commission (
+                    {order.commission.totalRate ? order.commission.totalRate.toFixed(2) : '0.00'}%):
+                  </span>
+                  <span className="font-bold">
+                    ₹{order.commission.totalAmount.toLocaleString()}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
+
+          {/* Commission Breakdown */}
+          {order.commission &&
+            order.commission.breakdown &&
+            order.commission.breakdown.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold mb-4">Commission Breakdown</h3>
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="space-y-3">
+                    {(order.commission.breakdown || []).map((breakdown, index) => (
+                      <div key={index} className="flex justify-between items-center">
+                        <div>
+                          <span className="font-medium capitalize">
+                            {breakdown.category || 'Unknown'}
+                          </span>
+                          <span className="text-sm text-gray-600 ml-2">
+                            ({breakdown.itemCount || 0} item
+                            {(breakdown.itemCount || 0) > 1 ? 's' : ''})
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium text-red-600">
+                            ₹{(breakdown.amount || 0).toLocaleString()}
+                          </div>
+                          <div className="text-sm text-gray-500">{breakdown.rate || 0}%</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-red-200">
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold">Total Commission:</span>
+                      <span className="font-bold text-red-600">
+                        ₹{(order.commission.totalAmount || 0).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center mt-1">
+                      <span className="text-sm text-gray-600">Status:</span>
+                      <span
+                        className={`text-sm font-medium ${order.commission.isApplied ? 'text-green-600' : 'text-yellow-600'}`}
+                      >
+                        {order.commission.isApplied ? 'Applied to Balance' : 'Pending Application'}
+                      </span>
+                    </div>
+                    {order.commission.appliedAt && (
+                      <div className="flex justify-between items-center mt-1">
+                        <span className="text-sm text-gray-600">Applied At:</span>
+                        <span className="text-sm text-gray-600">
+                          {new Date(order.commission.appliedAt).toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
           {/* Status History */}
           {order.statusHistory && order.statusHistory.length > 0 && (
@@ -857,7 +969,7 @@ const BuyOrderDetailsModal: React.FC<BuyOrderDetailsModalProps> = ({
                       <p className="text-sm text-gray-500">{status.note}</p>
                     </div>
                     <p className="text-sm text-gray-500">
-                      {new Date(status.timestamp).toLocaleString()}
+                      {status.timestamp ? new Date(status.timestamp).toLocaleString() : 'N/A'}
                     </p>
                   </div>
                 ))}
@@ -922,6 +1034,38 @@ const BuyOrderDetailsModal: React.FC<BuyOrderDetailsModalProps> = ({
           {canAcceptReject && (
             <div className="space-y-4">
               <h4 className="font-semibold">Order Assignment Response</h4>
+
+              {/* Commission Warning */}
+              {order.commission && (
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
+                    <div>
+                      <h5 className="font-medium text-yellow-800">Commission Notice</h5>
+                      <p className="text-sm text-yellow-700 mt-1">
+                        By accepting this order, a commission of{' '}
+                        <strong>
+                          ₹{(order.commission.totalAmount || 0).toLocaleString()} (
+                          {order.commission.totalRate
+                            ? order.commission.totalRate.toFixed(2)
+                            : '0.00'}
+                          %)
+                        </strong>{' '}
+                        will be added to your commission balance.
+                      </p>
+                      {order.commission.breakdown && order.commission.breakdown.length > 1 && (
+                        <div className="mt-2 text-sm text-yellow-700">
+                          <strong>Breakdown:</strong>{' '}
+                          {order.commission.breakdown
+                            .map(b => `${b.category}: ₹${b.amount} (${b.rate}%)`)
+                            .join(', ')}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="flex gap-4">
                 <button
                   onClick={() => onAction(order._id, 'accepted')}

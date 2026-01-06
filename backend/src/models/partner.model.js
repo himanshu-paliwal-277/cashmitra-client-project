@@ -105,6 +105,16 @@ const partnerSchema = new mongoose.Schema(
         type: Number,
         default: 0,
       },
+      commissionBalance: {
+        type: Number,
+        default: 0,
+        comment: 'Amount partner owes to admin as commission',
+      },
+      totalCommissionPaid: {
+        type: Number,
+        default: 0,
+        comment: 'Total commission amount paid to admin',
+      },
       transactions: [
         {
           type: {
@@ -131,6 +141,11 @@ const partnerSchema = new mongoose.Schema(
           referenceModel: {
             type: String,
             enum: ['WalletRechargeRequest', 'Order', 'SellOrder'],
+          },
+          transactionCategory: {
+            type: String,
+            enum: ['wallet', 'commission'],
+            default: 'wallet',
           },
         },
       ],

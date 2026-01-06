@@ -3,6 +3,7 @@ import { Cart } from '../models/cart.model.js';
 import { Order } from '../models/order.model.js';
 import { Partner } from '../models/partner.model.js';
 import { Product } from '../models/product.model.js';
+import { calculateCommissionForItems } from '../utils/commission.utils.js';
 
 export const searchProducts = async (req, res) => {
   try {
@@ -483,18 +484,54 @@ export const checkout = async (req, res) => {
         0
       );
 
-      const commissionRate = 5;
-      const commissionAmount = (totalAmount * commissionRate) / 100;
+      // Populate items with product data for commission calculation
+      const itemsWithProducts = [];
+      for (const item of partnerData.items) {
+        const product = await BuyProduct.findById(item.product);
+        itemsWithProducts.push({
+          ...item,
+          product: product, // Full product data for category detection
+        });
+      }
+
+      // Calculate commission for all items in this order
+      let commissionData;
+      try {
+        commissionData = await calculateCommissionForItems(
+          itemsWithProducts,
+          'buy',
+          partnerId
+        );
+      } catch (error) {
+        console.error('Commission calculation error:', error);
+        // Fallback to default rates
+        const fallbackAmount = Math.round((totalAmount * 5) / 100);
+        commissionData = {
+          totalRate: 5,
+          totalAmount: fallbackAmount,
+          breakdown: [
+            {
+              category: 'accessories',
+              rate: 5,
+              amount: fallbackAmount,
+              itemCount: partnerData.items.length,
+            },
+          ],
+          items: itemsWithProducts,
+        };
+      }
 
       const order = new Order({
         orderType: 'buy',
         user: req.user._id,
         partner: partnerId,
-        items: partnerData.items,
+        items: commissionData.items, // Items now include commission data
         totalAmount,
         commission: {
-          rate: commissionRate,
-          amount: commissionAmount,
+          totalRate: commissionData.totalRate,
+          totalAmount: commissionData.totalAmount,
+          breakdown: commissionData.breakdown,
+          isApplied: false, // Will be applied when partner accepts
         },
         paymentDetails: {
           method: paymentMethod,

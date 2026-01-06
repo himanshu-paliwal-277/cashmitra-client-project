@@ -2,6 +2,12 @@ import mongoose from 'mongoose';
 
 const bankConfigSchema = new mongoose.Schema(
   {
+    configType: {
+      type: String,
+      enum: ['recharge', 'commission'],
+      required: true,
+      default: 'recharge',
+    },
     bankName: {
       type: String,
       required: [true, 'Bank name is required'],
@@ -36,10 +42,14 @@ const bankConfigSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Ensure only one active bank config at a time
+// Ensure only one active bank config per type at a time
 bankConfigSchema.index(
-  { isActive: 1 },
-  { unique: true, partialFilterExpression: { isActive: true } }
+  { configType: 1, isActive: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { isActive: true },
+    name: 'unique_active_config_per_type',
+  }
 );
 
 export const BankConfig = mongoose.model('BankConfig', bankConfigSchema);

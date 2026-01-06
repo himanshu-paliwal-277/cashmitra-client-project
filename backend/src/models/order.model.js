@@ -48,6 +48,21 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           default: 1,
         },
+        commission: {
+          rate: {
+            type: Number,
+            min: 0,
+            max: 100,
+          },
+          amount: {
+            type: Number,
+            min: 0,
+          },
+          category: {
+            type: String,
+            enum: ['mobile', 'tablet', 'laptop', 'accessories'],
+          },
+        },
       },
     ],
     totalAmount: {
@@ -55,13 +70,50 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
     commission: {
-      rate: {
+      totalRate: {
         type: Number,
         required: true,
+        min: 0,
+        max: 100,
+        comment: 'Weighted average commission rate across all items',
       },
-      amount: {
+      totalAmount: {
         type: Number,
         required: true,
+        min: 0,
+        comment: 'Total commission amount for all items',
+      },
+      breakdown: [
+        {
+          category: {
+            type: String,
+            enum: ['mobile', 'tablet', 'laptop', 'accessories'],
+            required: true,
+          },
+          rate: {
+            type: Number,
+            required: true,
+            min: 0,
+            max: 100,
+          },
+          amount: {
+            type: Number,
+            required: true,
+            min: 0,
+          },
+          itemCount: {
+            type: Number,
+            required: true,
+            min: 1,
+          },
+        },
+      ],
+      isApplied: {
+        type: Boolean,
+        default: false,
+      },
+      appliedAt: {
+        type: Date,
       },
     },
     paymentDetails: {

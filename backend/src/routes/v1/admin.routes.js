@@ -467,4 +467,61 @@ router.put(
   adminController.toggleAgentStatus
 );
 
+router.post(
+  '/partners/:partnerId/commission/add',
+  isAuthenticated,
+  authorize('admin'),
+  adminController.addCommissionBalance
+);
+
+router.post(
+  '/partners/:partnerId/commission/adjust',
+  isAuthenticated,
+  authorize('admin'),
+  adminController.adjustCommissionBalance
+);
+
+router.get(
+  '/partners/:partnerId/commission',
+  isAuthenticated,
+  authorize('admin'),
+  adminController.getPartnerCommissionDetails
+);
+
+// Bank Configuration Management Routes
+router.get(
+  '/bank-configurations',
+  isAuthenticated,
+  authorize('admin'),
+  adminController.getBankConfigurations
+);
+
+router.post(
+  '/bank-configurations/fix-data',
+  isAuthenticated,
+  authorize('admin'),
+  adminController.fixBankConfigurationData
+);
+
+router.post(
+  '/bank-configurations',
+  isAuthenticated,
+  authorize('admin'),
+  adminController.createBankConfiguration
+);
+
+router.put(
+  '/bank-configurations/:configId',
+  isAuthenticated,
+  authorize('admin'),
+  adminController.updateBankConfiguration
+);
+
+router.delete(
+  '/bank-configurations/:configId',
+  isAuthenticated,
+  authorize('admin'),
+  adminController.deleteBankConfiguration
+);
+
 export default router;

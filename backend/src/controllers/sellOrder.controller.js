@@ -1,3 +1,4 @@
+import { calculateCommissionForOrder } from '../controllers/commissionSettings.controller.js';
 import {
   ApiError,
   asyncHandler,
@@ -5,13 +6,15 @@ import {
 import { Partner } from '../models/partner.model.js';
 import { SellOfferSession } from '../models/sellOfferSession.model.js';
 import { SellOrder } from '../models/sellOrder.model.js';
+import { getCategoryFromProduct } from '../utils/commission.utils.js';
 import geocodingService from '../utils/geocoding.utils.js';
 
 export var createOrder = asyncHandler(async (req, res) => {
   const { sessionId, pickup, payment, orderNumber } = req.body;
   const userId = req.user.id;
 
-  const session = await SellOfferSession.findById(sessionId);
+  const session =
+    await SellOfferSession.findById(sessionId).populate('productId');
   if (!session) {
     throw new ApiError(404, 'Session not found');
   }
@@ -69,6 +72,27 @@ export var createOrder = asyncHandler(async (req, res) => {
     }
   }
 
+  // Calculate commission for sell order (will be applied when partner accepts)
+  const category = getCategoryFromProduct(session.productId);
+  let commissionData;
+  try {
+    // Use a default partner ID for initial calculation (will be recalculated when assigned)
+    commissionData = await calculateCommissionForOrder(
+      session.finalPrice,
+      category,
+      'sell',
+      null // No partner assigned yet
+    );
+  } catch (error) {
+    console.error('Commission calculation error:', error);
+    // Fallback to default rates
+    commissionData = {
+      rate: 3,
+      amount: (session.finalPrice * 3) / 100,
+      category,
+    };
+  }
+
   const order = new SellOrder({
     userId,
     sessionId,
@@ -79,6 +103,19 @@ export var createOrder = asyncHandler(async (req, res) => {
     payment,
     quoteAmount: session.finalPrice,
     orderNumber: finalOrderNumber,
+    commission: {
+      totalRate: commissionData.rate,
+      totalAmount: commissionData.amount,
+      breakdown: [
+        {
+          category: commissionData.category,
+          rate: commissionData.rate,
+          amount: commissionData.amount,
+          itemCount: 1,
+        },
+      ],
+      isApplied: false, // Will be applied when partner accepts
+    },
     status: 'open', // Set status to 'open' for partner broadcast system
   });
 

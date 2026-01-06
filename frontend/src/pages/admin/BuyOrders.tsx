@@ -674,10 +674,10 @@ const BuyOrders = () => {
                   {selectedOrder.commission && (
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-600">
-                        Commission ({selectedOrder.commission.rate * 100}%)
+                        Commission ({selectedOrder.commission.totalRate}%)
                       </span>
                       <span className="text-gray-900">
-                        {formatCurrency(selectedOrder.commission.amount)}
+                        {formatCurrency(selectedOrder.commission.totalAmount)}
                       </span>
                     </div>
                   )}

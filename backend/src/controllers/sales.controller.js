@@ -6,6 +6,7 @@ import { BuyProduct } from '../models/buyProduct.model.js';
 import { Order } from '../models/order.model.js';
 import { Transaction } from '../models/transaction.model.js';
 import { Wallet } from '../models/wallet.model.js';
+import { calculateCommissionForItems } from '../utils/commission.utils.js';
 
 export var createOrder = asyncHandler(async (req, res) => {
   if (
@@ -98,9 +99,95 @@ export var createOrder = asyncHandler(async (req, res) => {
   const finalDeliveryFee = deliveryFee || 0;
   totalAmount += finalDeliveryFee;
 
-  const commissionRate = 0.1;
-  const totalCommission = (totalAmount - finalDeliveryFee) * commissionRate; // Commission only on product amount, not delivery
-  // const partnerAmount = totalAmount - totalCommission;
+  // Calculate commission using the dynamic commission system
+  let commissionData;
+  try {
+    // Prepare items with actual product data for commission calculation
+    const itemsWithProducts = [];
+
+    for (const item of processedItems) {
+      const product = await BuyProduct.findById(item.product).populate({
+        path: 'categoryId',
+        select: 'name superCategory',
+        populate: {
+          path: 'superCategory',
+          select: 'name slug',
+        },
+      });
+
+      if (product) {
+        // Determine category from superCategory (the correct way)
+        let category = 'accessories'; // Default fallback
+
+        if (product.categoryId && product.categoryId.superCategory) {
+          const superCategoryName =
+            product.categoryId.superCategory.name.toLowerCase();
+          const superCategorySlug =
+            product.categoryId.superCategory.slug.toLowerCase();
+
+          if (
+            superCategoryName.includes('mobile') ||
+            superCategorySlug === 'mobile'
+          ) {
+            category = 'mobile';
+          } else if (
+            superCategoryName.includes('tablet') ||
+            superCategorySlug === 'tablet'
+          ) {
+            category = 'tablet';
+          } else if (
+            superCategoryName.includes('laptop') ||
+            superCategorySlug === 'laptops'
+          ) {
+            category = 'laptop';
+          }
+        }
+
+        itemsWithProducts.push({
+          ...item,
+          product: {
+            name: product.name,
+            brand: product.brand,
+            category: category,
+          },
+        });
+      } else {
+        // Fallback if product not found
+        itemsWithProducts.push({
+          ...item,
+          product: {
+            name: 'Product',
+            category: 'accessories',
+          },
+        });
+      }
+    }
+
+    commissionData = await calculateCommissionForItems(
+      itemsWithProducts,
+      'buy',
+      orderPartnerId
+    );
+  } catch (error) {
+    console.error('Commission calculation error:', error);
+    // Fallback to default commission structure
+    const fallbackRate = 5;
+    const fallbackAmount =
+      (totalAmount - finalDeliveryFee) * (fallbackRate / 100);
+    commissionData = {
+      totalRate: fallbackRate,
+      totalAmount: Math.round(fallbackAmount), // Round to whole number
+      breakdown: [
+        {
+          category: 'accessories',
+          rate: fallbackRate,
+          amount: Math.round(fallbackAmount), // Round to whole number
+          itemCount: processedItems.length,
+        },
+      ],
+      isApplied: false,
+    };
+  }
 
   let discountAmount = 0;
 
@@ -115,10 +202,7 @@ export var createOrder = asyncHandler(async (req, res) => {
     items: processedItems,
     totalAmount,
     discountAmount,
-    commission: {
-      rate: commissionRate,
-      amount: totalCommission,
-    },
+    commission: commissionData,
     paymentDetails: {
       method: paymentMethod === 'card' ? 'UPI' : paymentMethod,
       status: 'pending',
@@ -314,6 +398,36 @@ export var cancelOrder = asyncHandler(async (req, res) => {
 
   if (!['pending', 'confirmed'].includes(order.status)) {
     throw new ApiError(400, 'Order cannot be cancelled at this stage');
+  }
+
+  // Rollback commission if it was applied
+  if (order.commission && order.commission.isApplied && order.partner) {
+    try {
+      const { rollbackCommissionFromPartner } =
+        await import('../utils/commission.utils.js');
+
+      await rollbackCommissionFromPartner(
+        order.partner.toString(),
+        order.commission.totalAmount,
+        orderId,
+        'Order',
+        `Order cancelled - ${reason || 'No reason provided'}`
+      );
+
+      // Mark commission as not applied
+      order.commission.isApplied = false;
+      order.commission.rolledBackAt = new Date();
+
+      console.log(
+        `✅ Commission rolled back for cancelled order ${orderId}: ₹${order.commission.totalAmount}`
+      );
+    } catch (error) {
+      console.error(
+        '❌ Commission rollback failed for cancelled order:',
+        error
+      );
+      // Continue with cancellation even if rollback fails
+    }
   }
 
   order.status = 'cancelled';

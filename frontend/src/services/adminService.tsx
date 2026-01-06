@@ -459,32 +459,6 @@ class AdminService {
     }
   }
 
-  // Commission Settings
-  async getCommissionSettings() {
-    try {
-      const response = await api.get('/admin/commission');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching commission settings:', error);
-      // Return mock data if API fails
-      return {
-        sellCommission: 5,
-        buyCommission: 3,
-        deliveryCharges: 50,
-        processingFee: 25,
-      };
-    }
-  }
-
-  async updateCommissionSettings(settings: any) {
-    try {
-      const response = await api.put('/admin/commission', settings);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  }
-
   // User Management
   async getAllUsers(params: any = {}) {
     try {
@@ -1826,6 +1800,184 @@ class AdminService {
       return response.data;
     } catch (error) {
       console.error('Error updating bank config:', error);
+      throw error.response?.data || error;
+    }
+  }
+  async addCommissionBalance(partnerId: string, amount: number, description?: string) {
+    try {
+      const response = await api.post(`/admin/partners/${partnerId}/commission/add`, {
+        partnerId,
+        amount,
+        description,
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  async adjustCommissionBalance(
+    partnerId: string,
+    amount: number,
+    type: 'add' | 'subtract',
+    description?: string
+  ) {
+    try {
+      const response = await api.post(`/admin/partners/${partnerId}/commission/adjust`, {
+        partnerId,
+        amount,
+        type,
+        description,
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  async getPartnerCommissionDetails(partnerId: string) {
+    try {
+      const response = await api.get(`/admin/partners/${partnerId}/commission`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  // Commission Request Management
+  async getAllCommissionRequests(params = {}) {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const response = await api.get(`/commission-requests/admin/all?${queryString}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  async processCommissionRequest(
+    requestId: string,
+    status: 'approved' | 'rejected',
+    adminNotes?: string
+  ) {
+    try {
+      const response = await api.put(`/commission-requests/admin/${requestId}/process`, {
+        status,
+        adminNotes,
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  // Bank Configuration Management
+  async getBankConfigurations(configType?: 'recharge' | 'commission') {
+    try {
+      const params = configType ? `?configType=${configType}` : '';
+      const response = await api.get(`/admin/bank-configurations${params}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  // Commission Settings Management
+  async getCommissionSettings() {
+    try {
+      const response = await api.get('/commission-settings');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  async updateGlobalCommissionRates(data: any) {
+    try {
+      const response = await api.put('/commission-settings/global', data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  async getPartnerCommissionRates(partnerId: string) {
+    try {
+      const response = await api.get(`/commission-settings/partner/${partnerId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  async setPartnerCommissionRates(partnerId: string, rates: any) {
+    try {
+      const response = await api.put(`/commission-settings/partner/${partnerId}`, rates);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  async deletePartnerCommissionRates(partnerId: string) {
+    try {
+      const response = await api.delete(`/commission-settings/partner/${partnerId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  async createBankConfiguration(configData: any) {
+    try {
+      const response = await api.post('/admin/bank-configurations', configData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  async updateBankConfiguration(configId: string, configData: any) {
+    try {
+      const response = await api.put(`/admin/bank-configurations/${configId}`, configData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  async deleteBankConfiguration(configId: string) {
+    try {
+      const response = await api.delete(`/admin/bank-configurations/${configId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  // Wallet Recharge Request Management (for backward compatibility)
+  async getAllWalletRechargeRequests(params = {}) {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const response = await api.get(`/wallet-recharge/admin/requests?${queryString}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  async processWalletRechargeRequest(
+    requestId: string,
+    status: 'approved' | 'rejected',
+    adminNotes?: string
+  ) {
+    try {
+      const response = await api.put(`/wallet-recharge/admin/requests/${requestId}/process`, {
+        status,
+        adminNotes,
+      });
+      return response.data;
+    } catch (error) {
       throw error.response?.data || error;
     }
   }

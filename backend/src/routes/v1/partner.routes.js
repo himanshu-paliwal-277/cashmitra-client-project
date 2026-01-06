@@ -290,6 +290,33 @@ router.put(
   asyncHandler(partnerController.claimSellOrder)
 );
 
+// Accept sell order with commission processing
+router.put(
+  '/sell/:orderId/accept',
+  isAuthenticated,
+  authorize('partner'),
+  validateObjectId('orderId'),
+  [check('notes').optional().isString().withMessage('Notes must be a string')],
+  validateRequest,
+  asyncHandler(partnerController.acceptSellOrder)
+);
+
+// Reject sell order with commission rollback
+router.put(
+  '/sell/:orderId/reject',
+  isAuthenticated,
+  authorize('partner'),
+  validateObjectId('orderId'),
+  [
+    check('reason')
+      .optional()
+      .isString()
+      .withMessage('Reason must be a string'),
+  ],
+  validateRequest,
+  asyncHandler(partnerController.rejectSellOrder)
+);
+
 router.put(
   '/location',
   isAuthenticated,

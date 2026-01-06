@@ -496,6 +496,35 @@ class PartnerService {
       throw error.response?.data || error;
     }
   }
+
+  // Commission Request Management
+  async createCommissionRequest(requestData: any) {
+    try {
+      const response = await api.post('/commission-requests', requestData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  async getMyCommissionRequests(params = {}) {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const response = await api.get(`/commission-requests/my-requests?${queryString}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
+  async getCommissionBankConfig() {
+    try {
+      const response = await api.get('/commission-requests/bank-config');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
 }
 
 export const partnerService = new PartnerService();

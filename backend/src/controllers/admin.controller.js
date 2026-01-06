@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 import { Agent } from '../models/agent.model.js';
+import { BankConfig } from '../models/bankConfig.model.js';
 import { ConditionQuestionnaire } from '../models/conditionQuestionnaire.model.js';
 import { Finance } from '../models/finance.model.js';
 import { Inventory } from '../models/inventory.model.js';
@@ -2348,6 +2349,40 @@ export const updateOrderStatus = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
+    const previousStatus = order.status;
+
+    // Handle commission rollback when order is cancelled by admin
+    if (status === 'cancelled' && previousStatus !== 'cancelled') {
+      if (order.commission && order.commission.isApplied && order.partner) {
+        try {
+          const { rollbackCommissionFromPartner } =
+            await import('../utils/commission.utils.js');
+
+          await rollbackCommissionFromPartner(
+            order.partner.toString(),
+            order.commission.totalAmount,
+            orderId,
+            'Order',
+            `Order cancelled by admin - ${notes || 'No reason provided'}`
+          );
+
+          // Mark commission as not applied
+          order.commission.isApplied = false;
+          order.commission.rolledBackAt = new Date();
+
+          console.log(
+            `✅ Commission rolled back for admin-cancelled order ${orderId}: ₹${order.commission.totalAmount}`
+          );
+        } catch (error) {
+          console.error(
+            '❌ Commission rollback failed for admin-cancelled order:',
+            error
+          );
+          // Continue with status update even if rollback fails
+        }
+      }
+    }
+
     order.status = status;
     if (notes) {
       order.notes = notes;
@@ -4202,4 +4237,593 @@ export const toggleUserStatus = async (req, res) => {
     message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
     data: user,
   });
+};
+
+export const addCommissionBalance = async (req, res) => {
+  try {
+    const { partnerId, amount, description } = req.body;
+
+    if (!partnerId || !amount || amount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Partner ID and valid amount are required',
+      });
+    }
+
+    const partner = await Partner.findById(partnerId);
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: 'Partner not found',
+      });
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      partner.wallet.commissionBalance += amount;
+
+      partner.wallet.transactions.push({
+        type: 'debit',
+        amount: amount,
+        description: description || `Commission charge added by admin`,
+        timestamp: new Date(),
+        transactionCategory: 'commission',
+      });
+
+      const transaction = await Transaction.create(
+        [
+          {
+            transactionType: 'commission_charge',
+            amount: amount,
+            partner: partnerId,
+            paymentMethod: 'System',
+            status: 'completed',
+            description: description || `Commission charge added by admin`,
+            metadata: {
+              addedBy: req.user._id,
+              addedAt: new Date(),
+              previousBalance: partner.wallet.commissionBalance - amount,
+              newBalance: partner.wallet.commissionBalance,
+            },
+          },
+        ],
+        { session }
+      );
+
+      await partner.save({ session });
+      await session.commitTransaction();
+
+      res.status(200).json({
+        success: true,
+        message: 'Commission balance added successfully',
+        data: {
+          partnerId: partner._id,
+          shopName: partner.shopName,
+          newCommissionBalance: partner.wallet.commissionBalance,
+          amount: amount,
+          transactionId: transaction[0]._id,
+        },
+      });
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  } catch (error) {
+    console.error('Add commission balance error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
+export const adjustCommissionBalance = async (req, res) => {
+  try {
+    const { partnerId, amount, description, type } = req.body;
+
+    if (
+      !partnerId ||
+      !amount ||
+      amount <= 0 ||
+      !['add', 'subtract'].includes(type)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'Partner ID, valid amount, and type (add/subtract) are required',
+      });
+    }
+
+    const partner = await Partner.findById(partnerId);
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: 'Partner not found',
+      });
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const oldBalance = partner.wallet.commissionBalance;
+
+      if (type === 'add') {
+        partner.wallet.commissionBalance += amount;
+      } else {
+        if (partner.wallet.commissionBalance < amount) {
+          await session.abortTransaction();
+          return res.status(400).json({
+            success: false,
+            message: 'Cannot subtract more than current commission balance',
+          });
+        }
+        partner.wallet.commissionBalance -= amount;
+
+        partner.wallet.totalCommissionPaid += amount;
+      }
+
+      partner.wallet.transactions.push({
+        type: type === 'add' ? 'debit' : 'credit',
+        amount: type === 'add' ? amount : -amount,
+        description:
+          description ||
+          `Commission balance ${type === 'add' ? 'increased' : 'decreased'} by admin`,
+        timestamp: new Date(),
+        transactionCategory: 'commission',
+      });
+
+      const transactionType =
+        type === 'add' ? 'commission_charge' : 'commission_payment';
+      const transaction = await Transaction.create(
+        [
+          {
+            transactionType: transactionType,
+            amount: type === 'add' ? amount : -amount,
+            partner: partnerId,
+            paymentMethod: 'System',
+            status: 'completed',
+            description:
+              description ||
+              `Commission balance ${type === 'add' ? 'increased' : 'decreased'} by admin`,
+            metadata: {
+              adjustedBy: req.user._id,
+              adjustedAt: new Date(),
+              adjustmentType: type,
+              previousBalance: oldBalance,
+              newBalance: partner.wallet.commissionBalance,
+              totalCommissionPaid: partner.wallet.totalCommissionPaid,
+            },
+          },
+        ],
+        { session }
+      );
+
+      await partner.save({ session });
+      await session.commitTransaction();
+
+      res.status(200).json({
+        success: true,
+        message: `Commission balance ${type === 'add' ? 'increased' : 'decreased'} successfully`,
+        data: {
+          partnerId: partner._id,
+          shopName: partner.shopName,
+          oldCommissionBalance: oldBalance,
+          newCommissionBalance: partner.wallet.commissionBalance,
+          adjustmentAmount: amount,
+          adjustmentType: type,
+          transactionId: transaction[0]._id,
+        },
+      });
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  } catch (error) {
+    console.error('Adjust commission balance error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
+export const getPartnerCommissionDetails = async (req, res) => {
+  try {
+    const { partnerId } = req.params;
+
+    const partner = await Partner.findById(partnerId)
+      .select(
+        'shopName shopEmail wallet.commissionBalance wallet.totalCommissionPaid wallet.transactions user'
+      )
+      .populate('user', 'name email');
+
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: 'Partner not found',
+      });
+    }
+
+    const commissionTransactions = partner.wallet.transactions
+      .filter((transaction) => transaction.transactionCategory === 'commission')
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    const transactionRecords = await Transaction.find({
+      partner: partnerId,
+      transactionType: { $in: ['commission_charge', 'commission_payment'] },
+    })
+      .sort({ createdAt: -1 })
+      .limit(20);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        partner: {
+          _id: partner._id,
+          shopName: partner.shopName,
+          shopEmail: partner.shopEmail,
+          user: partner.user,
+        },
+        commissionBalance: partner.wallet.commissionBalance,
+        totalCommissionPaid: partner.wallet.totalCommissionPaid,
+        commissionTransactions: commissionTransactions.slice(0, 20), // Last 20 transactions from partner wallet
+        transactionRecords: transactionRecords, // Transaction records for audit trail
+      },
+    });
+  } catch (error) {
+    console.error('Get partner commission details error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+// Bank Configuration Management
+export const getBankConfigurations = async (req, res) => {
+  try {
+    const { configType } = req.query;
+
+    console.log('🔍 getBankConfigurations called with configType:', configType);
+
+    // Get all configurations first
+    const allConfigs = await BankConfig.find({})
+      .populate('updatedBy', 'name email')
+      .sort({ configType: 1, createdAt: -1 });
+
+    console.log('🔍 Total configs found:', allConfigs.length);
+
+    // Filter manually if configType is provided
+    let filteredConfigs = allConfigs;
+    if (configType && ['recharge', 'commission'].includes(configType)) {
+      filteredConfigs = allConfigs.filter(
+        (config) => config.configType === configType
+      );
+      console.log('🔍 Filtered configs count:', filteredConfigs.length);
+    }
+
+    res.status(200).json({
+      success: true,
+      data: filteredConfigs,
+    });
+  } catch (error) {
+    console.error('Get bank configurations error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
+export const fixBankConfigurationData = async (req, res) => {
+  try {
+    console.log('🔧 Starting bank configuration data cleanup...');
+
+    // Get all configurations grouped by type
+    const rechargeConfigs = await BankConfig.find({
+      configType: 'recharge',
+      isActive: true,
+    });
+    const commissionConfigs = await BankConfig.find({
+      configType: 'commission',
+      isActive: true,
+    });
+
+    console.log(`Found ${rechargeConfigs.length} active recharge configs`);
+    console.log(`Found ${commissionConfigs.length} active commission configs`);
+
+    let fixedCount = 0;
+
+    // Fix recharge configs - keep only the most recent one active
+    if (rechargeConfigs.length > 1) {
+      const sortedRecharge = rechargeConfigs.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      // Deactivate all except the first (most recent)
+      for (let i = 1; i < sortedRecharge.length; i++) {
+        await BankConfig.findByIdAndUpdate(sortedRecharge[i]._id, {
+          isActive: false,
+        });
+        fixedCount++;
+        console.log(
+          `Deactivated recharge config: ${sortedRecharge[i].bankName}`
+        );
+      }
+    }
+
+    // Fix commission configs - keep only the most recent one active
+    if (commissionConfigs.length > 1) {
+      const sortedCommission = commissionConfigs.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      // Deactivate all except the first (most recent)
+      for (let i = 1; i < sortedCommission.length; i++) {
+        await BankConfig.findByIdAndUpdate(sortedCommission[i]._id, {
+          isActive: false,
+        });
+        fixedCount++;
+        console.log(
+          `Deactivated commission config: ${sortedCommission[i].bankName}`
+        );
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Data cleanup completed. Fixed ${fixedCount} configurations.`,
+      data: {
+        fixedCount,
+        rechargeConfigsFound: rechargeConfigs.length,
+        commissionConfigsFound: commissionConfigs.length,
+      },
+    });
+  } catch (error) {
+    console.error('Fix bank configuration data error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during data cleanup',
+      error: error.message,
+    });
+  }
+};
+
+export const createBankConfiguration = async (req, res) => {
+  try {
+    const {
+      configType,
+      bankName,
+      accountNumber,
+      ifscCode,
+      accountHolderName,
+      branch,
+      upiId,
+      qrCodeUrl,
+    } = req.body;
+
+    if (!['recharge', 'commission'].includes(configType)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid config type. Must be recharge or commission',
+      });
+    }
+
+    console.log(`🔧 Creating ${configType} bank configuration...`);
+
+    // Use the same approach as getBankConfigurations to avoid query issues
+    const allConfigs = await BankConfig.find({});
+    const existingActiveConfigs = allConfigs.filter(
+      (config) => config.configType === configType && config.isActive === true
+    );
+
+    console.log(
+      `Found ${existingActiveConfigs.length} existing active ${configType} configs`
+    );
+
+    if (existingActiveConfigs.length > 1) {
+      console.log('Multiple active configs found, fixing...');
+      // Keep the most recent one active, deactivate others
+      const sortedConfigs = existingActiveConfigs.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      // Deactivate all except the first (most recent)
+      for (let i = 1; i < sortedConfigs.length; i++) {
+        await BankConfig.findByIdAndUpdate(sortedConfigs[i]._id, {
+          isActive: false,
+        });
+        console.log(`Deactivated config: ${sortedConfigs[i].bankName}`);
+      }
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      console.log(`Deactivating existing active ${configType} configs...`);
+      // Deactivate existing active config of the same type
+      const updateResult = await BankConfig.updateMany(
+        { configType, isActive: true },
+        { isActive: false },
+        { session }
+      );
+      console.log(`Deactivated ${updateResult.modifiedCount} configs`);
+
+      console.log('Creating new config...');
+      // Create new config
+      const bankConfig = await BankConfig.create(
+        [
+          {
+            configType,
+            bankName,
+            accountNumber,
+            ifscCode,
+            accountHolderName,
+            branch,
+            upiId,
+            qrCodeUrl,
+            isActive: true,
+            updatedBy: req.user._id,
+          },
+        ],
+        { session }
+      );
+
+      await session.commitTransaction();
+      console.log('Transaction committed successfully');
+
+      // Populate for response
+      await bankConfig[0].populate('updatedBy', 'name email');
+
+      res.status(201).json({
+        success: true,
+        message: `${configType.charAt(0).toUpperCase() + configType.slice(1)} bank configuration created successfully`,
+        data: bankConfig[0],
+      });
+    } catch (error) {
+      console.log('Transaction error:', error.message);
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  } catch (error) {
+    console.error('Create bank configuration error:', error);
+
+    // Handle duplicate key error specifically
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'A bank configuration of this type is already active. Please deactivate it first.',
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
+export const updateBankConfiguration = async (req, res) => {
+  try {
+    const { configId } = req.params;
+    const {
+      bankName,
+      accountNumber,
+      ifscCode,
+      accountHolderName,
+      branch,
+      upiId,
+      qrCodeUrl,
+      isActive,
+    } = req.body;
+
+    const bankConfig = await BankConfig.findById(configId);
+    if (!bankConfig) {
+      return res.status(404).json({
+        success: false,
+        message: 'Bank configuration not found',
+      });
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // If setting this config as active, deactivate others of the same type
+      if (isActive && !bankConfig.isActive) {
+        await BankConfig.updateMany(
+          {
+            configType: bankConfig.configType,
+            isActive: true,
+            _id: { $ne: configId },
+          },
+          { isActive: false },
+          { session }
+        );
+      }
+
+      // Update the configuration
+      const updatedConfig = await BankConfig.findByIdAndUpdate(
+        configId,
+        {
+          bankName,
+          accountNumber,
+          ifscCode,
+          accountHolderName,
+          branch,
+          upiId,
+          qrCodeUrl,
+          isActive,
+          updatedBy: req.user._id,
+        },
+        { new: true, session }
+      ).populate('updatedBy', 'name email');
+
+      await session.commitTransaction();
+
+      res.status(200).json({
+        success: true,
+        message: 'Bank configuration updated successfully',
+        data: updatedConfig,
+      });
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  } catch (error) {
+    console.error('Update bank configuration error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
+export const deleteBankConfiguration = async (req, res) => {
+  try {
+    const { configId } = req.params;
+
+    const bankConfig = await BankConfig.findById(configId);
+    if (!bankConfig) {
+      return res.status(404).json({
+        success: false,
+        message: 'Bank configuration not found',
+      });
+    }
+
+    await BankConfig.findByIdAndDelete(configId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Bank configuration deleted successfully',
+    });
+  } catch (error) {
+    console.error('Delete bank configuration error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
 };

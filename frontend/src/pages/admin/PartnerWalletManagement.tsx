@@ -28,8 +28,15 @@ interface PartnerWallet {
       name: string;
       email: string;
     };
+    wallet: {
+      balance: number;
+      commissionBalance: number;
+      totalCommissionPaid: number;
+    };
   };
   balance: number;
+  commissionBalance?: number;
+  totalCommissionPaid?: number;
   totalEarnings?: number;
   totalWithdrawals?: number;
   pendingAmount?: number;
@@ -52,6 +59,8 @@ interface WalletTransaction {
 interface WalletStats {
   totalPartners: number;
   totalBalance: number;
+  totalCommissionBalance: number;
+  totalCommissionPaid: number;
   totalEarnings: number;
   totalWithdrawals: number;
 }
@@ -64,14 +73,21 @@ const PartnerWalletManagement = () => {
   const [selectedPartner, setSelectedPartner] = useState<PartnerWallet | null>(null);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showTransactionHistoryModal, setShowTransactionHistoryModal] = useState(false);
+  const [showCommissionModal, setShowCommissionModal] = useState(false);
   const [transactionType, setTransactionType] = useState<'credit' | 'debit'>('credit');
+  const [commissionType, setCommissionType] = useState<'add' | 'subtract'>('add');
   const [transactionAmount, setTransactionAmount] = useState('');
+  const [commissionAmount, setCommissionAmount] = useState('');
   const [transactionDescription, setTransactionDescription] = useState('');
+  const [commissionDescription, setCommissionDescription] = useState('');
   const [transactionLoading, setTransactionLoading] = useState(false);
+  const [commissionLoading, setCommissionLoading] = useState(false);
   const [transactionHistoryLoading, setTransactionHistoryLoading] = useState(false);
   const [stats, setStats] = useState<WalletStats>({
     totalPartners: 0,
     totalBalance: 0,
+    totalCommissionBalance: 0,
+    totalCommissionPaid: 0,
     totalEarnings: 0,
     totalWithdrawals: 0,
   });
@@ -96,6 +112,8 @@ const PartnerWalletManagement = () => {
           response.data.stats || {
             totalPartners: 0,
             totalBalance: 0,
+            totalCommissionBalance: 0,
+            totalCommissionPaid: 0,
             totalEarnings: 0,
             totalWithdrawals: 0,
           }
@@ -145,6 +163,50 @@ const PartnerWalletManagement = () => {
   }, [searchQuery]);
 
   const filteredWallets = wallets;
+
+  const handleAddCommission = async () => {
+    if (!selectedPartner || !commissionAmount || !commissionDescription) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    const amount = parseFloat(commissionAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    setCommissionLoading(true);
+    try {
+      const response = await adminService.adjustCommissionBalance(
+        selectedPartner.partner._id,
+        amount,
+        commissionType,
+        commissionDescription
+      );
+
+      if (response.success) {
+        toast.success(
+          response.message ||
+            `Commission balance ${commissionType === 'add' ? 'increased' : 'decreased'} successfully`
+        );
+
+        // Reset form
+        setCommissionAmount('');
+        setCommissionDescription('');
+        setShowCommissionModal(false);
+        setSelectedPartner(null);
+
+        // Refresh wallet data
+        fetchWalletData(pagination.currentPage, searchQuery);
+      }
+    } catch (error: any) {
+      console.error('Error adjusting commission balance:', error);
+      toast.error(error.message || 'Failed to adjust commission balance');
+    } finally {
+      setCommissionLoading(false);
+    }
+  };
 
   const handleAddTransaction = async () => {
     if (!selectedPartner || !transactionAmount || !transactionDescription) {
@@ -240,6 +302,10 @@ const PartnerWalletManagement = () => {
     switch (type) {
       case 'commission':
         return { label: 'Commission', color: 'text-green-600', bg: 'bg-green-100' };
+      case 'commission_charge':
+        return { label: 'Commission Charge', color: 'text-red-600', bg: 'bg-red-100' };
+      case 'commission_payment':
+        return { label: 'Commission Payment', color: 'text-green-600', bg: 'bg-green-100' };
       case 'wallet_credit':
         return { label: 'Admin Credit', color: 'text-blue-600', bg: 'bg-blue-100' };
       case 'wallet_debit':
@@ -274,7 +340,7 @@ const PartnerWalletManagement = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 lg:gap-6 mb-8">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
@@ -299,6 +365,34 @@ const PartnerWalletManagement = () => {
             </div>
             <div className="p-2 lg:p-3 bg-green-100 rounded-full flex-shrink-0 ml-2">
               <Wallet className="h-4 w-4 lg:h-6 lg:w-6 text-green-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs lg:text-sm font-medium text-gray-600 mb-1">Commission Owed</p>
+              <p className="text-lg lg:text-2xl font-bold text-red-600 break-words leading-tight">
+                {formatCurrency(stats.totalCommissionBalance)}
+              </p>
+            </div>
+            <div className="p-2 lg:p-3 bg-red-100 rounded-full flex-shrink-0 ml-2">
+              <TrendingDown className="h-4 w-4 lg:h-6 lg:w-6 text-red-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs lg:text-sm font-medium text-gray-600 mb-1">Commission Paid</p>
+              <p className="text-lg lg:text-2xl font-bold text-green-600 break-words leading-tight">
+                {formatCurrency(stats.totalCommissionPaid)}
+              </p>
+            </div>
+            <div className="p-2 lg:p-3 bg-green-100 rounded-full flex-shrink-0 ml-2">
+              <TrendingUp className="h-4 w-4 lg:h-6 lg:w-6 text-green-600" />
             </div>
           </div>
         </div>
@@ -373,6 +467,9 @@ const PartnerWalletManagement = () => {
                   Current Balance
                 </th>
                 <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Commission Balance
+                </th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
@@ -408,6 +505,11 @@ const PartnerWalletManagement = () => {
                   <td className="px-4 lg:px-6 py-4">
                     <div className="text-sm font-medium text-gray-900 max-w-[100px] lg:max-w-none break-words">
                       {formatCurrency(wallet.balance)}
+                    </div>
+                  </td>
+                  <td className="px-4 lg:px-6 py-4">
+                    <div className="text-sm font-medium text-red-600 max-w-[100px] lg:max-w-none break-words">
+                      {formatCurrency(wallet.partner?.wallet?.commissionBalance || 0)}
                     </div>
                   </td>
                   <td className="px-4 lg:px-6 py-4">
@@ -447,6 +549,17 @@ const PartnerWalletManagement = () => {
                         title="Add Debit"
                       >
                         <Minus className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedPartner(wallet);
+                          setCommissionType('add');
+                          setShowCommissionModal(true);
+                        }}
+                        className="text-orange-600 hover:text-orange-900 p-1 rounded"
+                        title="Adjust Commission"
+                      >
+                        <TrendingUp className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleViewTransactions(wallet)}
@@ -697,6 +810,106 @@ const PartnerWalletManagement = () => {
                   <p className="text-gray-500">No transactions found</p>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Commission Balance Modal */}
+      {showCommissionModal && selectedPartner && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-gray-900">
+                {commissionType === 'add' ? 'Add' : 'Subtract'} Commission Balance
+              </h3>
+              <button
+                onClick={() => {
+                  setShowCommissionModal(false);
+                  setSelectedPartner(null);
+                  setCommissionAmount('');
+                  setCommissionDescription('');
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-600">Partner</p>
+              <p className="font-medium break-words">{selectedPartner.partner.shopName}</p>
+              <p className="text-sm text-gray-500 break-words">
+                Current Commission Balance:{' '}
+                {formatCurrency(selectedPartner.partner?.wallet?.commissionBalance || 0)}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                <select
+                  value={commissionType}
+                  onChange={e => setCommissionType(e.target.value as 'add' | 'subtract')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="add">Add Commission (Partner owes more)</option>
+                  <option value="subtract">Subtract Commission (Partner paid/reduced)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Amount *</label>
+                <input
+                  type="number"
+                  value={commissionAmount}
+                  onChange={e => setCommissionAmount(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter amount"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description *
+                </label>
+                <textarea
+                  value={commissionDescription}
+                  onChange={e => setCommissionDescription(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows={3}
+                  placeholder="Enter commission adjustment description"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowCommissionModal(false);
+                  setSelectedPartner(null);
+                  setCommissionAmount('');
+                  setCommissionDescription('');
+                }}
+                className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                disabled={commissionLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddCommission}
+                disabled={commissionLoading}
+                className={`flex-1 px-4 py-2 text-white rounded-lg ${
+                  commissionType === 'add'
+                    ? 'bg-orange-600 hover:bg-orange-700'
+                    : 'bg-green-600 hover:bg-green-700'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                {commissionLoading
+                  ? 'Processing...'
+                  : `${commissionType === 'add' ? 'Add' : 'Subtract'} Commission`}
+              </button>
             </div>
           </div>
         </div>

@@ -6,6 +6,12 @@ import { SellOrder } from '../models/sellOrder.model.js';
 import { SellProduct } from '../models/sellProduct.model.js';
 import { User } from '../models/user.model.js';
 import ApiError from '../utils/apiError.js';
+import {
+  applyCommissionForItems,
+  applyCommissionToPartner,
+  getCategoryFromProduct,
+  rollbackCommissionForItems,
+} from '../utils/commission.utils.js';
 import { sanitizeData } from '../utils/security.utils.js';
 
 export async function registerPartnerShop(req, res) {
@@ -988,6 +994,43 @@ export async function respondToOrderAssignment(req, res) {
         400
       );
     }
+
+    // Apply commission when order is accepted
+    try {
+      if (!order.commission.isApplied) {
+        console.log(`🔄 Applying commission for buy order ${order._id}:`, {
+          partnerId: partner._id.toString(),
+          orderValue: order.totalAmount,
+          commissionBreakdown: order.commission.breakdown,
+          totalCommissionAmount: order.commission.totalAmount,
+        });
+
+        // Apply commission to partner's balance using the pre-calculated commission data
+        await applyCommissionForItems(
+          partner._id,
+          {
+            totalAmount: order.commission.totalAmount,
+            totalRate: order.commission.totalRate,
+            breakdown: order.commission.breakdown,
+          },
+          order._id,
+          'Order'
+        );
+
+        // Mark commission as applied in order
+        order.commission.isApplied = true;
+        order.commission.appliedAt = new Date();
+        await order.save();
+
+        console.log(
+          `✅ Multi-category commission applied successfully for order ${order._id}`
+        );
+      }
+    } catch (commissionError) {
+      console.error('Commission application error:', commissionError);
+      // Don't fail the order acceptance, but log the error
+      // The commission can be applied manually by admin if needed
+    }
   }
 
   order.partnerAssignment.response = {
@@ -1026,6 +1069,34 @@ export async function respondToOrderAssignment(req, res) {
       timestamp: new Date(),
       note: `Order rejected by partner: ${reason || 'No reason provided'}. Available for reassignment.`,
     });
+
+    // Rollback commission if it was already applied
+    try {
+      if (order.commission.isApplied) {
+        console.log(
+          `🔄 Rolling back commission for rejected order ${order._id}`
+        );
+
+        await rollbackCommissionForItems(
+          partner._id,
+          order.commission.totalAmount,
+          order._id,
+          'Order',
+          'Order rejected by partner'
+        );
+
+        // Mark commission as not applied
+        order.commission.isApplied = false;
+        order.commission.appliedAt = undefined;
+
+        console.log(
+          `✅ Commission rolled back for rejected order ${order._id}`
+        );
+      }
+    } catch (rollbackError) {
+      console.error('Commission rollback error:', rollbackError);
+      // Don't fail the rejection, but log the error
+    }
   }
 
   await order.save();
@@ -1615,10 +1686,138 @@ export async function updatePartnerSellOrderStatus(req, res) {
   const order = await SellOrder.findOne({
     _id: orderId,
     $or: [{ assignedTo: partnerId }, { assigned_partner_id: partnerId }],
+  }).populate({
+    path: 'sessionId',
+    populate: {
+      path: 'productId',
+      select: 'name brand categoryId images',
+    },
   });
 
   if (!order) {
     throw new ApiError('Order not found or access denied', 404);
+  }
+
+  const oldStatus = order.status;
+
+  // Apply commission when status changes to confirmed
+  if (status === 'confirmed' && oldStatus !== 'confirmed') {
+    try {
+      if (!order.commission || !order.commission.isApplied) {
+        // For sell orders, use the pre-calculated commission from order creation
+        if (order.commission && order.commission.totalAmount) {
+          console.log(`🔄 Applying commission for sell order ${order._id}:`, {
+            partnerId: partner._id.toString(),
+            orderValue: order.quoteAmount,
+            commissionAmount: order.commission.totalAmount,
+          });
+
+          // Apply commission using the pre-calculated data
+          const { applyCommissionForItems } =
+            await import('../utils/commission.utils.js');
+
+          await applyCommissionForItems(
+            partner._id,
+            {
+              totalAmount: order.commission.totalAmount,
+              totalRate: order.commission.totalRate,
+              breakdown: order.commission.breakdown,
+            },
+            order._id,
+            'SellOrder'
+          );
+
+          // Mark commission as applied
+          order.commission.isApplied = true;
+          order.commission.appliedAt = new Date();
+        } else {
+          // Fallback: calculate commission if not pre-calculated
+          const { applyCommissionToPartner, getCategoryFromProduct } =
+            await import('../utils/commission.utils.js');
+
+          const product = order.sessionId?.productId;
+          const category = getCategoryFromProduct(product);
+          const orderValue = order.quoteAmount;
+
+          console.log(
+            `🔄 Calculating and applying commission for sell order ${order._id}:`,
+            {
+              partnerId: partner._id.toString(),
+              orderValue,
+              category,
+            }
+          );
+
+          const commissionResult = await applyCommissionToPartner(
+            partner._id,
+            orderValue,
+            category,
+            'sell',
+            order._id,
+            'SellOrder'
+          );
+
+          // Update order with commission details
+          order.commission = {
+            totalRate: commissionResult.commission.rate,
+            totalAmount: commissionResult.commission.amount,
+            breakdown: [
+              {
+                category: commissionResult.commission.category,
+                rate: commissionResult.commission.rate,
+                amount: commissionResult.commission.amount,
+                itemCount: 1,
+              },
+            ],
+            isApplied: true,
+            appliedAt: new Date(),
+          };
+        }
+
+        console.log(
+          `✅ Commission applied successfully for sell order ${order._id}`
+        );
+      }
+    } catch (commissionError) {
+      console.error('Commission application error:', commissionError);
+      // Don't fail the status update, but log the error
+      // The commission can be applied manually by admin if needed
+    }
+  }
+
+  // Rollback commission when status changes from confirmed to cancelled/rejected
+  if (
+    (status === 'cancelled' || oldStatus === 'confirmed') &&
+    oldStatus === 'confirmed' &&
+    status !== 'confirmed'
+  ) {
+    try {
+      if (order.commission && order.commission.isApplied) {
+        console.log(
+          `🔄 Rolling back commission for sell order status change ${order._id}`
+        );
+
+        const { rollbackCommissionForItems } =
+          await import('../utils/commission.utils.js');
+
+        await rollbackCommissionForItems(
+          partner._id,
+          order.commission.totalAmount,
+          order._id,
+          'SellOrder',
+          `Sell order status changed from ${oldStatus} to ${status}`
+        );
+
+        // Mark commission as not applied
+        order.commission.isApplied = false;
+        order.commission.appliedAt = undefined;
+
+        console.log(`✅ Commission rolled back for sell order ${order._id}`);
+      }
+    } catch (rollbackError) {
+      console.error('Commission rollback error:', rollbackError);
+      // Don't fail the status update, but log the error
+    }
   }
 
   order.status = status;
@@ -2283,6 +2482,224 @@ export async function claimSellOrder(req, res) {
     res.status(500).json({
       success: false,
       message: 'Error claiming order',
+      error: error.message,
+    });
+  }
+}
+
+// Accept sell order with commission processing
+export async function acceptSellOrder(req, res) {
+  try {
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      throw new ApiError('Partner profile not found', 404);
+    }
+
+    const { orderId } = req.params;
+    const { notes } = req.body;
+
+    const order = await SellOrder.findOne({
+      _id: orderId,
+      assigned_partner_id: partner._id,
+      status: 'pending_acceptance',
+    }).populate({
+      path: 'sessionId',
+      populate: {
+        path: 'productId',
+        select: 'name brand categoryId images',
+      },
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found or not assigned to you',
+      });
+    }
+
+    // Apply commission when sell order is accepted
+    try {
+      if (!order.commission || !order.commission.isApplied) {
+        // For sell orders, use the pre-calculated commission from order creation
+        if (order.commission && order.commission.totalAmount) {
+          console.log(`🔄 Applying commission for sell order ${order._id}:`, {
+            partnerId: partner._id.toString(),
+            orderValue: order.quoteAmount,
+            commissionAmount: order.commission.totalAmount,
+          });
+
+          // Apply commission using the pre-calculated data
+          await applyCommissionForItems(
+            partner._id,
+            {
+              totalAmount: order.commission.totalAmount,
+              totalRate: order.commission.totalRate,
+              breakdown: order.commission.breakdown,
+            },
+            order._id,
+            'SellOrder'
+          );
+
+          // Mark commission as applied
+          order.commission.isApplied = true;
+          order.commission.appliedAt = new Date();
+        } else {
+          // Fallback: calculate commission if not pre-calculated
+          const product = order.sessionId?.productId;
+          const category = getCategoryFromProduct(product);
+          const orderValue = order.quoteAmount;
+
+          console.log(
+            `🔄 Calculating and applying commission for sell order ${order._id}:`,
+            {
+              partnerId: partner._id.toString(),
+              orderValue,
+              category,
+            }
+          );
+
+          const commissionResult = await applyCommissionToPartner(
+            partner._id,
+            orderValue,
+            category,
+            'sell',
+            order._id,
+            'SellOrder'
+          );
+
+          // Update order with commission details
+          order.commission = {
+            totalRate: commissionResult.commission.rate,
+            totalAmount: commissionResult.commission.amount,
+            breakdown: [
+              {
+                category: commissionResult.commission.category,
+                rate: commissionResult.commission.rate,
+                amount: commissionResult.commission.amount,
+                itemCount: 1,
+              },
+            ],
+            isApplied: true,
+            appliedAt: new Date(),
+          };
+        }
+
+        console.log(
+          `✅ Commission applied successfully for sell order ${order._id}`
+        );
+      }
+    } catch (commissionError) {
+      console.error('Commission application error:', commissionError);
+      // Don't fail the order acceptance, but log the error
+      // The commission can be applied manually by admin if needed
+    }
+
+    // Update order status to confirmed
+    order.status = 'confirmed';
+    if (notes) {
+      order.notes = notes;
+    }
+
+    await order.save();
+
+    // Populate order for response
+    const populatedOrder = await SellOrder.findById(order._id)
+      .populate('userId', 'name email phone')
+      .populate({
+        path: 'sessionId',
+        populate: {
+          path: 'productId',
+          select: 'name brand categoryId images',
+        },
+      })
+      .populate('assigned_partner_id', 'shopName shopPhone shopEmail');
+
+    res.json({
+      success: true,
+      message: 'Sell order accepted successfully',
+      data: populatedOrder,
+    });
+  } catch (error) {
+    console.error('Error accepting sell order:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error accepting sell order',
+      error: error.message,
+    });
+  }
+}
+
+// Reject sell order with commission rollback
+export async function rejectSellOrder(req, res) {
+  try {
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      throw new ApiError('Partner profile not found', 404);
+    }
+
+    const { orderId } = req.params;
+    const { reason } = req.body;
+
+    const order = await SellOrder.findOne({
+      _id: orderId,
+      assigned_partner_id: partner._id,
+      status: 'pending_acceptance',
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found or not assigned to you',
+      });
+    }
+
+    // Rollback commission if it was applied
+    try {
+      if (order.commission && order.commission.isApplied) {
+        console.log(
+          `🔄 Rolling back commission for rejected sell order ${order._id}`
+        );
+
+        await rollbackCommissionForItems(
+          partner._id,
+          order.commission.totalAmount,
+          order._id,
+          'SellOrder',
+          'Sell order rejected by partner'
+        );
+
+        // Mark commission as not applied
+        order.commission.isApplied = false;
+        order.commission.appliedAt = undefined;
+
+        console.log(
+          `✅ Commission rolled back for rejected sell order ${order._id}`
+        );
+      }
+    } catch (rollbackError) {
+      console.error('Commission rollback error:', rollbackError);
+      // Don't fail the rejection, but log the error
+    }
+
+    // Make order available again
+    order.assigned_partner_id = null;
+    order.status = 'open';
+    if (reason) {
+      order.notes = `Rejected by partner: ${reason}`;
+    }
+
+    await order.save();
+
+    res.json({
+      success: true,
+      message: 'Sell order rejected successfully',
+      data: { orderId: order._id, status: order.status },
+    });
+  } catch (error) {
+    console.error('Error rejecting sell order:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error rejecting sell order',
       error: error.message,
     });
   }

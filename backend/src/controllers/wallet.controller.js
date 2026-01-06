@@ -647,7 +647,8 @@ export async function getAllWallets(req, res) {
     const wallets = await Wallet.find({ partner: { $in: partnerIds } })
       .populate({
         path: 'partner',
-        select: 'shopName shopEmail phone isVerified user',
+        select:
+          'shopName shopEmail phone isVerified user wallet.commissionBalance wallet.totalCommissionPaid',
         populate: {
           path: 'user',
           select: 'name email',
@@ -661,11 +662,40 @@ export async function getAllWallets(req, res) {
       partner: { $in: partnerIds },
     });
 
+    const enhancedWallets = await Promise.all(
+      wallets.map(async (wallet) => {
+        const partner = await Partner.findById(wallet.partner._id);
+        return {
+          ...wallet.toObject(),
+          partner: {
+            ...wallet.partner.toObject(),
+            wallet: {
+              balance: wallet.balance,
+              commissionBalance: partner?.wallet?.commissionBalance || 0,
+              totalCommissionPaid: partner?.wallet?.totalCommissionPaid || 0,
+            },
+          },
+          commissionBalance: partner?.wallet?.commissionBalance || 0,
+          totalCommissionPaid: partner?.wallet?.totalCommissionPaid || 0,
+        };
+      })
+    );
+
     // Calculate stats
     const allWallets = await Wallet.find({ partner: { $in: partnerIds } });
+    const allPartners = await Partner.find({ _id: { $in: partnerIds } });
+
     const stats = {
       totalPartners: allWallets.length,
       totalBalance: allWallets.reduce((sum, wallet) => sum + wallet.balance, 0),
+      totalCommissionBalance: allPartners.reduce(
+        (sum, partner) => sum + (partner.wallet?.commissionBalance || 0),
+        0
+      ),
+      totalCommissionPaid: allPartners.reduce(
+        (sum, partner) => sum + (partner.wallet?.totalCommissionPaid || 0),
+        0
+      ),
       totalEarnings: 0,
       totalWithdrawals: 0,
     };
@@ -689,7 +719,7 @@ export async function getAllWallets(req, res) {
     res.status(200).json({
       success: true,
       data: {
-        wallets,
+        wallets: enhancedWallets,
         stats,
         totalPages: Math.ceil(totalWallets / limit),
         currentPage: parseInt(page),
@@ -841,6 +871,10 @@ export async function getWalletTransactions(req, res) {
         query.transactionType = { $in: ['commission', 'wallet_credit'] };
       } else if (type === 'debit') {
         query.transactionType = { $in: ['payout', 'wallet_debit'] };
+      } else if (type === 'commission') {
+        query.transactionType = {
+          $in: ['commission_charge', 'commission_payment'],
+        };
       }
     }
 

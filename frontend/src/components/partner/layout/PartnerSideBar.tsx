@@ -6,6 +6,7 @@ import {
   Users,
   Smartphone,
   Wallet,
+  CreditCard,
 } from 'lucide-react';
 import PartnerSideBarItem from './PartnerSideBarItem';
 import { useLocation } from 'react-router-dom';
@@ -46,7 +47,10 @@ const PartnerSideBar = ({ isOpen, onClose }: PartnerSideBarProps) => {
     },
     {
       title: 'Wallet & Finance',
-      items: [{ to: '/partner/wallet-recharge', icon: Wallet, label: 'Wallet Recharge' }],
+      items: [
+        { to: '/partner/wallet-recharge', icon: Wallet, label: 'Wallet Recharge' },
+        { to: '/partner/commission-payment', icon: CreditCard, label: 'Commission Payment' },
+      ],
     },
     {
       title: 'Team Management',
