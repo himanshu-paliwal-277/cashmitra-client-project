@@ -491,7 +491,7 @@ function EditProduct() {
           {errors.price && <span className="text-red-500 text-xs">{errors.price}</span>}
         </div>
 
-        <div className="flex flex-col gap-2">
+        {/* <div className="flex flex-col gap-2">
           <label className="font-medium text-gray-900 text-sm">Original Price (₹)</label>
           <input
             type="number"
@@ -503,7 +503,7 @@ function EditProduct() {
             step="0.01"
             className="px-3 py-3 border border-gray-300 rounded-md text-sm transition-colors focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );

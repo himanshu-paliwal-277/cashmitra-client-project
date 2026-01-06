@@ -67,6 +67,10 @@ const BuyProductSchema = new mongoose.Schema(
       {
         label: String,
         price: Number,
+        ram: String,
+        storage: String,
+        color: String,
+        stock: { type: Number, default: 0 },
       },
     ],
 
@@ -133,6 +137,7 @@ const BuyProductSchema = new mongoose.Schema(
       },
       quantity: { type: Number, default: 0, min: 0 },
       originalPrice: { type: Number },
+      imeiNumber: { type: String, trim: true },
       warranty: {
         available: { type: Boolean, default: false },
         durationMonths: { type: Number, default: 0 },

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginAdmin, getAdminProfile } from '../services/adminService';
+import { getStorageKeys } from '../utils/jwt.utils';
 
 // Create the context
 const AdminAuthContext = createContext();
@@ -26,11 +27,32 @@ export const AdminAuthProvider = ({ children }: any) => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('userData');
+        const storageKeys = getStorageKeys('admin');
+        const token = localStorage.getItem(storageKeys.token);
+        const storedUser = localStorage.getItem(storageKeys.userData);
 
-        if (token && storedUser) {
-          const userData = JSON.parse(storedUser);
+        // Backward compatibility: migrate old token if it's an admin token
+        if (!token) {
+          const oldToken = localStorage.getItem('token');
+          const oldUserData = localStorage.getItem('userData');
+          if (oldToken && oldUserData) {
+            try {
+              const userData = JSON.parse(oldUserData);
+              if (userData.role === 'admin') {
+                localStorage.setItem(storageKeys.token, oldToken);
+                localStorage.setItem(storageKeys.userData, oldUserData);
+              }
+            } catch (e) {
+              console.error('Error migrating admin token:', e);
+            }
+          }
+        }
+
+        const finalToken = localStorage.getItem(storageKeys.token);
+        const finalUserData = localStorage.getItem(storageKeys.userData);
+
+        if (finalToken && finalUserData) {
+          const userData = JSON.parse(finalUserData);
           // Check if user is admin
           if (userData.role === 'admin') {
             // Verify token validity by fetching profile
@@ -66,9 +88,10 @@ export const AdminAuthProvider = ({ children }: any) => {
         role: data.role,
       };
 
-      // Store auth data with consistent naming
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userData', JSON.stringify(adminDetails));
+      // Store auth data with admin-specific keys
+      const storageKeys = getStorageKeys('admin');
+      localStorage.setItem(storageKeys.token, data.token);
+      localStorage.setItem(storageKeys.userData, JSON.stringify(adminDetails));
 
       // Update state
       setAdminUser(adminDetails);
@@ -86,9 +109,10 @@ export const AdminAuthProvider = ({ children }: any) => {
 
   // Logout function
   const logout = () => {
-    // Clear auth data from localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('userData');
+    // Clear admin-specific auth data from localStorage
+    const storageKeys = getStorageKeys('admin');
+    localStorage.removeItem(storageKeys.token);
+    localStorage.removeItem(storageKeys.userData);
 
     // Reset state
     setAdminUser(null);
@@ -100,7 +124,8 @@ export const AdminAuthProvider = ({ children }: any) => {
 
   // Get auth header for API requests
   const getAuthHeader = () => {
-    const token = localStorage.getItem('token');
+    const storageKeys = getStorageKeys('admin');
+    const token = localStorage.getItem(storageKeys.token);
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 

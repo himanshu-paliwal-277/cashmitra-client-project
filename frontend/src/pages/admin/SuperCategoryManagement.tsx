@@ -28,7 +28,7 @@ const SuperCategoryManagement = () => {
     try {
       setLoading(true);
       setError(''); // Clear previous errors
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
 
       let url = `${API_BASE_URL}/buy-super-categories?`;
       if (filterActive !== 'all') {
@@ -83,7 +83,7 @@ const SuperCategoryManagement = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       const response = await fetch(`${API_BASE_URL}/buy-super-categories/${id}`, {
         method: 'DELETE',
         headers: {

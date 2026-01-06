@@ -52,3 +52,29 @@ export const getRedirectPathByRole = (role: string): string => {
 
   return roleRedirects[role.toLowerCase()] || '/';
 };
+
+/**
+ * Detect role based on current URL path
+ */
+export const getRoleFromPath = (pathname: string): 'admin' | 'partner' | 'agent' | 'customer' => {
+  if (pathname.startsWith('/admin')) {
+    return 'admin';
+  }
+  if (pathname.startsWith('/partner')) {
+    return 'partner';
+  }
+  if (pathname.startsWith('/agent')) {
+    return 'agent';
+  }
+  return 'customer';
+};
+
+/**
+ * Get storage keys for a specific role
+ */
+export const getStorageKeys = (role: 'admin' | 'partner' | 'agent' | 'customer') => {
+  return {
+    token: `${role}Token`,
+    userData: `${role}UserData`,
+  };
+};

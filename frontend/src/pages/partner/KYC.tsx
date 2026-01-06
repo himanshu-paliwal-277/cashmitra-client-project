@@ -101,7 +101,7 @@ function PartnerKYC() {
       const uploadResponse = await axios.post(`${API_BASE_URL}/upload/document`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('partnerToken')}`,
         },
       });
 

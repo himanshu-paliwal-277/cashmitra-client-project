@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getRoleFromPath, getStorageKeys } from './jwt.utils';
 
 // Centralized API configuration reading from .env
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -11,11 +12,13 @@ const api = axios.create({
   },
 });
 
-// Attach auth token if present
-// Using consistent 'token' key for all user types (customer, admin, vendor, partner)
+// Attach auth token if present based on current URL/role
 api.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('token');
+    // Determine role from current window location
+    const currentRole = getRoleFromPath(window.location.pathname);
+    const storageKeys = getStorageKeys(currentRole);
+    const token = localStorage.getItem(storageKeys.token);
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

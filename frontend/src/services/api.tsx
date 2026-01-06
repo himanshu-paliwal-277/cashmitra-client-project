@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { getRoleFromPath, getStorageKeys } from '../utils/jwt.utils';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
 const api = axios.create({
@@ -8,11 +10,13 @@ const api = axios.create({
   },
 });
 
-// Add a request interceptor to include auth token
-// Using consistent 'token' key for all user types (customer, admin, vendor, partner)
+// Add a request interceptor to include auth token based on current URL/role
 api.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('token');
+    // Determine role from current window location
+    const currentRole = getRoleFromPath(window.location.pathname);
+    const storageKeys = getStorageKeys(currentRole);
+    const token = localStorage.getItem(storageKeys.token);
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -36,12 +40,24 @@ api.interceptors.response.use(
         message === 'Not authorized, token failed'
       ) {
         console.log('Auth token invalid - clearing and redirecting to login');
-        localStorage.removeItem('token');
-        localStorage.removeItem('userData');
 
-        // Redirect to login if not already there
+        // Clear the current role's auth data
+        const currentRole = getRoleFromPath(window.location.pathname);
+        const storageKeys = getStorageKeys(currentRole);
+        localStorage.removeItem(storageKeys.token);
+        localStorage.removeItem(storageKeys.userData);
+
+        // Redirect to role-specific login if not already there
         if (!window.location.pathname.includes('/login')) {
-          window.location.href = '/login';
+          if (currentRole === 'admin') {
+            window.location.href = '/admin/login';
+          } else if (currentRole === 'partner') {
+            window.location.href = '/partner/login';
+          } else if (currentRole === 'agent') {
+            window.location.href = '/agent/login';
+          } else {
+            window.location.href = '/login';
+          }
         }
       }
     }

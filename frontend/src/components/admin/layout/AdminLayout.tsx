@@ -15,7 +15,7 @@ const AdminLayout = () => {
 
   // Check if non-admin user is accessing admin pages and redirect
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('customerToken') || localStorage.getItem('partnerToken');
     const userData = localStorage.getItem('userData');
 
     if (token && userData) {

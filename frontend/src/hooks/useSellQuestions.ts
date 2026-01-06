@@ -25,7 +25,7 @@ const useSellQuestions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       const queryParams = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
@@ -61,7 +61,7 @@ const useSellQuestions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       const response = await api.get(`/sell-questions/${questionId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -82,7 +82,7 @@ const useSellQuestions = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await api.post('/sell-questions', questionData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -109,7 +109,7 @@ const useSellQuestions = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await api.put(`/sell-questions/${questionId}`, questionData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -136,7 +136,7 @@ const useSellQuestions = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         await api.delete(`/sell-questions/${questionId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -161,7 +161,7 @@ const useSellQuestions = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await api.put('/sell-questions/reorder', reorderData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -187,7 +187,7 @@ const useSellQuestions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       const response = await api.get(`/sell-questions/${questionId}/options`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -209,7 +209,7 @@ const useSellQuestions = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await api.post(`/sell-questions/${questionId}/options`, optionData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -236,7 +236,7 @@ const useSellQuestions = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await api.put(
           `/sell-questions/${questionId}/options/${optionId}`,
           optionData,
@@ -267,7 +267,7 @@ const useSellQuestions = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         await api.delete(`/sell-questions/${questionId}/options/${optionId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -292,7 +292,7 @@ const useSellQuestions = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await api.put(
           `/sell-questions/${questionId}/options/reorder`,
           reorderData,

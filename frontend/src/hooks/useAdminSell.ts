@@ -16,7 +16,7 @@ const useAdminSell = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       // Use the admin sell orders endpoint: GET /api/sell-orders (requires admin auth)
       // This endpoint is protected by authorize('admin') middleware after the user routes
       const response = await fetch('/api/sell-orders?limit=100', {
@@ -69,7 +69,7 @@ const useAdminSell = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await fetch(`/api/admin/sell-orders/${orderId}/status`, {
           method: 'PUT',
           headers: {
@@ -103,7 +103,7 @@ const useAdminSell = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await fetch('/api/admin/sell-orders', {
           method: 'POST',
           headers: {
@@ -137,7 +137,7 @@ const useAdminSell = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await fetch(`/api/admin/sell-orders/${orderId}`, {
           method: 'DELETE',
           headers: {

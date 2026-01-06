@@ -109,7 +109,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
   };
 
   const uploadImageToCloudinary = async (file: any) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('adminToken');
     const uploadFormData = new FormData();
     uploadFormData.append('image', file);
 
@@ -140,7 +140,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
     try {
       setLoading(true);
       setErrors({}); // Clear previous errors
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
 
       let imageUrl = imagePreview;
 

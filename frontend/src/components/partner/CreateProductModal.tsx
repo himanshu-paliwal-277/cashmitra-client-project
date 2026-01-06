@@ -17,6 +17,8 @@ import {
   Palette,
   Shield,
   Star,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import partnerService from '../../services/partnerService';
@@ -33,6 +35,35 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
   const [superCategories, setSuperCategories] = useState([]);
   const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState<any>({});
+
+  // Accordion state - sections with required fields open by default
+  const [openSections, setOpenSections] = useState({
+    categorySelection: true, // Has required fields
+    basicInfo: true, // Has required fields
+    images: true, // Has required fields
+    pricing: true, // Has required fields
+    stock: true, // Has required fields
+    availability: false,
+    variants: false,
+    addOns: false,
+    conditionOptions: false,
+    topSpecs: false,
+    display: false,
+    performance: false,
+    camera: false,
+    battery: false,
+    connectivity: false,
+    storage: false,
+    design: false,
+    sensors: false,
+    trustMetrics: false,
+    badges: false,
+    paymentOptions: false,
+  });
+
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
 
   // Enhanced form data for partner product creation
   const [formData, setFormData] = useState<any>({
@@ -56,6 +87,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
       condition: 'New',
       quantity: '',
       originalPrice: '',
+      imeiNumber: '',
       warranty: {
         available: false,
         durationMonths: '',
@@ -77,11 +109,11 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
     // Add-ons and accessories
     addOns: [],
 
-    // Condition options for different states
+    // Condition options for different states with variants
     conditionOptions: [
-      { label: 'Excellent', price: 0 },
-      { label: 'Good', price: -1000 },
-      { label: 'Fair', price: -2000 },
+      { label: 'Excellent', price: 0, ram: '', storage: '', color: '', stock: 0 },
+      { label: 'Good', price: 0, ram: '', storage: '', color: '', stock: 0 },
+      { label: 'Fair', price: 0, ram: '', storage: '', color: '', stock: 0 },
     ],
 
     // Key specifications (will be converted to object in backend)
@@ -334,16 +366,24 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
         .filter((result: any) => result.success && result.data?.url)
         .map((result: any) => result.data.url);
 
-      setFormData((prev: any) => ({
-        ...prev,
-        images: [...prev.images, ...newImages],
-      }));
+      if (newImages.length > 0) {
+        setFormData((prev: any) => ({
+          ...prev,
+          images: [...prev.images, ...newImages],
+        }));
+        toast.success(`${newImages.length} image(s) uploaded successfully!`);
+      } else {
+        toast.error('No images were uploaded successfully');
+      }
 
-      toast.success(`${newImages.length} image(s) uploaded successfully!`);
-    } catch (error) {
+      // Reset the file input
+      e.target.value = '';
+    } catch (error: any) {
       console.error('Error uploading images:', error);
-      toast.error('Failed to upload images. Please try again.');
+      toast.error(error.message || 'Failed to upload images. Please try again.');
       setErrors({ images: 'Failed to upload images' });
+      // Reset the file input
+      e.target.value = '';
     } finally {
       setLoading(false);
     }
@@ -506,6 +546,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
         condition: 'New',
         quantity: '',
         originalPrice: '',
+        imeiNumber: '',
         warranty: {
           available: false,
           durationMonths: '',
@@ -521,9 +562,9 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
       variants: [],
       addOns: [],
       conditionOptions: [
-        { label: 'Excellent', price: 0 },
-        { label: 'Good', price: -1000 },
-        { label: 'Fair', price: -2000 },
+        { label: 'Excellent', price: 0, ram: '', storage: '', color: '', stock: 0 },
+        { label: 'Good', price: 0, ram: '', storage: '', color: '', stock: 0 },
+        { label: 'Fair', price: 0, ram: '', storage: '', color: '', stock: 0 },
       ],
       topSpecs: [],
       productDetails: {
@@ -699,63 +740,84 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
           {/* Form */}
           <form onSubmit={handleSubmit} className="px-6">
             {/* Category Selection */}
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Package className="w-5 h-5 text-blue-600" />
-                <h3 className="text-lg font-semibold text-gray-900">Category Selection</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Super Category <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="superCategoryId"
-                    value={formData.superCategoryId}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                  >
-                    <option value="">Select Super Category</option>
-                    {superCategories.map((superCat: any) => (
-                      <option key={superCat._id || superCat.id} value={superCat._id || superCat.id}>
-                        {superCat.name}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.superCategoryId && (
-                    <p className="text-red-500 text-sm mt-1">{errors.superCategoryId}</p>
-                  )}
+            <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection('categorySelection')}
+                className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <Package className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Category Selection <span className="text-red-500">*</span>
+                  </h3>
                 </div>
+                {openSections.categorySelection ? (
+                  <ChevronUp className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-600" />
+                )}
+              </button>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="categoryId"
-                    value={formData.categoryId}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                    disabled={!formData.superCategoryId}
-                  >
-                    <option value="">
-                      {formData.superCategoryId ? 'Select Category' : 'Select Super Category First'}
-                    </option>
-                    {categories.map((cat: any) => (
-                      <option key={cat._id || cat.id} value={cat._id || cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.categoryId && (
-                    <p className="text-red-500 text-sm mt-1">{errors.categoryId}</p>
-                  )}
-                </div>
-              </div>
+              {openSections.categorySelection && (
+                <div className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Super Category <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        name="superCategoryId"
+                        value={formData.superCategoryId}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      >
+                        <option value="">Select Super Category</option>
+                        {superCategories.map((superCat: any) => (
+                          <option
+                            key={superCat._id || superCat.id}
+                            value={superCat._id || superCat.id}
+                          >
+                            {superCat.name}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.superCategoryId && (
+                        <p className="text-red-500 text-sm mt-1">{errors.superCategoryId}</p>
+                      )}
+                    </div>
 
-              {formData.superCategoryId && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Category <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        name="categoryId"
+                        value={formData.categoryId}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                        disabled={!formData.superCategoryId}
+                      >
+                        <option value="">
+                          {formData.superCategoryId
+                            ? 'Select Category'
+                            : 'Select Super Category First'}
+                        </option>
+                        {categories.map((cat: any) => (
+                          <option key={cat._id || cat.id} value={cat._id || cat.id}>
+                            {cat.name}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.categoryId && (
+                        <p className="text-red-500 text-sm mt-1">{errors.categoryId}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* {formData.superCategoryId && (
                 <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-green-800 text-sm">
                     ✅ Super Category:{' '}
@@ -772,19 +834,19 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                     )}
                   </p>
                 </div>
-              )}
+              )} */}
 
-              {!formData.categoryId && (
+                  {/* {!formData.categoryId && (
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-blue-800 text-sm">
                     👆 Please select a super category and category above to continue with product
                     details.
                   </p>
                 </div>
-              )}
+              )} */}
 
-              {/* Form Completion Progress */}
-              {formData.categoryId && (
+                  {/* Form Completion Progress */}
+                  {/* {formData.categoryId && (
                 <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
                   <h4 className="text-sm font-semibold text-gray-900 mb-2">
                     Required Fields Progress
@@ -860,6 +922,8 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                     </p>
                   </div>
                 </div>
+              )} */}
+                </div>
               )}
             </div>
 
@@ -867,276 +931,373 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
             {formData.categoryId && (
               <>
                 {/* Basic Information */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Package className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Product Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        placeholder="e.g., iPhone 14 Pro Max"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                      {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('basicInfo')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Package className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Basic Information <span className="text-red-500">*</span>
+                      </h3>
                     </div>
+                    {openSections.basicInfo ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Brand <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="brand"
-                        value={formData.brand}
-                        onChange={handleInputChange}
-                        placeholder="e.g., Apple"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                      {errors.brand && <p className="text-red-500 text-sm mt-1">{errors.brand}</p>}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Model Number
-                      </label>
-                      <input
-                        type="text"
-                        name="productDetails.general.modelNumber"
-                        value={formData.productDetails.general.modelNumber}
-                        onChange={handleInputChange}
-                        placeholder="e.g., A2894"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2 cursor-pointer">
+                  {openSections.basicInfo && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Product Name <span className="text-red-500">*</span>
+                          </label>
                           <input
-                            type="checkbox"
-                            name="isActive"
-                            checked={formData.isActive}
+                            type="text"
+                            name="name"
+                            value={formData.name}
                             onChange={handleInputChange}
-                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            placeholder="e.g., iPhone 14 Pro Max"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
                           />
-                          <span className="text-sm text-gray-700">Product is active</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
+                          {errors.name && (
+                            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Brand <span className="text-red-500">*</span>
+                          </label>
                           <input
-                            type="checkbox"
-                            name="isRefurbished"
-                            checked={formData.isRefurbished}
+                            type="text"
+                            name="brand"
+                            value={formData.brand}
                             onChange={handleInputChange}
-                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            placeholder="e.g., Apple"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
                           />
-                          <span className="text-sm text-gray-700">Refurbished Product</span>
+                          {errors.brand && (
+                            <p className="text-red-500 text-sm mt-1">{errors.brand}</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Model Number
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.general.modelNumber"
+                            value={formData.productDetails.general.modelNumber}
+                            onChange={handleInputChange}
+                            placeholder="e.g., A2894"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Status
+                          </label>
+                          <div className="space-y-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                name="isActive"
+                                checked={formData.isActive}
+                                onChange={handleInputChange}
+                                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              />
+                              <span className="text-sm text-gray-700">Product is active</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                name="isRefurbished"
+                                checked={formData.isRefurbished}
+                                onChange={handleInputChange}
+                                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              />
+                              <span className="text-sm text-gray-700">Refurbished Product</span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Description <span className="text-red-500">*</span>
                         </label>
+                        <textarea
+                          name="description"
+                          value={formData.description}
+                          onChange={handleInputChange}
+                          placeholder="Enter detailed product description..."
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        />
+                        {errors.description && (
+                          <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+                        )}
                       </div>
                     </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Description <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      placeholder="Enter detailed product description..."
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                    {errors.description && (
-                      <p className="text-red-500 text-sm mt-1">{errors.description}</p>
-                    )}
-                  </div>
+                  )}
                 </div>
 
                 {/* Images */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Camera className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Product Images</h3>
-                  </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                      id="image-upload"
-                    />
-                    <label htmlFor="image-upload" className="cursor-pointer">
-                      <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-600 mb-2">Click to upload product images</p>
-                      <p className="text-sm text-gray-500">PNG, JPG up to 5MB each</p>
-                    </label>
-                  </div>
-                  {formData.images.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                      {formData.images.map((image: string, index: number) => (
-                        <div key={index} className="relative">
-                          <img
-                            src={image}
-                            alt={`Product ${index + 1}`}
-                            className="w-full h-32 object-cover rounded-lg border border-gray-200"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => handleImageRemove(index)}
-                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
-                          >
-                            <X size={14} />
-                          </button>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('images')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Camera className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Product Images <span className="text-red-500">*</span>
+                      </h3>
+                    </div>
+                    {openSections.images ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.images && (
+                    <div className="p-4">
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          id="image-upload"
+                        />
+                        <label htmlFor="image-upload" className="cursor-pointer">
+                          <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                          <p className="text-gray-600 mb-2">Click to upload product images</p>
+                          <p className="text-sm text-gray-500">PNG, JPG up to 5MB each</p>
+                        </label>
+                      </div>
+                      {formData.images.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                          {formData.images.map((image: string, index: number) => (
+                            <div key={index} className="relative">
+                              <img
+                                src={image}
+                                alt={`Product ${index + 1}`}
+                                className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleImageRemove(index)}
+                                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
+                      {errors.images && (
+                        <p className="text-red-500 text-sm mt-2">{errors.images}</p>
+                      )}
                     </div>
                   )}
-                  {errors.images && <p className="text-red-500 text-sm mt-2">{errors.images}</p>}
                 </div>
 
                 {/* Pricing */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <DollarSign className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Pricing</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        MRP <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        name="pricing.mrp"
-                        value={formData.pricing.mrp}
-                        onChange={handleInputChange}
-                        placeholder="99999"
-                        step="0.01"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                      {errors['pricing.mrp'] && (
-                        <p className="text-red-500 text-sm mt-1">{errors['pricing.mrp']}</p>
-                      )}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('pricing')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <DollarSign className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Pricing <span className="text-red-500">*</span>
+                      </h3>
                     </div>
+                    {openSections.pricing ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Discounted Price
-                      </label>
-                      <input
-                        type="number"
-                        name="pricing.discountedPrice"
-                        value={formData.pricing.discountedPrice}
-                        onChange={handleInputChange}
-                        placeholder="89999"
-                        step="0.01"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
+                  {openSections.pricing && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            MRP <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="number"
+                            name="pricing.mrp"
+                            value={formData.pricing.mrp}
+                            onChange={handleInputChange}
+                            placeholder="99999"
+                            step="0.01"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                          />
+                          {errors['pricing.mrp'] && (
+                            <p className="text-red-500 text-sm mt-1">{errors['pricing.mrp']}</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Discounted Price
+                          </label>
+                          <input
+                            type="number"
+                            name="pricing.discountedPrice"
+                            value={formData.pricing.discountedPrice}
+                            onChange={handleInputChange}
+                            placeholder="89999"
+                            step="0.01"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Discount %{' '}
+                            <span className="text-xs text-gray-500">(Auto-calculated)</span>
+                          </label>
+                          <input
+                            type="number"
+                            name="pricing.discountPercent"
+                            value={formData.pricing.discountPercent}
+                            placeholder="0"
+                            step="0.01"
+                            readOnly
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                          />
+                          {formData.pricing.discountPercent &&
+                            parseFloat(formData.pricing.discountPercent) > 0 && (
+                              <p className="text-green-600 text-xs mt-1">
+                                ✓ {formData.pricing.discountPercent}% discount calculated
+                              </p>
+                            )}
+                        </div>
+                      </div>
+
+                      {/* Pricing Help Text */}
+                      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-blue-800 text-sm">
+                          💡 <strong>Auto-calculation:</strong> The discount percentage is
+                          automatically calculated when you enter both MRP and discounted price.
+                          {formData.pricing.mrp && formData.pricing.discountedPrice && (
+                            <span className="block mt-1">
+                              Current: ₹{formData.pricing.discountedPrice} (₹
+                              {(
+                                parseFloat(formData.pricing.mrp) -
+                                parseFloat(formData.pricing.discountedPrice)
+                              ).toFixed(2)}{' '}
+                              off from ₹{formData.pricing.mrp})
+                            </span>
+                          )}
+                        </p>
+                      </div>
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Discount % <span className="text-xs text-gray-500">(Auto-calculated)</span>
-                      </label>
-                      <input
-                        type="number"
-                        name="pricing.discountPercent"
-                        value={formData.pricing.discountPercent}
-                        placeholder="0"
-                        step="0.01"
-                        readOnly
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
-                      />
-                      {formData.pricing.discountPercent &&
-                        parseFloat(formData.pricing.discountPercent) > 0 && (
-                          <p className="text-green-600 text-xs mt-1">
-                            ✓ {formData.pricing.discountPercent}% discount calculated
-                          </p>
-                        )}
-                    </div>
-                  </div>
-
-                  {/* Pricing Help Text */}
-                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-blue-800 text-sm">
-                      💡 <strong>Auto-calculation:</strong> The discount percentage is automatically
-                      calculated when you enter both MRP and discounted price.
-                      {formData.pricing.mrp && formData.pricing.discountedPrice && (
-                        <span className="block mt-1">
-                          Current: ₹{formData.pricing.discountedPrice} (₹
-                          {(
-                            parseFloat(formData.pricing.mrp) -
-                            parseFloat(formData.pricing.discountedPrice)
-                          ).toFixed(2)}{' '}
-                          off from ₹{formData.pricing.mrp})
-                        </span>
-                      )}
-                    </p>
-                  </div>
+                  )}
                 </div>
 
                 {/* Stock & Condition */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Package className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Stock & Condition</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Condition <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        name="stock.condition"
-                        value={formData.stock.condition}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      >
-                        <option value="New">New</option>
-                        <option value="Like New">Like New</option>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('stock')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Package className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Stock & Condition <span className="text-red-500">*</span>
+                      </h3>
+                    </div>
+                    {openSections.stock ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.stock && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Condition <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            name="stock.condition"
+                            value={formData.stock.condition}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                          >
+                            <option value="New">New</option>
+                            {/* <option value="Like New">Like New</option>
                         <option value="Good">Good</option>
-                        <option value="Fair">Fair</option>
-                        <option value="Refurbished">Refurbished</option>
-                      </select>
-                    </div>
+                        <option value="Fair">Fair</option> */}
+                            <option value="Refurbished">Refurbished</option>
+                          </select>
+                        </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Quantity <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        name="stock.quantity"
-                        value={formData.stock.quantity}
-                        onChange={handleInputChange}
-                        placeholder="100"
-                        min="0"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                      {errors['stock.quantity'] && (
-                        <p className="text-red-500 text-sm mt-1">{errors['stock.quantity']}</p>
-                      )}
-                    </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Quantity <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="number"
+                            name="stock.quantity"
+                            value={formData.stock.quantity}
+                            onChange={handleInputChange}
+                            placeholder="100"
+                            min="0"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                          />
+                          {errors['stock.quantity'] && (
+                            <p className="text-red-500 text-sm mt-1">{errors['stock.quantity']}</p>
+                          )}
+                        </div>
 
-                    <div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            IMEI Number
+                          </label>
+                          <input
+                            type="text"
+                            name="stock.imeiNumber"
+                            value={formData.stock.imeiNumber || ''}
+                            onChange={handleInputChange}
+                            placeholder="Enter IMEI number"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Optional: Product's IMEI number
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Original Price (if used)
                       </label>
@@ -1150,101 +1311,119 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
-                  </div>
+                  </div> */}
 
-                  {/* Warranty Section */}
-                  <div className="mt-4">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                      Warranty Information
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            name="stock.warranty.available"
-                            checked={formData.stock.warranty.available}
-                            onChange={handleInputChange}
-                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                          />
-                          <span className="text-sm text-gray-700">Warranty Available</span>
-                        </label>
+                      {/* Warranty Section */}
+                      <div className="mt-4">
+                        <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                          Warranty Information
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                name="stock.warranty.available"
+                                checked={formData.stock.warranty.available}
+                                onChange={handleInputChange}
+                                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              />
+                              <span className="text-sm text-gray-700">Warranty Available</span>
+                            </label>
+                          </div>
+
+                          {formData.stock.warranty.available && (
+                            <>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Duration (months)
+                                </label>
+                                <input
+                                  type="number"
+                                  name="stock.warranty.durationMonths"
+                                  value={formData.stock.warranty.durationMonths}
+                                  onChange={handleInputChange}
+                                  placeholder="12"
+                                  min="1"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Warranty Description
+                                </label>
+                                <input
+                                  type="text"
+                                  name="stock.warranty.description"
+                                  value={formData.stock.warranty.description}
+                                  onChange={handleInputChange}
+                                  placeholder="Manufacturer warranty"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </div>
-
-                      {formData.stock.warranty.available && (
-                        <>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Duration (months)
-                            </label>
-                            <input
-                              type="number"
-                              name="stock.warranty.durationMonths"
-                              value={formData.stock.warranty.durationMonths}
-                              onChange={handleInputChange}
-                              placeholder="12"
-                              min="1"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Warranty Description
-                            </label>
-                            <input
-                              type="text"
-                              name="stock.warranty.description"
-                              value={formData.stock.warranty.description}
-                              onChange={handleInputChange}
-                              placeholder="Manufacturer warranty"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                          </div>
-                        </>
-                      )}
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Availability */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Package className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Availability</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="availability.inStock"
-                          checked={formData.availability.inStock}
-                          onChange={handleInputChange}
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-700">In Stock</span>
-                      </label>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('availability')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Package className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Availability</h3>
                     </div>
+                    {openSections.availability ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Estimated Delivery
-                      </label>
-                      <input
-                        type="text"
-                        name="availability.estimatedDelivery"
-                        value={formData.availability.estimatedDelivery}
-                        onChange={handleInputChange}
-                        placeholder="2-3 business days"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
+                  {openSections.availability && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              name="availability.inStock"
+                              checked={formData.availability.inStock}
+                              onChange={handleInputChange}
+                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">In Stock</span>
+                          </label>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Estimated Delivery
+                          </label>
+                          <input
+                            type="text"
+                            name="availability.estimatedDelivery"
+                            value={formData.availability.estimatedDelivery}
+                            onChange={handleInputChange}
+                            placeholder="2-3 business days"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Key Features */}
-                <div className="mb-6">
+                {/* <div className="mb-6">
                   <div className="flex items-center gap-3 mb-4">
                     <Star className="w-5 h-5 text-blue-600" />
                     <h3 className="text-lg font-semibold text-gray-900">Key Features</h3>
@@ -1288,461 +1467,598 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                       Add Feature
                     </button>
                   </div>
-                </div>
+                </div> */}
 
-                {/* Technical Specifications */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <Monitor className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Technical Specifications
-                    </h3>
-                  </div>
-
-                  {/* Display */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Monitor size={16} />
-                      Display
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Screen Size
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.display.size"
-                          value={formData.productDetails.display.size}
-                          onChange={handleInputChange}
-                          placeholder='6.7"'
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Resolution
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.display.resolution"
-                          value={formData.productDetails.display.resolution}
-                          onChange={handleInputChange}
-                          placeholder="2778 x 1284"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Display Type
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.display.type"
-                          value={formData.productDetails.display.type}
-                          onChange={handleInputChange}
-                          placeholder="Super Retina XDR OLED"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Protection
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.display.protection"
-                          value={formData.productDetails.display.protection}
-                          onChange={handleInputChange}
-                          placeholder="Ceramic Shield"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Refresh Rate
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.display.refreshRate"
-                          value={formData.productDetails.display.refreshRate}
-                          onChange={handleInputChange}
-                          placeholder="120Hz"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Brightness
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.display.brightness"
-                          value={formData.productDetails.display.brightness}
-                          onChange={handleInputChange}
-                          placeholder="1000 nits"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
+                {/* Display */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('display')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Monitor className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Display</h3>
                     </div>
-                  </div>
+                    {openSections.display ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
 
-                  {/* Performance */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Cpu size={16} />
-                      Performance
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Processor
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.general.processor"
-                          value={formData.productDetails.general.processor}
-                          onChange={handleInputChange}
-                          placeholder="A16 Bionic"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Chipset
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.general.chipset"
-                          value={formData.productDetails.general.chipset}
-                          onChange={handleInputChange}
-                          placeholder="Apple A16 Bionic"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">GPU</label>
-                        <input
-                          type="text"
-                          name="productDetails.general.gpu"
-                          value={formData.productDetails.general.gpu}
-                          onChange={handleInputChange}
-                          placeholder="Apple GPU (5-core)"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Operating System
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.general.os"
-                          value={formData.productDetails.general.os}
-                          onChange={handleInputChange}
-                          placeholder="iOS 16"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Memory & Storage */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <HardDrive size={16} />
-                      Memory & Storage
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">RAM</label>
-                        <input
-                          type="text"
-                          name="productDetails.memory.ram"
-                          value={formData.productDetails.memory.ram}
-                          onChange={handleInputChange}
-                          placeholder="6GB"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Storage
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.memory.storage"
-                          value={formData.productDetails.memory.storage}
-                          onChange={handleInputChange}
-                          placeholder="128GB"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            name="productDetails.memory.expandable"
-                            checked={formData.productDetails.memory.expandable}
-                            onChange={handleInputChange}
-                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                          />
-                          <span className="text-sm text-gray-700">Expandable Storage</span>
-                        </label>
-                      </div>
-                      {formData.productDetails.memory.expandable && (
+                  {openSections.display && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Card Slot
+                            Screen Size
                           </label>
                           <input
                             type="text"
-                            name="productDetails.memory.cardSlot"
-                            value={formData.productDetails.memory.cardSlot}
+                            name="productDetails.display.size"
+                            value={formData.productDetails.display.size}
                             onChange={handleInputChange}
-                            placeholder="microSD, up to 1TB"
+                            placeholder='6.7"'
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Camera */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Camera size={16} />
-                      Camera
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Rear Camera (Primary)
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.camera.rear.primary"
-                          value={formData.productDetails.camera.rear.primary}
-                          onChange={handleInputChange}
-                          placeholder="48MP"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Rear Camera (Secondary)
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.camera.rear.secondary"
-                          value={formData.productDetails.camera.rear.secondary}
-                          onChange={handleInputChange}
-                          placeholder="12MP Ultra Wide"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Front Camera
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.camera.front.primary"
-                          value={formData.productDetails.camera.front.primary}
-                          onChange={handleInputChange}
-                          placeholder="12MP TrueDepth"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Battery */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Battery size={16} />
-                      Battery
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Battery Capacity
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.battery.capacity"
-                          value={formData.productDetails.battery.capacity}
-                          onChange={handleInputChange}
-                          placeholder="4323 mAh"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Battery Type
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.battery.type"
-                          value={formData.productDetails.battery.type}
-                          onChange={handleInputChange}
-                          placeholder="Li-Ion"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Wired Charging
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.battery.charging.wired"
-                          value={formData.productDetails.battery.charging.wired}
-                          onChange={handleInputChange}
-                          placeholder="20W"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2 cursor-pointer">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Resolution
+                          </label>
                           <input
-                            type="checkbox"
-                            name="productDetails.battery.charging.wireless"
-                            checked={formData.productDetails.battery.charging.wireless}
+                            type="text"
+                            name="productDetails.display.resolution"
+                            value={formData.productDetails.display.resolution}
                             onChange={handleInputChange}
-                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            placeholder="2778 x 1284"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          <span className="text-sm text-gray-700">Wireless Charging</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Display Type
+                          </label>
                           <input
-                            type="checkbox"
-                            name="productDetails.battery.charging.fastCharging"
-                            checked={formData.productDetails.battery.charging.fastCharging}
+                            type="text"
+                            name="productDetails.display.type"
+                            value={formData.productDetails.display.type}
                             onChange={handleInputChange}
-                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            placeholder="Super Retina XDR OLED"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          <span className="text-sm text-gray-700">Fast Charging</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Protection
+                          </label>
                           <input
-                            type="checkbox"
-                            name="productDetails.battery.charging.reverseCharging"
-                            checked={formData.productDetails.battery.charging.reverseCharging}
+                            type="text"
+                            name="productDetails.display.protection"
+                            value={formData.productDetails.display.protection}
                             onChange={handleInputChange}
-                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            placeholder="Ceramic Shield"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          <span className="text-sm text-gray-700">Reverse Charging</span>
-                        </label>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Refresh Rate
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.display.refreshRate"
+                            value={formData.productDetails.display.refreshRate}
+                            onChange={handleInputChange}
+                            placeholder="120Hz"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Brightness
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.display.brightness"
+                            value={formData.productDetails.display.brightness}
+                            onChange={handleInputChange}
+                            placeholder="1000 nits"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
+                </div>
 
-                  {/* Network & Connectivity */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Wifi size={16} />
-                      Network & Connectivity
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">SIM</label>
-                        <input
-                          type="text"
-                          name="productDetails.network.sim"
-                          value={formData.productDetails.network.sim}
-                          onChange={handleInputChange}
-                          placeholder="Dual SIM"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Network
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.network.network"
-                          value={formData.productDetails.network.network}
-                          onChange={handleInputChange}
-                          placeholder="5G, 4G LTE"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Wi-Fi
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.network.wifi"
-                          value={formData.productDetails.network.wifi}
-                          onChange={handleInputChange}
-                          placeholder="Wi-Fi 6"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Bluetooth
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.network.bluetooth"
-                          value={formData.productDetails.network.bluetooth}
-                          onChange={handleInputChange}
-                          placeholder="5.3"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="flex items-center gap-2 cursor-pointer">
+                {/* Performance */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('performance')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Cpu className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Performance</h3>
+                    </div>
+                    {openSections.performance ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.performance && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Processor
+                          </label>
                           <input
-                            type="checkbox"
-                            name="productDetails.network.gps"
-                            checked={formData.productDetails.network.gps}
+                            type="text"
+                            name="productDetails.general.processor"
+                            value={formData.productDetails.general.processor}
                             onChange={handleInputChange}
-                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            placeholder="A16 Bionic"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          <span className="text-sm text-gray-700">GPS</span>
-                        </label>
-                      </div>
-                      <div>
-                        <label className="flex items-center gap-2 cursor-pointer">
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Chipset
+                          </label>
                           <input
-                            type="checkbox"
-                            name="productDetails.network.nfc"
-                            checked={formData.productDetails.network.nfc}
+                            type="text"
+                            name="productDetails.general.chipset"
+                            value={formData.productDetails.general.chipset}
                             onChange={handleInputChange}
-                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            placeholder="Apple A16 Bionic"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          <span className="text-sm text-gray-700">NFC</span>
-                        </label>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            GPU
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.general.gpu"
+                            value={formData.productDetails.general.gpu}
+                            onChange={handleInputChange}
+                            placeholder="Apple GPU (5-core)"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Operating System
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.general.os"
+                            value={formData.productDetails.general.os}
+                            onChange={handleInputChange}
+                            placeholder="iOS 16"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
+                </div>
 
-                  {/* Design */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Palette size={16} />
-                      Design
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Weight
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.design.weight"
-                          value={formData.productDetails.design.weight}
-                          onChange={handleInputChange}
-                          placeholder="240g"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
+                {/* Memory & Storage */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('storage')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <HardDrive className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Memory & Storage</h3>
+                    </div>
+                    {openSections.storage ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.storage && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            RAM
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.memory.ram"
+                            value={formData.productDetails.memory.ram}
+                            onChange={handleInputChange}
+                            placeholder="6GB"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Storage
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.memory.storage"
+                            value={formData.productDetails.memory.storage}
+                            onChange={handleInputChange}
+                            placeholder="128GB"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              name="productDetails.memory.expandable"
+                              checked={formData.productDetails.memory.expandable}
+                              onChange={handleInputChange}
+                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">Expandable Storage</span>
+                          </label>
+                        </div>
+                        {formData.productDetails.memory.expandable && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Card Slot
+                            </label>
+                            <input
+                              type="text"
+                              name="productDetails.memory.cardSlot"
+                              value={formData.productDetails.memory.cardSlot}
+                              onChange={handleInputChange}
+                              placeholder="microSD, up to 1TB"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                          </div>
+                        )}
                       </div>
-                      <div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Camera */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('camera')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Camera className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Camera</h3>
+                    </div>
+                    {openSections.camera ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.camera && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Rear Camera (Primary)
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.camera.rear.primary"
+                            value={formData.productDetails.camera.rear.primary}
+                            onChange={handleInputChange}
+                            placeholder="48MP"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Rear Camera (Secondary)
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.camera.rear.secondary"
+                            value={formData.productDetails.camera.rear.secondary}
+                            onChange={handleInputChange}
+                            placeholder="12MP Ultra Wide"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Front Camera
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.camera.front.primary"
+                            value={formData.productDetails.camera.front.primary}
+                            onChange={handleInputChange}
+                            placeholder="12MP TrueDepth"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Battery */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('battery')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Battery className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Battery</h3>
+                    </div>
+                    {openSections.battery ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.battery && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Battery Capacity
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.battery.capacity"
+                            value={formData.productDetails.battery.capacity}
+                            onChange={handleInputChange}
+                            placeholder="4323 mAh"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Battery Type
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.battery.type"
+                            value={formData.productDetails.battery.type}
+                            onChange={handleInputChange}
+                            placeholder="Li-Ion"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Wired Charging
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.battery.charging.wired"
+                            value={formData.productDetails.battery.charging.wired}
+                            onChange={handleInputChange}
+                            placeholder="20W"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              name="productDetails.battery.charging.wireless"
+                              checked={formData.productDetails.battery.charging.wireless}
+                              onChange={handleInputChange}
+                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">Wireless Charging</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              name="productDetails.battery.charging.fastCharging"
+                              checked={formData.productDetails.battery.charging.fastCharging}
+                              onChange={handleInputChange}
+                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">Fast Charging</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              name="productDetails.battery.charging.reverseCharging"
+                              checked={formData.productDetails.battery.charging.reverseCharging}
+                              onChange={handleInputChange}
+                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">Reverse Charging</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Network & Connectivity */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('connectivity')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Wifi className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Network & Connectivity
+                      </h3>
+                    </div>
+                    {openSections.connectivity ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.connectivity && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            SIM
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.network.sim"
+                            value={formData.productDetails.network.sim}
+                            onChange={handleInputChange}
+                            placeholder="Dual SIM"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Network
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.network.network"
+                            value={formData.productDetails.network.network}
+                            onChange={handleInputChange}
+                            placeholder="5G, 4G LTE"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Wi-Fi
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.network.wifi"
+                            value={formData.productDetails.network.wifi}
+                            onChange={handleInputChange}
+                            placeholder="Wi-Fi 6"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Bluetooth
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.network.bluetooth"
+                            value={formData.productDetails.network.bluetooth}
+                            onChange={handleInputChange}
+                            placeholder="5.3"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              name="productDetails.network.gps"
+                              checked={formData.productDetails.network.gps}
+                              onChange={handleInputChange}
+                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">GPS</span>
+                          </label>
+                        </div>
+                        <div>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              name="productDetails.network.nfc"
+                              checked={formData.productDetails.network.nfc}
+                              onChange={handleInputChange}
+                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">NFC</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Design */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('design')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Palette className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Design</h3>
+                    </div>
+                    {openSections.design ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.design && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Weight
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.design.weight"
+                            value={formData.productDetails.design.weight}
+                            onChange={handleInputChange}
+                            placeholder="240g"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Material
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.design.material"
+                            value={formData.productDetails.design.material}
+                            onChange={handleInputChange}
+                            placeholder="Glass front and back, stainless steel frame"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Water Resistance
+                          </label>
+                          <input
+                            type="text"
+                            name="productDetails.design.waterResistance"
+                            value={formData.productDetails.design.waterResistance}
+                            onChange={handleInputChange}
+                            placeholder="IP68"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-4">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Dimensions (H x W x T)
                         </label>
@@ -1773,43 +2089,31 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                           />
                         </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Material
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.design.material"
-                          value={formData.productDetails.design.material}
-                          onChange={handleInputChange}
-                          placeholder="Glass front and back, stainless steel frame"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Water Resistance
-                        </label>
-                        <input
-                          type="text"
-                          name="productDetails.design.waterResistance"
-                          value={formData.productDetails.design.waterResistance}
-                          onChange={handleInputChange}
-                          placeholder="IP68"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Product Variants */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Package className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Product Variants</h3>
-                  </div>
-                  <div className="space-y-3">
+                {/* <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('variants')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Package className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Product Variants</h3>
+                    </div>
+                    {openSections.variants ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.variants && (
+                    <div className="p-4">
+                      <div className="space-y-3">
                     {formData.variants?.map((variant: any, index: number) => (
                       <div
                         key={index}
@@ -1894,438 +2198,640 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                       <Plus size={16} />
                       Add Variant
                     </button>
-                  </div>
-                </div>
+                      </div>
+                    </div>
+                  )}
+                </div> */}
 
                 {/* Add-ons & Accessories */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Plus className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Add-ons & Accessories</h3>
-                  </div>
-                  <div className="space-y-3">
-                    {formData.addOns?.map((addon: any, index: number) => (
-                      <div
-                        key={index}
-                        className="grid grid-cols-1 md:grid-cols-4 gap-3 p-4 border border-gray-200 rounded-lg"
-                      >
-                        <input
-                          type="text"
-                          placeholder="Add-on Name"
-                          value={addon.name || ''}
-                          onChange={e => {
-                            const newAddOns = [...formData.addOns];
-                            newAddOns[index] = { ...addon, name: e.target.value };
-                            setFormData((prev: any) => ({ ...prev, addOns: newAddOns }));
-                          }}
-                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                        <input
-                          type="number"
-                          placeholder="Cost"
-                          value={addon.cost || ''}
-                          onChange={e => {
-                            const newAddOns = [...formData.addOns];
-                            newAddOns[index] = { ...addon, cost: parseFloat(e.target.value) || 0 };
-                            setFormData((prev: any) => ({ ...prev, addOns: newAddOns }));
-                          }}
-                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Description"
-                          value={addon.description || ''}
-                          onChange={e => {
-                            const newAddOns = [...formData.addOns];
-                            newAddOns[index] = { ...addon, description: e.target.value };
-                            setFormData((prev: any) => ({ ...prev, addOns: newAddOns }));
-                          }}
-                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('addOns')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Plus className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Add-ons & Accessories</h3>
+                    </div>
+                    {openSections.addOns ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.addOns && (
+                    <div className="p-4">
+                      <div className="space-y-3">
+                        {formData.addOns?.map((addon: any, index: number) => (
+                          <div
+                            key={index}
+                            className="grid grid-cols-1 md:grid-cols-4 gap-3 p-4 border border-gray-200 rounded-lg"
+                          >
+                            <input
+                              type="text"
+                              placeholder="Add-on Name"
+                              value={addon.name || ''}
+                              onChange={e => {
+                                const newAddOns = [...formData.addOns];
+                                newAddOns[index] = { ...addon, name: e.target.value };
+                                setFormData((prev: any) => ({ ...prev, addOns: newAddOns }));
+                              }}
+                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                            <input
+                              type="number"
+                              placeholder="Cost"
+                              value={addon.cost || ''}
+                              onChange={e => {
+                                const newAddOns = [...formData.addOns];
+                                newAddOns[index] = {
+                                  ...addon,
+                                  cost: parseFloat(e.target.value) || 0,
+                                };
+                                setFormData((prev: any) => ({ ...prev, addOns: newAddOns }));
+                              }}
+                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Description"
+                              value={addon.description || ''}
+                              onChange={e => {
+                                const newAddOns = [...formData.addOns];
+                                newAddOns[index] = { ...addon, description: e.target.value };
+                                setFormData((prev: any) => ({ ...prev, addOns: newAddOns }));
+                              }}
+                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newAddOns = formData.addOns.filter(
+                                  (_: any, i: number) => i !== index
+                                );
+                                setFormData((prev: any) => ({ ...prev, addOns: newAddOns }));
+                              }}
+                              className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                        ))}
                         <button
                           type="button"
-                          onClick={() => {
-                            const newAddOns = formData.addOns.filter(
-                              (_: any, i: number) => i !== index
-                            );
-                            setFormData((prev: any) => ({ ...prev, addOns: newAddOns }));
-                          }}
-                          className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                          onClick={() =>
+                            setFormData((prev: any) => ({
+                              ...prev,
+                              addOns: [...prev.addOns, { name: '', cost: 0, description: '' }],
+                            }))
+                          }
+                          className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
                         >
-                          <X size={16} />
+                          <Plus size={16} />
+                          Add Accessory
                         </button>
                       </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFormData((prev: any) => ({
-                          ...prev,
-                          addOns: [...prev.addOns, { name: '', cost: 0, description: '' }],
-                        }))
-                      }
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
-                    >
-                      <Plus size={16} />
-                      Add Accessory
-                    </button>
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Condition Options */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Shield className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Condition Options</h3>
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                      Price adjustments for different conditions
-                    </span>
-                  </div>
-                  <div className="space-y-3">
-                    {formData.conditionOptions?.map((condition: any, index: number) => (
-                      <div
-                        key={index}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 border border-gray-200 rounded-lg"
-                      >
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Condition Label
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="e.g., Excellent, Good, Fair"
-                            value={condition.label || ''}
-                            onChange={e => {
-                              const newConditions = [...formData.conditionOptions];
-                              newConditions[index] = { ...condition, label: e.target.value };
-                              setFormData((prev: any) => ({
-                                ...prev,
-                                conditionOptions: newConditions,
-                              }));
-                            }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Price Adjustment (₹)
-                          </label>
-                          <input
-                            type="number"
-                            placeholder="0 for no change, negative for discount"
-                            value={condition.price || ''}
-                            onChange={e => {
-                              const newConditions = [...formData.conditionOptions];
-                              newConditions[index] = {
-                                ...condition,
-                                price: parseFloat(e.target.value) || 0,
-                              };
-                              setFormData((prev: any) => ({
-                                ...prev,
-                                conditionOptions: newConditions,
-                              }));
-                            }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                          <p className="text-xs text-gray-500 mt-1">
-                            {condition.price > 0 && `+₹${condition.price} (Premium)`}
-                            {condition.price < 0 && `₹${Math.abs(condition.price)} discount`}
-                            {condition.price === 0 && 'No price change'}
-                          </p>
-                        </div>
-                        <div className="flex items-end">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newConditions = formData.conditionOptions.filter(
-                                (_: any, i: number) => i !== index
-                              );
-                              setFormData((prev: any) => ({
-                                ...prev,
-                                conditionOptions: newConditions,
-                              }));
-                            }}
-                            className="w-full px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center justify-center gap-2"
-                            disabled={formData.conditionOptions.length <= 1}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('conditionOptions')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Shield className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Condition Options</h3>
+                    </div>
+                    {openSections.conditionOptions ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.conditionOptions && (
+                    <div className="p-4">
+                      <div className="space-y-4">
+                        {formData.conditionOptions?.map((condition: any, index: number) => (
+                          <div
+                            key={index}
+                            className="p-4 border border-gray-200 rounded-lg bg-gray-50"
                           >
-                            <X size={16} />
-                            Remove
-                          </button>
-                        </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Condition Label
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g., Excellent, Good, Fair"
+                                  value={condition.label || ''}
+                                  onChange={e => {
+                                    const newConditions = [...formData.conditionOptions];
+                                    newConditions[index] = { ...condition, label: e.target.value };
+                                    setFormData((prev: any) => ({
+                                      ...prev,
+                                      conditionOptions: newConditions,
+                                    }));
+                                  }}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Price (₹)
+                                </label>
+                                <input
+                                  type="number"
+                                  placeholder="Enter actual price"
+                                  value={condition.price || ''}
+                                  onChange={e => {
+                                    const newConditions = [...formData.conditionOptions];
+                                    newConditions[index] = {
+                                      ...condition,
+                                      price: parseFloat(e.target.value) || 0,
+                                    };
+                                    setFormData((prev: any) => ({
+                                      ...prev,
+                                      conditionOptions: newConditions,
+                                    }));
+                                  }}
+                                  min="0"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                              </div>
+                              <div className="flex items-end">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newConditions = formData.conditionOptions.filter(
+                                      (_: any, i: number) => i !== index
+                                    );
+                                    setFormData((prev: any) => ({
+                                      ...prev,
+                                      conditionOptions: newConditions,
+                                    }));
+                                  }}
+                                  className="w-full px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center justify-center gap-2"
+                                  disabled={formData.conditionOptions.length <= 1}
+                                >
+                                  <X size={16} />
+                                  Remove
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Variant Fields: RAM, Storage, Color, Stock */}
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3 pt-3 border-t border-gray-300">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  RAM
+                                </label>
+                                <select
+                                  value={condition.ram || ''}
+                                  onChange={e => {
+                                    const newConditions = [...formData.conditionOptions];
+                                    newConditions[index] = { ...condition, ram: e.target.value };
+                                    setFormData((prev: any) => ({
+                                      ...prev,
+                                      conditionOptions: newConditions,
+                                    }));
+                                  }}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                  <option value="">Select RAM</option>
+                                  <option value="2GB">2GB</option>
+                                  <option value="3GB">3GB</option>
+                                  <option value="4GB">4GB</option>
+                                  <option value="6GB">6GB</option>
+                                  <option value="8GB">8GB</option>
+                                  <option value="12GB">12GB</option>
+                                  <option value="16GB">16GB</option>
+                                  <option value="18GB">18GB</option>
+                                  <option value="24GB">24GB</option>
+                                  <option value="32GB">32GB</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Storage
+                                </label>
+                                <select
+                                  value={condition.storage || ''}
+                                  onChange={e => {
+                                    const newConditions = [...formData.conditionOptions];
+                                    newConditions[index] = {
+                                      ...condition,
+                                      storage: e.target.value,
+                                    };
+                                    setFormData((prev: any) => ({
+                                      ...prev,
+                                      conditionOptions: newConditions,
+                                    }));
+                                  }}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                  <option value="">Select Storage</option>
+                                  <option value="16GB">16GB</option>
+                                  <option value="32GB">32GB</option>
+                                  <option value="64GB">64GB</option>
+                                  <option value="128GB">128GB</option>
+                                  <option value="256GB">256GB</option>
+                                  <option value="512GB">512GB</option>
+                                  <option value="1TB">1TB</option>
+                                  <option value="2TB">2TB</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Color
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g., Black, White"
+                                  value={condition.color || ''}
+                                  onChange={e => {
+                                    const newConditions = [...formData.conditionOptions];
+                                    newConditions[index] = { ...condition, color: e.target.value };
+                                    setFormData((prev: any) => ({
+                                      ...prev,
+                                      conditionOptions: newConditions,
+                                    }));
+                                  }}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Stock
+                                </label>
+                                <input
+                                  type="number"
+                                  placeholder="Available quantity"
+                                  value={condition.stock || 0}
+                                  onChange={e => {
+                                    const newConditions = [...formData.conditionOptions];
+                                    newConditions[index] = {
+                                      ...condition,
+                                      stock: parseInt(e.target.value) || 0,
+                                    };
+                                    setFormData((prev: any) => ({
+                                      ...prev,
+                                      conditionOptions: newConditions,
+                                    }));
+                                  }}
+                                  min="0"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setFormData((prev: any) => ({
+                              ...prev,
+                              conditionOptions: [
+                                ...prev.conditionOptions,
+                                { label: '', price: 0, ram: '', storage: '', color: '', stock: 0 },
+                              ],
+                            }))
+                          }
+                          className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
+                        >
+                          <Plus size={16} />
+                          Add Condition Option
+                        </button>
                       </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFormData((prev: any) => ({
-                          ...prev,
-                          conditionOptions: [...prev.conditionOptions, { label: '', price: 0 }],
-                        }))
-                      }
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
-                    >
-                      <Plus size={16} />
-                      Add Condition Option
-                    </button>
-                  </div>
-                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-blue-800 text-sm">
-                      💡 <strong>Condition Options:</strong> These allow customers to choose
-                      different product conditions with corresponding price adjustments. Use
-                      positive values for premium conditions and negative values for discounts.
-                    </p>
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Sensors & Features */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Monitor className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Sensors & Features</h3>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="productDetails.sensors.fingerprintScanner"
-                        checked={formData.productDetails.sensors.fingerprintScanner}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">Fingerprint Scanner</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="productDetails.sensors.faceUnlock"
-                        checked={formData.productDetails.sensors.faceUnlock}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">Face Unlock</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="productDetails.sensors.accelerometer"
-                        checked={formData.productDetails.sensors.accelerometer}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">Accelerometer</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="productDetails.sensors.gyroscope"
-                        checked={formData.productDetails.sensors.gyroscope}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">Gyroscope</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="productDetails.sensors.proximity"
-                        checked={formData.productDetails.sensors.proximity}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">Proximity Sensor</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="productDetails.sensors.compass"
-                        checked={formData.productDetails.sensors.compass}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">Compass</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="productDetails.sensors.barometer"
-                        checked={formData.productDetails.sensors.barometer}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">Barometer</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="productDetails.network.audioJack"
-                        checked={formData.productDetails.network.audioJack}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">3.5mm Audio Jack</span>
-                    </label>
-                  </div>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('sensors')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Monitor className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Sensors & Features</h3>
+                    </div>
+                    {openSections.sensors ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.sensors && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="productDetails.sensors.fingerprintScanner"
+                            checked={formData.productDetails.sensors.fingerprintScanner}
+                            onChange={handleInputChange}
+                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">Fingerprint Scanner</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="productDetails.sensors.faceUnlock"
+                            checked={formData.productDetails.sensors.faceUnlock}
+                            onChange={handleInputChange}
+                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">Face Unlock</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="productDetails.sensors.accelerometer"
+                            checked={formData.productDetails.sensors.accelerometer}
+                            onChange={handleInputChange}
+                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">Accelerometer</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="productDetails.sensors.gyroscope"
+                            checked={formData.productDetails.sensors.gyroscope}
+                            onChange={handleInputChange}
+                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">Gyroscope</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="productDetails.sensors.proximity"
+                            checked={formData.productDetails.sensors.proximity}
+                            onChange={handleInputChange}
+                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">Proximity Sensor</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="productDetails.sensors.compass"
+                            checked={formData.productDetails.sensors.compass}
+                            onChange={handleInputChange}
+                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">Compass</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="productDetails.sensors.barometer"
+                            checked={formData.productDetails.sensors.barometer}
+                            onChange={handleInputChange}
+                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">Barometer</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="productDetails.network.audioJack"
+                            checked={formData.productDetails.network.audioJack}
+                            onChange={handleInputChange}
+                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">3.5mm Audio Jack</span>
+                        </label>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Payment Options */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <DollarSign className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Payment Options</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="paymentOptions.emiAvailable"
-                        checked={formData.paymentOptions.emiAvailable}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">EMI Available</span>
-                    </label>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('paymentOptions')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <DollarSign className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Payment Options</h3>
+                    </div>
+                    {openSections.paymentOptions ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Accepted Payment Methods
-                      </label>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        {['Cash', 'UPI', 'Card', 'Net Banking', 'Wallet', 'EMI'].map(method => (
-                          <label key={method} className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={formData.paymentOptions.methods.includes(method)}
-                              onChange={e => {
-                                const methods = e.target.checked
-                                  ? [...formData.paymentOptions.methods, method]
-                                  : formData.paymentOptions.methods.filter(
-                                      (m: string) => m !== method
-                                    );
-                                setFormData((prev: any) => ({
-                                  ...prev,
-                                  paymentOptions: { ...prev.paymentOptions, methods },
-                                }));
-                              }}
-                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                            />
-                            <span className="text-sm text-gray-700">{method}</span>
+                  {openSections.paymentOptions && (
+                    <div className="p-4">
+                      <div className="space-y-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="paymentOptions.emiAvailable"
+                            checked={formData.paymentOptions.emiAvailable}
+                            onChange={handleInputChange}
+                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">EMI Available</span>
+                        </label>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Accepted Payment Methods
                           </label>
-                        ))}
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            {['Cash', 'UPI', 'Card', 'Net Banking', 'Wallet', 'EMI'].map(method => (
+                              <label
+                                key={method}
+                                className="flex items-center gap-2 cursor-pointer"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={formData.paymentOptions.methods.includes(method)}
+                                  onChange={e => {
+                                    const methods = e.target.checked
+                                      ? [...formData.paymentOptions.methods, method]
+                                      : formData.paymentOptions.methods.filter(
+                                          (m: string) => m !== method
+                                        );
+                                    setFormData((prev: any) => ({
+                                      ...prev,
+                                      paymentOptions: { ...prev.paymentOptions, methods },
+                                    }));
+                                  }}
+                                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                />
+                                <span className="text-sm text-gray-700">{method}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Product Badges */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Star className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Product Badges & Certifications
-                    </h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Quality Checks Badge
-                      </label>
-                      <input
-                        type="text"
-                        name="badges.qualityChecks"
-                        value={formData.badges.qualityChecks}
-                        onChange={handleInputChange}
-                        placeholder="e.g., 32-Point Quality Check"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('badges')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Star className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Product Badges & Certifications
+                      </h3>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Warranty Badge
-                      </label>
-                      <input
-                        type="text"
-                        name="badges.warranty"
-                        value={formData.badges.warranty}
-                        onChange={handleInputChange}
-                        placeholder="e.g., 1 Year Warranty"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
+                    {openSections.badges ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.badges && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Quality Checks Badge
+                          </label>
+                          <input
+                            type="text"
+                            name="badges.qualityChecks"
+                            value={formData.badges.qualityChecks}
+                            onChange={handleInputChange}
+                            placeholder="e.g., 32-Point Quality Check"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Warranty Badge
+                          </label>
+                          <input
+                            type="text"
+                            name="badges.warranty"
+                            value={formData.badges.warranty}
+                            onChange={handleInputChange}
+                            placeholder="e.g., 1 Year Warranty"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Refund Policy Badge
+                          </label>
+                          <input
+                            type="text"
+                            name="badges.refundPolicy"
+                            value={formData.badges.refundPolicy}
+                            onChange={handleInputChange}
+                            placeholder="e.g., 7 Days Return"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Assurance Badge
+                          </label>
+                          <input
+                            type="text"
+                            name="badges.assurance"
+                            value={formData.badges.assurance}
+                            onChange={handleInputChange}
+                            placeholder="e.g., Cashmitra Assured"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Refund Policy Badge
-                      </label>
-                      <input
-                        type="text"
-                        name="badges.refundPolicy"
-                        value={formData.badges.refundPolicy}
-                        onChange={handleInputChange}
-                        placeholder="e.g., 7 Days Return"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Assurance Badge
-                      </label>
-                      <input
-                        type="text"
-                        name="badges.assurance"
-                        value={formData.badges.assurance}
-                        onChange={handleInputChange}
-                        placeholder="e.g., Cashmitra Assured"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Trust & Legal */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Shield className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Trust & Legal</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Warranty
-                      </label>
-                      <input
-                        type="text"
-                        name="trustMetrics.warranty"
-                        value={formData.trustMetrics.warranty}
-                        onChange={handleInputChange}
-                        placeholder="1 Year Manufacturer Warranty"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('trustMetrics')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Shield className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Trust & Legal</h3>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Return Policy
-                      </label>
-                      <input
-                        type="text"
-                        name="trustMetrics.returnPolicy"
-                        value={formData.trustMetrics.returnPolicy}
-                        onChange={handleInputChange}
-                        placeholder="7 Days Return Policy"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
+                    {openSections.trustMetrics ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.trustMetrics && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Warranty
+                          </label>
+                          <input
+                            type="text"
+                            name="trustMetrics.warranty"
+                            value={formData.trustMetrics.warranty}
+                            onChange={handleInputChange}
+                            placeholder="1 Year Manufacturer Warranty"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Return Policy
+                          </label>
+                          <input
+                            type="text"
+                            name="trustMetrics.returnPolicy"
+                            value={formData.trustMetrics.returnPolicy}
+                            onChange={handleInputChange}
+                            placeholder="7 Days Return Policy"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              name="trustMetrics.authenticity"
+                              checked={formData.trustMetrics.authenticity}
+                              onChange={handleInputChange}
+                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">
+                              Certified Authentic Product
+                            </span>
+                          </label>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="trustMetrics.authenticity"
-                          checked={formData.trustMetrics.authenticity}
-                          onChange={handleInputChange}
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-700">Certified Authentic Product</span>
-                      </label>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </>
             )}

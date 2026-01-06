@@ -26,7 +26,9 @@ class SellService {
       }
 
       // Get customer info from localStorage
-      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+      const { getStorageKeys } = require('../utils/jwt.utils');
+      const storageKeys = getStorageKeys('customer');
+      const userData = JSON.parse(localStorage.getItem(storageKeys.userData) || '{}');
 
       // Transform the data structure to match backend expectations for /api/sell-orders
       const transformedData = {

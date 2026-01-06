@@ -15,7 +15,7 @@ const MainLayout = () => {
 
   // Check if admin or partner is accessing customer pages and redirect
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('adminToken') || localStorage.getItem('partnerToken');
     const userData = localStorage.getItem('userData');
 
     if (token && userData) {

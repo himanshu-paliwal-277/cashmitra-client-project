@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { API_BASE_URL } from '../utils/api';
+import { getStorageKeys } from '../utils/jwt.utils';
 
 interface Partner {
   _id: string;
@@ -71,11 +72,32 @@ export const PartnerAuthProvider: React.FC<PartnerAuthProviderProps> = ({ childr
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const storedPartner = localStorage.getItem('userData');
+        const storageKeys = getStorageKeys('partner');
+        const token = localStorage.getItem(storageKeys.token);
+        const storedPartner = localStorage.getItem(storageKeys.userData);
 
-        if (token && storedPartner) {
-          const partnerData = JSON.parse(storedPartner);
+        // Backward compatibility: migrate old token if it's a partner token
+        if (!token) {
+          const oldToken = localStorage.getItem('token');
+          const oldUserData = localStorage.getItem('userData');
+          if (oldToken && oldUserData) {
+            try {
+              const userData = JSON.parse(oldUserData);
+              if (userData.role === 'partner') {
+                localStorage.setItem(storageKeys.token, oldToken);
+                localStorage.setItem(storageKeys.userData, oldUserData);
+              }
+            } catch (e) {
+              console.error('Error migrating partner token:', e);
+            }
+          }
+        }
+
+        const finalToken = localStorage.getItem(storageKeys.token);
+        const finalPartner = localStorage.getItem(storageKeys.userData);
+
+        if (finalToken && finalPartner) {
+          const partnerData = JSON.parse(finalPartner);
           // Check if user is partner
           if (partnerData.role === 'partner') {
             setPartner(partnerData);
@@ -87,8 +109,9 @@ export const PartnerAuthProvider: React.FC<PartnerAuthProviderProps> = ({ childr
       } catch (error) {
         console.error('Error initializing partner auth:', error);
         // Clear invalid data
-        localStorage.removeItem('token');
-        localStorage.removeItem('userData');
+        const storageKeys = getStorageKeys('partner');
+        localStorage.removeItem(storageKeys.token);
+        localStorage.removeItem(storageKeys.userData);
       } finally {
         setLoading(false);
       }
@@ -100,7 +123,8 @@ export const PartnerAuthProvider: React.FC<PartnerAuthProviderProps> = ({ childr
   // Fetch partner permissions
   const fetchPartnerPermissions = async (partnerId: string): Promise<void> => {
     try {
-      const token = localStorage.getItem('token');
+      const storageKeys = getStorageKeys('partner');
+      const token = localStorage.getItem(storageKeys.token);
       const response = await fetch(`${API_BASE_URL}/partner-permissions`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -143,9 +167,10 @@ export const PartnerAuthProvider: React.FC<PartnerAuthProviderProps> = ({ childr
       const data = await response.json();
 
       if (response.ok) {
-        // Store auth data with consistent naming
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('userData', JSON.stringify(data));
+        // Store auth data with partner-specific keys
+        const storageKeys = getStorageKeys('partner');
+        localStorage.setItem(storageKeys.token, data.token);
+        localStorage.setItem(storageKeys.userData, JSON.stringify(data));
 
         setPartner(data);
 
@@ -169,8 +194,10 @@ export const PartnerAuthProvider: React.FC<PartnerAuthProviderProps> = ({ childr
 
   // Partner logout
   const logout = (): void => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userData');
+    // Clear partner-specific auth data
+    const storageKeys = getStorageKeys('partner');
+    localStorage.removeItem(storageKeys.token);
+    localStorage.removeItem(storageKeys.userData);
     setPartner(null);
     setPermissions({ buy: false, sell: false });
     toast.success('Logged out successfully');
@@ -188,7 +215,8 @@ export const PartnerAuthProvider: React.FC<PartnerAuthProviderProps> = ({ childr
     profileData: any
   ): Promise<{ success: boolean; partner?: any; message?: string }> => {
     try {
-      const token = localStorage.getItem('token');
+      const storageKeys = getStorageKeys('partner');
+      const token = localStorage.getItem(storageKeys.token);
       const response = await fetch(`${API_BASE_URL}/partners/profile`, {
         method: 'PUT',
         headers: {
@@ -203,7 +231,7 @@ export const PartnerAuthProvider: React.FC<PartnerAuthProviderProps> = ({ childr
       if (response.ok) {
         const updatedPartner = { ...partner, ...data.partner };
         setPartner(updatedPartner);
-        localStorage.setItem('userData', JSON.stringify(updatedPartner));
+        localStorage.setItem(storageKeys.userData, JSON.stringify(updatedPartner));
         toast.success('Profile updated successfully');
         return { success: true, partner: updatedPartner };
       } else {
@@ -226,7 +254,8 @@ export const PartnerAuthProvider: React.FC<PartnerAuthProviderProps> = ({ childr
 
   // Check if partner is authenticated
   const isAuthenticated = (): boolean => {
-    return !!partner && !!localStorage.getItem('token');
+    const storageKeys = getStorageKeys('partner');
+    return !!partner && !!localStorage.getItem(storageKeys.token);
   };
 
   // Get partner's verification status

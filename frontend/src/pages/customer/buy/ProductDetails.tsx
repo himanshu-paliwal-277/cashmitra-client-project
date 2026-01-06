@@ -451,13 +451,14 @@ const ProductDetails = () => {
       _id: product._id,
       name: productName,
       price:
-        (selectedVariant?.price ||
-          product.pricing?.discountedPrice ||
-          product.pricing?.mrp ||
-          product.minPrice ||
-          product.maxPrice ||
-          product.price ||
-          0) + (selectedCondition?.price || 0),
+        selectedCondition?.price ||
+        selectedVariant?.price ||
+        product.pricing?.discountedPrice ||
+        product.pricing?.mrp ||
+        product.minPrice ||
+        product.maxPrice ||
+        product.price ||
+        0,
       image: productImage, // For checkout compatibility
       images: imageArray, // Full image array
       brand: product.brand || 'Unknown Brand',
@@ -592,12 +593,13 @@ const ProductDetails = () => {
     );
   }
   const priceNow =
-    (product.pricing?.discountedPrice ||
-      selectedVariant?.price ||
-      product.minPrice ||
-      product.maxPrice ||
-      product.price ||
-      0) + (selectedCondition?.price || 0);
+    selectedCondition?.price ||
+    selectedVariant?.price ||
+    product.pricing?.discountedPrice ||
+    product.minPrice ||
+    product.maxPrice ||
+    product.price ||
+    0;
   const mrp = product.pricing?.mrp || product.originalPrice || null;
   const discountPct = mrp && priceNow < mrp ? Math.round(((mrp - priceNow) / mrp) * 100) : null;
   const productName = getProductName();
@@ -876,40 +878,61 @@ const ProductDetails = () => {
             )}
           </div>
 
-          {/* Condition / Storage / Color */}
+          {/* Condition with Variants (RAM, Storage, Color, Stock) */}
           {product.conditionOptions?.length ? (
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">Condition</h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                Select Condition & Variant
+              </h4>
               <div className="flex flex-wrap gap-3">
                 {product.conditionOptions.map((c: any, i: any) => {
                   const active = selectedCondition?.label === c.label;
+                  const outOfStock = c.stock <= 0;
                   return (
                     <button
                       key={c._id || i}
-                      className={`flex flex-col items-start px-4 py-3 rounded-lg border-2 transition-all ${
+                      className={`flex flex-col items-start px-4 py-3 rounded-lg border-2 transition-all min-w-[200px] ${
                         active
                           ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
-                          : 'border-gray-200 hover:border-green-300 bg-white'
+                          : outOfStock
+                            ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
+                            : 'border-gray-200 hover:border-green-300 bg-white'
                       }`}
-                      onClick={() => setSelectedCondition(c)}
+                      onClick={() => !outOfStock && setSelectedCondition(c)}
+                      disabled={outOfStock}
                     >
                       <span className="font-semibold text-gray-900">{c.label}</span>
-                      <span className="text-sm text-gray-600">
-                        ₹
-                        {(
-                          (product.pricing?.discountedPrice ||
-                            product.pricing?.mrp ||
-                            product.minPrice ||
-                            product.maxPrice ||
-                            product.price ||
-                            0) + (c.price || 0)
-                        ).toLocaleString()}
-                        {c.price !== 0 && (
-                          <span className="ml-1 text-xs">
-                            ({c.price > 0 ? '+' : ''}₹{c.price})
-                          </span>
-                        )}
+                      <span className="text-lg font-bold text-green-600">
+                        ₹{(c.price || 0).toLocaleString()}
                       </span>
+                      <div className="mt-2 space-y-1 text-xs text-gray-600 w-full">
+                        {c.ram && (
+                          <div className="flex justify-between">
+                            <span>RAM:</span>
+                            <span className="font-medium text-gray-900">{c.ram}</span>
+                          </div>
+                        )}
+                        {c.storage && (
+                          <div className="flex justify-between">
+                            <span>Storage:</span>
+                            <span className="font-medium text-gray-900">{c.storage}</span>
+                          </div>
+                        )}
+                        {c.color && (
+                          <div className="flex justify-between">
+                            <span>Color:</span>
+                            <span className="font-medium text-gray-900">{c.color}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between pt-1 border-t border-gray-200">
+                          <span>Stock:</span>
+                          <span
+                            className={`font-medium ${outOfStock ? 'text-red-600' : 'text-green-600'}`}
+                          >
+                            {outOfStock ? 'Out of Stock' : `${c.stock} available`}
+                          </span>
+                        </div>
+                      </div>
                     </button>
                   );
                 })}

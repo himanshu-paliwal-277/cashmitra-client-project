@@ -24,7 +24,7 @@ const useSellAccessories = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
 
       // Filter out undefined values
       const cleanFilters = Object.entries(filters).reduce(
@@ -100,7 +100,7 @@ const useSellAccessories = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       const response = await api.get(`/sell-accessories/${accessoryId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -120,7 +120,7 @@ const useSellAccessories = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       const response = await api.post('/sell-accessories', accessoryData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -143,7 +143,7 @@ const useSellAccessories = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       const response = await api.put(`/sell-accessories/${accessoryId}`, accessoryData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -166,7 +166,7 @@ const useSellAccessories = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       await api.delete(`/sell-accessories/${accessoryId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -188,7 +188,7 @@ const useSellAccessories = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await api.post('/sell-accessories/bulk', accessoriesData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -215,7 +215,7 @@ const useSellAccessories = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await api.put('/sell-accessories/reorder', reorderData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -242,7 +242,7 @@ const useSellAccessories = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await api.patch(
           `/sell-accessories/${accessoryId}/toggle`,
           {},
