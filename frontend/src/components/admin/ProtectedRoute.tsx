@@ -29,15 +29,15 @@ const ProtectedRoute = () => {
     }
 
     // Redirect partners to partner dashboard
-    if (user.role === 'partner') {
-      return <Navigate to="/partner/dashboard" replace />;
-    }
+    // if (user.role === 'partner') {
+    //   return <Navigate to="/partner/dashboard" replace />;
+    // }
   }
 
   // Redirect to login if not authenticated as admin
-  if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />;
-  }
+  // if (!isAuthenticated) {
+  //   return <Navigate to="/admin/login" replace />;
+  // }
 
   // Render child routes if authenticated as admin
   return <Outlet />;

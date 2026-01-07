@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import AdminStatsCard from '../../components/admin/common/AdminStatsCard';
 import TableSkeleton from '../../components/admin/common/TableSkeleton';
+import { useNavigate } from 'react-router-dom';
 
 function AdminDashboard() {
   const { adminUser } = useAdminAuth() as any;
@@ -23,9 +24,17 @@ function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadDashboardData();
+  }, []);
+
+  useEffect(() => {
+    const adminToken = localStorage.getItem('adminToken');
+    if (!adminToken) {
+      navigate('/admin/login');
+    }
   }, []);
 
   const loadDashboardData = async () => {

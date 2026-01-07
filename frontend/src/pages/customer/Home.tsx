@@ -1,24 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
 // import Banner from '../components/Banner/Banner';
 import HeroCarousel from '../../components/customer/home/HeroCarousel';
 import ServicesSection from '../../components/customer/home/ServicesSection';
-// import BuyProductsList from '../components/BuyProductsList/BuyProductsList';
-// import { mobileProducts, laptopProducts } from '../data/products';
-// import useCatalogProducts from '../hooks/useCatalogProducts';
-import {
-  // Smartphone,
-  // Tablet,
-  // Laptop,
-  Clock,
-  Shield,
-  Truck,
-  Star,
-  ArrowRight,
-  Users,
-} from 'lucide-react';
 import HomeBanner from '../../components/customer/home/HomeBanner';
 import BuyProductsList from '../../components/customer/home/BuyProductsList/BuyProductsList';
 import HowItWorks from '../../components/customer/home/HowItWorks';

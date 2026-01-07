@@ -29,11 +29,11 @@ const PartnerLayout = () => {
         }
 
         // Redirect admins to admin dashboard
-        if (user.role === 'admin') {
-          console.log('Admin accessing partner pages - redirecting to admin dashboard');
-          navigate('/admin/dashboard', { replace: true });
-          return;
-        }
+        // if (user.role === 'admin') {
+        //   console.log('Admin accessing partner pages - redirecting to admin dashboard');
+        //   navigate('/admin/dashboard', { replace: true });
+        //   return;
+        // }
       } catch (error) {
         console.error('Error parsing user data in PartnerLayout:', error);
       }

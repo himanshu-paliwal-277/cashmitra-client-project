@@ -23,18 +23,18 @@ const MainLayout = () => {
         const user = JSON.parse(userData);
 
         // Redirect admin to admin dashboard
-        if (user.role === 'admin') {
-          console.log('Admin accessing customer pages - redirecting to admin dashboard');
-          navigate('/admin/dashboard', { replace: true });
-          return;
-        }
+        // if (user.role === 'admin') {
+        //   console.log('Admin accessing customer pages - redirecting to admin dashboard');
+        //   navigate('/admin/dashboard', { replace: true });
+        //   return;
+        // }
 
         // Redirect partner to partner dashboard
-        if (user.role === 'partner') {
-          console.log('Partner accessing customer pages - redirecting to partner dashboard');
-          navigate('/partner/dashboard', { replace: true });
-          return;
-        }
+        // if (user.role === 'partner') {
+        //   console.log('Partner accessing customer pages - redirecting to partner dashboard');
+        //   navigate('/partner/dashboard', { replace: true });
+        //   return;
+        // }
       } catch (error) {
         console.error('Error parsing user data in MainLayout:', error);
       }

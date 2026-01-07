@@ -29,9 +29,9 @@ const PartnerProtectedRoute = () => {
     }
 
     // Redirect admins to admin dashboard
-    if (user.role === 'admin') {
-      return <Navigate to="/admin/dashboard" replace />;
-    }
+    // if (user.role === 'admin') {
+    //   return <Navigate to="/admin/dashboard" replace />;
+    // }
   }
 
   // Redirect to login if not authenticated as partner

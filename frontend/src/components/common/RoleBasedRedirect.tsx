@@ -16,15 +16,15 @@ const RoleBasedRedirect = ({ children }: { children: React.ReactNode }) => {
 
       // Redirect based on role
       switch (role) {
-        case 'admin':
-          navigate('/admin/dashboard', { replace: true });
-          break;
-        case 'partner':
-          navigate('/partner/dashboard', { replace: true });
-          break;
-        case 'agent':
-          navigate('/agent/dashboard', { replace: true });
-          break;
+        // case 'admin':
+        //   navigate('/admin/dashboard', { replace: true });
+        //   break;
+        // case 'partner':
+        //   navigate('/partner/dashboard', { replace: true });
+        //   break;
+        // case 'agent':
+        //   navigate('/agent/dashboard', { replace: true });
+        //   break;
         case 'user':
         case 'customer':
           navigate('/', { replace: true });

@@ -63,7 +63,7 @@ export const AdminAuthProvider = ({ children }: any) => {
         }
       } catch (error) {
         console.error('Authentication check failed:', error);
-        logout(); // Clear potentially corrupted auth data
+        // logout(); // Clear potentially corrupted auth data
       } finally {
         setIsLoading(false);
       }
@@ -138,7 +138,7 @@ export const AdminAuthProvider = ({ children }: any) => {
     } catch (error) {
       console.error('Error refreshing profile:', error);
       if (error.response?.status === 401) {
-        logout();
+        // logout();
       }
       throw error;
     }

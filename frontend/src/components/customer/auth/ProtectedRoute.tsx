@@ -45,15 +45,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   // Check user role and redirect if not a customer
-  if (user?.role === 'admin') {
-    console.log('Admin user detected - redirecting to admin dashboard');
-    return <Navigate to="/admin/dashboard" replace />;
-  }
+  // if (user?.role === 'admin') {
+  //   console.log('Admin user detected - redirecting to admin dashboard');
+  //   return <Navigate to="/admin/dashboard" replace />;
+  // }
 
-  if (user?.role === 'partner') {
-    console.log('Partner user detected - redirecting to partner dashboard');
-    return <Navigate to="/partner/dashboard" replace />;
-  }
+  // if (user?.role === 'partner') {
+  //   console.log('Partner user detected - redirecting to partner dashboard');
+  //   return <Navigate to="/partner/dashboard" replace />;
+  // }
 
   // Render the protected component if authenticated as customer
   console.log('Customer authenticated - rendering protected content');

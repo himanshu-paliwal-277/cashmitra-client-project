@@ -14,6 +14,13 @@ function Dashboard() {
   // Debug: Log partner data
   console.log('Partner data in Dashboard:', partner);
 
+  useEffect(() => {
+    const partnerToken = localStorage.getItem('partnerToken');
+    if (!partnerToken) {
+      navigate('/partner/login');
+    }
+  }, []);
+
   // Get partner name safely
   const getPartnerName = () => {
     if (!partner) return 'Partner';
