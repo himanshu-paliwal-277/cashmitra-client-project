@@ -109,11 +109,50 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
     // Add-ons and accessories
     addOns: [],
 
-    // Condition options for different states with variants
+    // Condition options for different states with variants, images, and pricing
     conditionOptions: [
-      { label: 'Excellent', price: 0, ram: '', storage: '', color: '', stock: 0 },
-      { label: 'Good', price: 0, ram: '', storage: '', color: '', stock: 0 },
-      { label: 'Fair', price: 0, ram: '', storage: '', color: '', stock: 0 },
+      {
+        label: 'Excellent',
+        price: 0,
+        ram: '',
+        storage: '',
+        color: '',
+        stock: 0,
+        images: [],
+        pricing: {
+          mrp: '',
+          discountedPrice: '',
+          discountPercent: '',
+        },
+      },
+      {
+        label: 'Good',
+        price: 0,
+        ram: '',
+        storage: '',
+        color: '',
+        stock: 0,
+        images: [],
+        pricing: {
+          mrp: '',
+          discountedPrice: '',
+          discountPercent: '',
+        },
+      },
+      {
+        label: 'Fair',
+        price: 0,
+        ram: '',
+        storage: '',
+        color: '',
+        stock: 0,
+        images: [],
+        pricing: {
+          mrp: '',
+          discountedPrice: '',
+          discountPercent: '',
+        },
+      },
     ],
 
     // Key specifications (will be converted to object in backend)
@@ -562,9 +601,48 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
       variants: [],
       addOns: [],
       conditionOptions: [
-        { label: 'Excellent', price: 0, ram: '', storage: '', color: '', stock: 0 },
-        { label: 'Good', price: 0, ram: '', storage: '', color: '', stock: 0 },
-        { label: 'Fair', price: 0, ram: '', storage: '', color: '', stock: 0 },
+        {
+          label: 'Excellent',
+          price: 0,
+          ram: '',
+          storage: '',
+          color: '',
+          stock: 0,
+          images: [],
+          pricing: {
+            mrp: '',
+            discountedPrice: '',
+            discountPercent: '',
+          },
+        },
+        {
+          label: 'Good',
+          price: 0,
+          ram: '',
+          storage: '',
+          color: '',
+          stock: 0,
+          images: [],
+          pricing: {
+            mrp: '',
+            discountedPrice: '',
+            discountPercent: '',
+          },
+        },
+        {
+          label: 'Fair',
+          price: 0,
+          ram: '',
+          storage: '',
+          color: '',
+          stock: 0,
+          images: [],
+          pricing: {
+            mrp: '',
+            discountedPrice: '',
+            discountPercent: '',
+          },
+        },
       ],
       topSpecs: [],
       productDetails: {
@@ -1053,7 +1131,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                   )}
                 </div>
 
-                {/* Images */}
+                {/* Images - COMMENTED OUT - Now part of Condition Options */}
                 <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
                   <button
                     type="button"
@@ -1117,7 +1195,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                   )}
                 </div>
 
-                {/* Pricing */}
+                {/* Pricing - COMMENTED OUT - Now part of Condition Options */}
                 <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
                   <button
                     type="button"
@@ -1197,7 +1275,6 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         </div>
                       </div>
 
-                      {/* Pricing Help Text */}
                       <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                         <p className="text-blue-800 text-sm">
                           💡 <strong>Auto-calculation:</strong> The discount percentage is
@@ -2321,9 +2398,25 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         {formData.conditionOptions?.map((condition: any, index: number) => (
                           <div
                             key={index}
-                            className="p-4 border border-gray-200 rounded-lg bg-gray-50"
+                            className="p-4 relative border border-gray-200 rounded-lg bg-gray-50"
                           >
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newConditions = formData.conditionOptions.filter(
+                                  (_: any, i: number) => i !== index
+                                );
+                                setFormData((prev: any) => ({
+                                  ...prev,
+                                  conditionOptions: newConditions,
+                                }));
+                              }}
+                              className="absolute top-2 right-3 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 flex items-center justify-center gap-2"
+                              disabled={formData.conditionOptions.length <= 1}
+                            >
+                              <X size={16} />
+                            </button>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                   Condition Label
@@ -2343,19 +2436,20 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                               </div>
+
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  Price (₹)
+                                  Stock
                                 </label>
                                 <input
                                   type="number"
-                                  placeholder="Enter actual price"
-                                  value={condition.price || ''}
+                                  placeholder="Available quantity"
+                                  value={condition.stock || 0}
                                   onChange={e => {
                                     const newConditions = [...formData.conditionOptions];
                                     newConditions[index] = {
                                       ...condition,
-                                      price: parseFloat(e.target.value) || 0,
+                                      stock: parseInt(e.target.value) || 0,
                                     };
                                     setFormData((prev: any) => ({
                                       ...prev,
@@ -2366,29 +2460,10 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                               </div>
-                              <div className="flex items-end">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const newConditions = formData.conditionOptions.filter(
-                                      (_: any, i: number) => i !== index
-                                    );
-                                    setFormData((prev: any) => ({
-                                      ...prev,
-                                      conditionOptions: newConditions,
-                                    }));
-                                  }}
-                                  className="w-full px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center justify-center gap-2"
-                                  disabled={formData.conditionOptions.length <= 1}
-                                >
-                                  <X size={16} />
-                                  Remove
-                                </button>
-                              </div>
                             </div>
 
                             {/* Variant Fields: RAM, Storage, Color, Stock */}
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3 pt-3 border-t border-gray-300">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 pt-3 border-t border-gray-300">
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                   RAM
@@ -2467,28 +2542,228 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                               </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  Stock
-                                </label>
+                            </div>
+
+                            {/* Product Images for this condition */}
+                            <div className="mt-3 pt-3 border-t border-gray-300">
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <Camera className="w-4 h-4 inline mr-1" />
+                                Product Images
+                              </label>
+                              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
                                 <input
-                                  type="number"
-                                  placeholder="Available quantity"
-                                  value={condition.stock || 0}
-                                  onChange={e => {
-                                    const newConditions = [...formData.conditionOptions];
-                                    newConditions[index] = {
-                                      ...condition,
-                                      stock: parseInt(e.target.value) || 0,
-                                    };
-                                    setFormData((prev: any) => ({
-                                      ...prev,
-                                      conditionOptions: newConditions,
-                                    }));
+                                  type="file"
+                                  multiple
+                                  accept="image/*"
+                                  onChange={async e => {
+                                    const files = Array.from(e.target.files || []);
+                                    if (!files.length) return;
+
+                                    setLoading(true);
+                                    try {
+                                      const uploadPromises = files.map((file: any) =>
+                                        cloudinaryService.uploadImage(file, {
+                                          folder: 'partner-products',
+                                          transformation: [
+                                            { width: 800, height: 600, crop: 'fill' },
+                                            { quality: 'auto' },
+                                            { fetch_format: 'auto' },
+                                          ],
+                                        })
+                                      );
+                                      const uploadResults = await Promise.all(uploadPromises);
+
+                                      const newImages = uploadResults
+                                        .filter((result: any) => result.success && result.data?.url)
+                                        .map((result: any) => result.data.url);
+
+                                      if (newImages.length > 0) {
+                                        const newConditions = [...formData.conditionOptions];
+                                        newConditions[index] = {
+                                          ...condition,
+                                          images: [...(condition.images || []), ...newImages],
+                                        };
+                                        setFormData((prev: any) => ({
+                                          ...prev,
+                                          conditionOptions: newConditions,
+                                        }));
+                                        toast.success(
+                                          `${newImages.length} image(s) uploaded successfully!`
+                                        );
+                                      } else {
+                                        toast.error('No images were uploaded successfully');
+                                      }
+
+                                      e.target.value = '';
+                                    } catch (error: any) {
+                                      console.error('Error uploading images:', error);
+                                      toast.error(error.message || 'Failed to upload images');
+                                      e.target.value = '';
+                                    } finally {
+                                      setLoading(false);
+                                    }
                                   }}
-                                  min="0"
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  className="hidden"
+                                  id={`condition-image-upload-${index}`}
                                 />
+                                <label
+                                  htmlFor={`condition-image-upload-${index}`}
+                                  className="cursor-pointer"
+                                >
+                                  <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                                  <p className="text-gray-600 text-sm mb-1">
+                                    Click to upload images
+                                  </p>
+                                  <p className="text-xs text-gray-500">PNG, JPG up to 5MB each</p>
+                                </label>
+                              </div>
+                              {condition.images?.length > 0 && (
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3">
+                                  {condition.images.map((image: string, imgIndex: number) => (
+                                    <div key={imgIndex} className="relative">
+                                      <img
+                                        src={image}
+                                        alt={`${condition.label} ${imgIndex + 1}`}
+                                        className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const newConditions = [...formData.conditionOptions];
+                                          newConditions[index] = {
+                                            ...condition,
+                                            images: condition.images.filter(
+                                              (_: any, i: number) => i !== imgIndex
+                                            ),
+                                          };
+                                          setFormData((prev: any) => ({
+                                            ...prev,
+                                            conditionOptions: newConditions,
+                                          }));
+                                        }}
+                                        className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                                      >
+                                        <X size={12} />
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Pricing for this condition */}
+                            <div className="mt-3 pt-3 border-t border-gray-300">
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <DollarSign className="w-4 h-4 inline mr-1" />
+                                Pricing Details
+                              </label>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                                    MRP (₹)
+                                  </label>
+                                  <input
+                                    type="number"
+                                    placeholder="99999"
+                                    value={condition.pricing?.mrp || ''}
+                                    onChange={e => {
+                                      const newConditions = [...formData.conditionOptions];
+                                      const mrp = e.target.value;
+                                      const discountedPrice =
+                                        condition.pricing?.discountedPrice || '';
+
+                                      let discountPercent = '';
+                                      if (
+                                        mrp &&
+                                        discountedPrice &&
+                                        parseFloat(discountedPrice) < parseFloat(mrp)
+                                      ) {
+                                        discountPercent = (
+                                          ((parseFloat(mrp) - parseFloat(discountedPrice)) /
+                                            parseFloat(mrp)) *
+                                          100
+                                        ).toFixed(2);
+                                      }
+
+                                      newConditions[index] = {
+                                        ...condition,
+                                        pricing: {
+                                          ...condition.pricing,
+                                          mrp,
+                                          discountPercent,
+                                        },
+                                      };
+                                      setFormData((prev: any) => ({
+                                        ...prev,
+                                        conditionOptions: newConditions,
+                                      }));
+                                    }}
+                                    step="0.01"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                                    Discounted Price (₹)
+                                  </label>
+                                  <input
+                                    type="number"
+                                    placeholder="89999"
+                                    value={condition.pricing?.discountedPrice || ''}
+                                    onChange={e => {
+                                      const newConditions = [...formData.conditionOptions];
+                                      const discountedPrice = e.target.value;
+                                      const mrp = condition.pricing?.mrp || '';
+
+                                      let discountPercent = '';
+                                      if (
+                                        mrp &&
+                                        discountedPrice &&
+                                        parseFloat(discountedPrice) < parseFloat(mrp)
+                                      ) {
+                                        discountPercent = (
+                                          ((parseFloat(mrp) - parseFloat(discountedPrice)) /
+                                            parseFloat(mrp)) *
+                                          100
+                                        ).toFixed(2);
+                                      }
+
+                                      newConditions[index] = {
+                                        ...condition,
+                                        pricing: {
+                                          ...condition.pricing,
+                                          discountedPrice,
+                                          discountPercent,
+                                        },
+                                      };
+                                      setFormData((prev: any) => ({
+                                        ...prev,
+                                        conditionOptions: newConditions,
+                                      }));
+                                    }}
+                                    step="0.01"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                                    Discount % <span className="text-gray-400">(Auto)</span>
+                                  </label>
+                                  <input
+                                    type="number"
+                                    value={condition.pricing?.discountPercent || ''}
+                                    placeholder="0"
+                                    step="0.01"
+                                    readOnly
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                                  />
+                                  {condition.pricing?.discountPercent &&
+                                    parseFloat(condition.pricing.discountPercent) > 0 && (
+                                      <p className="text-green-600 text-xs mt-1">
+                                        ✓ {condition.pricing.discountPercent}% off
+                                      </p>
+                                    )}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -2500,7 +2775,20 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                               ...prev,
                               conditionOptions: [
                                 ...prev.conditionOptions,
-                                { label: '', price: 0, ram: '', storage: '', color: '', stock: 0 },
+                                {
+                                  label: '',
+                                  price: 0,
+                                  ram: '',
+                                  storage: '',
+                                  color: '',
+                                  stock: 0,
+                                  images: [],
+                                  pricing: {
+                                    mrp: '',
+                                    discountedPrice: '',
+                                    discountPercent: '',
+                                  },
+                                },
                               ],
                             }))
                           }

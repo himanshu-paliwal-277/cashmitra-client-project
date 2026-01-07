@@ -47,8 +47,8 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
   const [openSections, setOpenSections] = useState({
     categorySelection: true, // Has required fields
     basicInfo: true, // Has required fields
-    images: true, // Has required fields
-    pricing: true, // Has required fields
+    images: false,
+    pricing: false,
     stock: true, // Has required fields
     availability: false,
     variants: false,
@@ -116,11 +116,50 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
     // Add-ons and accessories
     addOns: [],
 
-    // Condition options for different states
+    // Condition options for different states with variants, images, and pricing
     conditionOptions: [
-      { label: 'Excellent', price: 0, ram: '', storage: '', color: '', stock: 0 },
-      { label: 'Good', price: 0, ram: '', storage: '', color: '', stock: 0 },
-      { label: 'Fair', price: 0, ram: '', storage: '', color: '', stock: 0 },
+      {
+        label: 'Excellent',
+        price: 0,
+        ram: '',
+        storage: '',
+        color: '',
+        stock: 0,
+        images: [],
+        pricing: {
+          mrp: '',
+          discountedPrice: '',
+          discountPercent: '',
+        },
+      },
+      {
+        label: 'Good',
+        price: 0,
+        ram: '',
+        storage: '',
+        color: '',
+        stock: 0,
+        images: [],
+        pricing: {
+          mrp: '',
+          discountedPrice: '',
+          discountPercent: '',
+        },
+      },
+      {
+        label: 'Fair',
+        price: 0,
+        ram: '',
+        storage: '',
+        color: '',
+        stock: 0,
+        images: [],
+        pricing: {
+          mrp: '',
+          discountedPrice: '',
+          discountPercent: '',
+        },
+      },
     ],
 
     // Key specifications (will be converted to object in backend)
@@ -316,9 +355,48 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
         variants: product.variants || [],
         addOns: product.addOns || [],
         conditionOptions: product.conditionOptions || [
-          { label: 'Excellent', price: 0, ram: '', storage: '', color: '', stock: 0 },
-          { label: 'Good', price: -1000, ram: '', storage: '', color: '', stock: 0 },
-          { label: 'Fair', price: -2000, ram: '', storage: '', color: '', stock: 0 },
+          {
+            label: 'Excellent',
+            price: 0,
+            ram: '',
+            storage: '',
+            color: '',
+            stock: 0,
+            images: [],
+            pricing: {
+              mrp: '',
+              discountedPrice: '',
+              discountPercent: '',
+            },
+          },
+          {
+            label: 'Good',
+            price: -1000,
+            ram: '',
+            storage: '',
+            color: '',
+            stock: 0,
+            images: [],
+            pricing: {
+              mrp: '',
+              discountedPrice: '',
+              discountPercent: '',
+            },
+          },
+          {
+            label: 'Fair',
+            price: -2000,
+            ram: '',
+            storage: '',
+            color: '',
+            stock: 0,
+            images: [],
+            pricing: {
+              mrp: '',
+              discountedPrice: '',
+              discountPercent: '',
+            },
+          },
         ],
 
         topSpecs: Array.isArray(product.topSpecs) ? product.topSpecs : [],

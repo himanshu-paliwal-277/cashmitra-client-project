@@ -71,6 +71,12 @@ const BuyProductSchema = new mongoose.Schema(
         storage: String,
         color: String,
         stock: { type: Number, default: 0 },
+        images: [String],
+        pricing: {
+          mrp: Number,
+          discountedPrice: Number,
+          discountPercent: Number,
+        },
       },
     ],
 
