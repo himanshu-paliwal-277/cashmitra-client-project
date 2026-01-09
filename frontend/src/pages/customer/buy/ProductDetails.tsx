@@ -149,14 +149,21 @@ const ProductDetails = () => {
 
   const getImageArray = () => {
     const imageArray = [];
-    if (product?.images) {
-      if (Array.isArray(product.images)) {
-        imageArray.push(...product.images.filter(img => img && img.trim()));
-      } else if (typeof product.images === 'object') {
-        if (product.images.main) imageArray.push(product.images.main.trim());
-        if (product.images.gallery) imageArray.push(product.images.gallery.trim());
-        if (product.images.thumbnail && product.images.thumbnail !== product.images.gallery) {
-          imageArray.push(product.images.thumbnail.trim());
+
+    // First priority: selected condition images
+    if (selectedCondition?.images && selectedCondition.images.length > 0) {
+      imageArray.push(...selectedCondition.images.filter((img: string) => img && img.trim()));
+    } else {
+      // Fallback to product images
+      if (product?.images) {
+        if (Array.isArray(product.images)) {
+          imageArray.push(...product.images.filter(img => img && img.trim()));
+        } else if (typeof product.images === 'object') {
+          if (product.images.main) imageArray.push(product.images.main.trim());
+          if (product.images.gallery) imageArray.push(product.images.gallery.trim());
+          if (product.images.thumbnail && product.images.thumbnail !== product.images.gallery) {
+            imageArray.push(product.images.thumbnail.trim());
+          }
         }
       }
     }
@@ -195,6 +202,11 @@ const ProductDetails = () => {
 
   const getProductImage = () => {
     if (!product) return '/placeholder-phone.jpg';
+
+    // Check if selected condition has images
+    if (selectedCondition?.images && selectedCondition.images.length > 0) {
+      return selectedCondition.images[0];
+    }
 
     // Handle object-based images structure from backend
     if (product.images && typeof product.images === 'object') {
@@ -608,11 +620,7 @@ const ProductDetails = () => {
     0;
 
   // Get MRP for strikethrough display
-  const mrp =
-    selectedCondition?.mrp ||
-    product.pricing?.mrp ||
-    product.originalPrice ||
-    null;
+  const mrp = selectedCondition?.mrp || product.pricing?.mrp || product.originalPrice || null;
 
   const discountPct = mrp && priceNow < mrp ? Math.round(((mrp - priceNow) / mrp) * 100) : null;
   const productName = getProductName();
@@ -830,6 +838,80 @@ const ProductDetails = () => {
               </div>
             </div>
 
+            {/* Condition with Variants (RAM, Storage, Color, Stock) */}
+            {product.conditionOptions?.length ? (
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                  Select Condition & Variant
+                </h4>
+                <div className="flex flex-wrap gap-3">
+                  {product.conditionOptions.map((c: any, i: any) => {
+                    const active = selectedCondition?.label === c.label;
+                    const outOfStock = c.stock <= 0;
+                    return (
+                      <button
+                        key={c._id || i}
+                        className={`flex flex-col items-start px-4 py-3 rounded-lg border-2 transition-all min-w-[200px] ${
+                          active
+                            ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
+                            : outOfStock
+                              ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
+                              : 'border-gray-200 hover:border-green-300 bg-white'
+                        }`}
+                        onClick={() => {
+                          if (!outOfStock) {
+                            setSelectedCondition(c);
+                            setSelectedImageIndex(0); // Reset to first image when condition changes
+                          }
+                        }}
+                        disabled={outOfStock}
+                      >
+                        <span className="font-semibold text-gray-900">{c.label}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg font-bold text-green-600">
+                            ₹{(c.discountedPrice || c.mrp || 0).toLocaleString()}
+                          </span>
+                          {c.discountedPrice && c.mrp && c.discountedPrice < c.mrp && (
+                            <span className="text-sm text-gray-500 line-through">
+                              ₹{c.mrp.toLocaleString()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-2 space-y-1 text-xs text-gray-600 w-full">
+                          {c.ram && (
+                            <div className="flex justify-between">
+                              <span>RAM:</span>
+                              <span className="font-medium text-gray-900">{c.ram}</span>
+                            </div>
+                          )}
+                          {c.storage && (
+                            <div className="flex justify-between">
+                              <span>Storage:</span>
+                              <span className="font-medium text-gray-900">{c.storage}</span>
+                            </div>
+                          )}
+                          {c.color && (
+                            <div className="flex justify-between">
+                              <span>Color:</span>
+                              <span className="font-medium text-gray-900">{c.color}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between pt-1 border-t border-gray-200">
+                            <span>Stock:</span>
+                            <span
+                              className={`font-medium ${outOfStock ? 'text-red-600' : 'text-green-600'}`}
+                            >
+                              {outOfStock ? 'Out of Stock' : `${c.stock} available`}
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+
             {/* Trust strip */}
             <div className="grid grid-cols-3 gap-4 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-3">
@@ -891,74 +973,6 @@ const ProductDetails = () => {
             )}
           </div>
 
-          {/* Condition with Variants (RAM, Storage, Color, Stock) */}
-          {product.conditionOptions?.length ? (
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">
-                Select Condition & Variant
-              </h4>
-              <div className="flex flex-wrap gap-3">
-                {product.conditionOptions.map((c: any, i: any) => {
-                  const active = selectedCondition?.label === c.label;
-                  const outOfStock = c.stock <= 0;
-                  return (
-                    <button
-                      key={c._id || i}
-                      className={`flex flex-col items-start px-4 py-3 rounded-lg border-2 transition-all min-w-[200px] ${
-                        active
-                          ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
-                          : outOfStock
-                            ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
-                            : 'border-gray-200 hover:border-green-300 bg-white'
-                      }`}
-                      onClick={() => !outOfStock && setSelectedCondition(c)}
-                      disabled={outOfStock}
-                    >
-                      <span className="font-semibold text-gray-900">{c.label}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-green-600">
-                          ₹{(c.discountedPrice || c.mrp || 0).toLocaleString()}
-                        </span>
-                        {c.discountedPrice && c.mrp && c.discountedPrice < c.mrp && (
-                          <span className="text-sm text-gray-500 line-through">
-                            ₹{c.mrp.toLocaleString()}
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-2 space-y-1 text-xs text-gray-600 w-full">
-                        {c.ram && (
-                          <div className="flex justify-between">
-                            <span>RAM:</span>
-                            <span className="font-medium text-gray-900">{c.ram}</span>
-                          </div>
-                        )}
-                        {c.storage && (
-                          <div className="flex justify-between">
-                            <span>Storage:</span>
-                            <span className="font-medium text-gray-900">{c.storage}</span>
-                          </div>
-                        )}
-                        {c.color && (
-                          <div className="flex justify-between">
-                            <span>Color:</span>
-                            <span className="font-medium text-gray-900">{c.color}</span>
-                          </div>
-                        )}
-                        <div className="flex justify-between pt-1 border-t border-gray-200">
-                          <span>Stock:</span>
-                          <span
-                            className={`font-medium ${outOfStock ? 'text-red-600' : 'text-green-600'}`}
-                          >
-                            {outOfStock ? 'Out of Stock' : `${c.stock} available`}
-                          </span>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ) : null}
           {product.storageOptions?.length ? (
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Storage</h4>

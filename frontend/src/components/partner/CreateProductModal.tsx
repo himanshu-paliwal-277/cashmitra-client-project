@@ -2696,12 +2696,11 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                               </div>
                             </div>
 
-                            {/* Image Upload for First (Excellent) Condition */}
-                            {index === 0 && (
-                              <div className="mt-3 pt-3 border-t border-gray-300">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  Product Images <span className="text-red-500">*</span>
-                                </label>
+                            {/* Image Upload for All Conditions */}
+                            <div className="mt-3 pt-3 border-t border-gray-300">
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Product Images {index === 0 && <span className="text-red-500">*</span>} <span className="text-xs text-gray-500">(Optional for other conditions)</span>
+                              </label>
                                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
                                   <input
                                     type="file"
@@ -2742,13 +2741,12 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                                     ))}
                                   </div>
                                 )}
-                                {errors['conditionOptions.0.images'] && (
+                                {errors['conditionOptions.0.images'] && index === 0 && (
                                   <p className="text-red-500 text-sm mt-2">
                                     {errors['conditionOptions.0.images']}
                                   </p>
                                 )}
                               </div>
-                            )}
                           </div>
                         ))}
                         <button
