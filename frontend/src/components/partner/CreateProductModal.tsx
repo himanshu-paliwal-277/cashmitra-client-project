@@ -111,7 +111,17 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
 
     // Condition options for different states with variants
     conditionOptions: [
-      { label: 'Excellent', mrp: 0, discountedPrice: 0, discountPercent: 0, ram: '', storage: '', color: '', stock: 0, images: [] },
+      {
+        label: 'Excellent',
+        mrp: 0,
+        discountedPrice: 0,
+        discountPercent: 0,
+        ram: '',
+        storage: '',
+        color: '',
+        stock: 0,
+        images: [],
+      },
     ],
 
     // Key specifications (will be converted to object in backend)
@@ -452,7 +462,9 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
       const newConditions = [...prev.conditionOptions];
       newConditions[conditionIndex] = {
         ...newConditions[conditionIndex],
-        images: newConditions[conditionIndex].images.filter((_: any, i: number) => i !== imageIndex),
+        images: newConditions[conditionIndex].images.filter(
+          (_: any, i: number) => i !== imageIndex
+        ),
       };
 
       // Sync with main images if it's the first "Excellent" condition
@@ -491,7 +503,8 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
 
     // Check for images in first "Excellent" condition option
     if (!excellentCondition?.images || excellentCondition.images.length === 0) {
-      newErrors['conditionOptions.0.images'] = 'At least one product image is required for Excellent condition';
+      newErrors['conditionOptions.0.images'] =
+        'At least one product image is required for Excellent condition';
     }
     setErrors(newErrors);
 
@@ -566,8 +579,12 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
       const excellentCondition = formData.conditionOptions[0];
       const syncedImages = excellentCondition?.images || formData.images;
       const syncedPrice = excellentCondition?.mrp || parseFloat(formData.pricing.mrp) || 0;
-      const syncedDiscountedPrice = excellentCondition?.discountedPrice || parseFloat(formData.pricing.discountedPrice) || syncedPrice;
-      const syncedDiscountPercent = excellentCondition?.discountPercent || parseFloat(formData.pricing.discountPercent) || 0;
+      const syncedDiscountedPrice =
+        excellentCondition?.discountedPrice ||
+        parseFloat(formData.pricing.discountedPrice) ||
+        syncedPrice;
+      const syncedDiscountPercent =
+        excellentCondition?.discountPercent || parseFloat(formData.pricing.discountPercent) || 0;
 
       // Convert images array to object format for API
       const imagesObj = syncedImages.reduce((acc: any, img: string, index: number) => {
@@ -663,7 +680,17 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
       variants: [],
       addOns: [],
       conditionOptions: [
-        { label: 'Excellent', mrp: 0, discountedPrice: 0, discountPercent: 0, ram: '', storage: '', color: '', stock: 0, images: [] },
+        {
+          label: 'Excellent',
+          mrp: 0,
+          discountedPrice: 0,
+          discountPercent: 0,
+          ram: '',
+          storage: '',
+          color: '',
+          stock: 0,
+          images: [],
+        },
       ],
       topSpecs: [],
       productDetails: {
@@ -2419,20 +2446,23 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                     <div className="p-4">
                       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                         <p className="text-sm text-blue-800">
-                          <strong>Note:</strong> The first "Excellent" condition option represents the main product listing. Its mrp and images will be used as the primary product details. This option cannot be removed or renamed.
+                          <strong>Note:</strong> The first "Excellent" condition option represents
+                          the main product listing. Its mrp and images will be used as the primary
+                          product details. This option cannot be removed or renamed.
                         </p>
                       </div>
                       <div className="space-y-4">
                         {formData.conditionOptions?.map((condition: any, index: number) => (
                           <div
                             key={index}
-                            className="p-4 border border-gray-200 rounded-lg bg-gray-50"
+                            className="p-4 border border-gray-200 rounded-lg bg-gray-50 relative"
                           >
                             {/* Pricing Section */}
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  Condition Label {index === 0 && <span className="text-red-500">*</span>}
+                                  Condition Label{' '}
+                                  {index === 0 && <span className="text-red-500">*</span>}
                                 </label>
                                 <input
                                   type="text"
@@ -2463,7 +2493,8 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                                   onChange={e => {
                                     const newConditions = [...formData.conditionOptions];
                                     const mrp = parseFloat(e.target.value) || 0;
-                                    const discountedPrice = newConditions[index].discountedPrice || 0;
+                                    const discountedPrice =
+                                      newConditions[index].discountedPrice || 0;
 
                                     // Calculate discount percentage
                                     let discountPercent = 0;
@@ -2500,7 +2531,9 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                                 {errors['conditionOptions.0.mrp'] && index === 0 && (
-                                  <p className="text-red-500 text-sm mt-1">{errors['conditionOptions.0.mrp']}</p>
+                                  <p className="text-red-500 text-sm mt-1">
+                                    {errors['conditionOptions.0.mrp']}
+                                  </p>
                                 )}
                               </div>
                               <div>
@@ -2571,7 +2604,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                             </div>
 
                             {/* Remove Button - Separate Row */}
-                            <div className="mb-3">
+                            {index !== 0 && (
                               <button
                                 type="button"
                                 onClick={() => {
@@ -2583,13 +2616,13 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                                     conditionOptions: newConditions,
                                   }));
                                 }}
-                                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                className="p-1 rounded-lg hover:scale-110 duration-200 flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed absolute top-1 right-1"
                                 disabled={index === 0}
                               >
-                                <X size={16} />
-                                Remove Condition
+                                <X size={18} color={'red'} />
+                                {/* Remove Condition */}
                               </button>
-                            </div>
+                            )}
 
                             {/* Variant Fields: RAM, Storage, Color, Stock */}
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3 pt-3 border-t border-gray-300">
@@ -2699,54 +2732,58 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                             {/* Image Upload for All Conditions */}
                             <div className="mt-3 pt-3 border-t border-gray-300">
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Product Images {index === 0 && <span className="text-red-500">*</span>} <span className="text-xs text-gray-500">(Optional for other conditions)</span>
+                                Product Images{' '}
+                                {index === 0 && <span className="text-red-500">*</span>}{' '}
+                                <span className="text-xs text-gray-500">
+                                  (Optional for other conditions)
+                                </span>
                               </label>
-                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                                  <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={e => handleConditionImageUpload(e, index)}
-                                    className="hidden"
-                                    id={`condition-image-upload-${index}`}
-                                  />
-                                  <label
-                                    htmlFor={`condition-image-upload-${index}`}
-                                    className="cursor-pointer"
-                                  >
-                                    <Camera className="w-10 h-10 text-gray-400 mx-auto mb-2" />
-                                    <p className="text-gray-600 text-sm mb-1">
-                                      Click to upload product images
-                                    </p>
-                                    <p className="text-xs text-gray-500">PNG, JPG up to 5MB each</p>
-                                  </label>
-                                </div>
-                                {condition.images && condition.images.length > 0 && (
-                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
-                                    {condition.images.map((image: string, imgIndex: number) => (
-                                      <div key={imgIndex} className="relative">
-                                        <img
-                                          src={image}
-                                          alt={`Product ${imgIndex + 1}`}
-                                          className="w-full h-24 object-cover rounded-lg border border-gray-200"
-                                        />
-                                        <button
-                                          type="button"
-                                          onClick={() => handleConditionImageRemove(index, imgIndex)}
-                                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
-                                        >
-                                          <X size={12} />
-                                        </button>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                                {errors['conditionOptions.0.images'] && index === 0 && (
-                                  <p className="text-red-500 text-sm mt-2">
-                                    {errors['conditionOptions.0.images']}
+                              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                <input
+                                  type="file"
+                                  multiple
+                                  accept="image/*"
+                                  onChange={e => handleConditionImageUpload(e, index)}
+                                  className="hidden"
+                                  id={`condition-image-upload-${index}`}
+                                />
+                                <label
+                                  htmlFor={`condition-image-upload-${index}`}
+                                  className="cursor-pointer"
+                                >
+                                  <Camera className="w-10 h-10 text-gray-400 mx-auto mb-2" />
+                                  <p className="text-gray-600 text-sm mb-1">
+                                    Click to upload product images
                                   </p>
-                                )}
+                                  <p className="text-xs text-gray-500">PNG, JPG up to 5MB each</p>
+                                </label>
                               </div>
+                              {condition.images && condition.images.length > 0 && (
+                                <div className="flex flex-wrap gap-3 mt-3">
+                                  {condition.images.map((image: string, imgIndex: number) => (
+                                    <div key={imgIndex} className="relative">
+                                      <img
+                                        src={image}
+                                        alt={`Product ${imgIndex + 1}`}
+                                        className="w-auto h-24 object-contain rounded-lg border border-gray-200"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => handleConditionImageRemove(index, imgIndex)}
+                                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                                      >
+                                        <X size={12} />
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {errors['conditionOptions.0.images'] && index === 0 && (
+                                <p className="text-red-500 text-sm mt-2">
+                                  {errors['conditionOptions.0.images']}
+                                </p>
+                              )}
+                            </div>
                           </div>
                         ))}
                         <button
@@ -2756,7 +2793,15 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                               ...prev,
                               conditionOptions: [
                                 ...prev.conditionOptions,
-                                { label: '', mrp: 0, ram: '', storage: '', color: '', stock: 0, images: [] },
+                                {
+                                  label: '',
+                                  mrp: 0,
+                                  ram: '',
+                                  storage: '',
+                                  color: '',
+                                  stock: 0,
+                                  images: [],
+                                },
                               ],
                             }))
                           }
