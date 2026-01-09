@@ -53,7 +53,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
     availability: false,
     variants: false,
     addOns: false,
-    conditionOptions: false,
+    conditionOptions: true, // Has required fields (mrp and images for Excellent condition)
     topSpecs: false,
     display: false,
     performance: false,
@@ -118,9 +118,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
 
     // Condition options for different states
     conditionOptions: [
-      { label: 'Excellent', price: 0, ram: '', storage: '', color: '', stock: 0 },
-      { label: 'Good', price: 0, ram: '', storage: '', color: '', stock: 0 },
-      { label: 'Fair', price: 0, ram: '', storage: '', color: '', stock: 0 },
+      { label: 'Excellent', mrp: 0, discountedPrice: 0, discountPercent: 0, ram: '', storage: '', color: '', stock: 0, images: [] },
     ],
 
     // Key specifications (will be converted to object in backend)
@@ -315,10 +313,18 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
 
         variants: product.variants || [],
         addOns: product.addOns || [],
-        conditionOptions: product.conditionOptions || [
-          { label: 'Excellent', price: 0, ram: '', storage: '', color: '', stock: 0 },
-          { label: 'Good', price: -1000, ram: '', storage: '', color: '', stock: 0 },
-          { label: 'Fair', price: -2000, ram: '', storage: '', color: '', stock: 0 },
+        conditionOptions: product.conditionOptions?.map((c: any) => ({
+          label: c.label,
+          mrp: c.mrp || c.price || 0,
+          discountedPrice: c.discountedPrice || 0,
+          discountPercent: c.discountPercent || 0,
+          ram: c.ram || '',
+          storage: c.storage || '',
+          color: c.color || '',
+          stock: c.stock || 0,
+          images: c.images || [],
+        })) || [
+          { label: 'Excellent', mrp: 0, discountedPrice: 0, discountPercent: 0, ram: '', storage: '', color: '', stock: 0, images: [] },
         ],
 
         topSpecs: Array.isArray(product.topSpecs) ? product.topSpecs : [],
@@ -575,7 +581,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
         }
         current[keys[keys.length - 1]] = val;
 
-        // Auto-calculate discount percentage when MRP or discounted price changes
+        // Auto-calculate discount percentage when MRP or discounted mrp changes
         if (name === 'pricing.mrp' || name === 'pricing.discountedPrice') {
           const mrp = parseFloat(name === 'pricing.mrp' ? val : newData.pricing.mrp) || 0;
           const discountedPrice =
@@ -656,6 +662,80 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
     }));
   };
 
+  const handleConditionImageUpload = async (e: any, conditionIndex: number) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    setLoading(true);
+    try {
+      const uploadPromises = files.map((file: any) =>
+        cloudinaryService.uploadImage(file, 'products')
+      );
+      const uploadResults = await Promise.all(uploadPromises);
+
+      const newImages = uploadResults
+        .filter((result: any) => result.success && result.data?.url)
+        .map((result: any) => result.data.url);
+
+      if (newImages.length > 0) {
+        setFormData((prev: any) => {
+          const newConditions = [...prev.conditionOptions];
+          newConditions[conditionIndex] = {
+            ...newConditions[conditionIndex],
+            images: [...(newConditions[conditionIndex].images || []), ...newImages],
+          };
+
+          if (conditionIndex === 0) {
+            return {
+              ...prev,
+              conditionOptions: newConditions,
+              images: newConditions[0].images,
+            };
+          }
+
+          return {
+            ...prev,
+            conditionOptions: newConditions,
+          };
+        });
+        toast.success(`${newImages.length} image(s) uploaded successfully!`);
+      } else {
+        toast.error('No images were uploaded successfully');
+      }
+
+      e.target.value = '';
+    } catch (error: any) {
+      console.error('Error uploading images:', error);
+      toast.error(error.message || 'Failed to upload images. Please try again.');
+      e.target.value = '';
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleConditionImageRemove = (conditionIndex: number, imageIndex: number) => {
+    setFormData((prev: any) => {
+      const newConditions = [...prev.conditionOptions];
+      newConditions[conditionIndex] = {
+        ...newConditions[conditionIndex],
+        images: newConditions[conditionIndex].images.filter((_: any, i: number) => i !== imageIndex),
+      };
+
+      if (conditionIndex === 0) {
+        return {
+          ...prev,
+          conditionOptions: newConditions,
+          images: newConditions[0].images,
+        };
+      }
+
+      return {
+        ...prev,
+        conditionOptions: newConditions,
+      };
+    });
+  };
+
   const validateForm = () => {
     const newErrors: any = {};
     if (!formData.superCategoryId) newErrors.superCategoryId = 'Super category is required';
@@ -682,8 +762,15 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
 
     setLoading(true);
     try {
+      // Sync first "Excellent" condition option with main pricing and images
+      const excellentCondition = formData.conditionOptions[0];
+      const syncedImages = excellentCondition?.images || formData.images;
+      const syncedPrice = excellentCondition?.mrp || parseFloat(formData.pricing.mrp) || 0;
+      const syncedDiscountedPrice = excellentCondition?.discountedPrice || parseFloat(formData.pricing.discountedPrice) || syncedPrice;
+      const syncedDiscountPercent = excellentCondition?.discountPercent || parseFloat(formData.pricing.discountPercent) || 0;
+
       // Convert images array to object format for API
-      const imagesObj = formData.images.reduce((acc: any, img: string, index: number) => {
+      const imagesObj = syncedImages.reduce((acc: any, img: string, index: number) => {
         if (index === 0) acc.main = img;
         else if (index === 1) acc.gallery = img;
         else if (index === 2) acc.thumbnail = img;
@@ -692,12 +779,23 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
 
       const productData = {
         ...formData,
-        images: formData.images.length > 0 ? imagesObj : {},
+        images: syncedImages.length > 0 ? imagesObj : {},
         pricing: {
-          mrp: parseFloat(formData.pricing.mrp) || 0,
-          discountedPrice: parseFloat(formData.pricing.discountedPrice) || 0,
-          discountPercent: parseFloat(formData.pricing.discountPercent) || 0,
+          mrp: syncedPrice,
+          discountedPrice: syncedDiscountedPrice,
+          discountPercent: syncedDiscountPercent,
         },
+        conditionOptions: formData.conditionOptions.map((condition: any) => ({
+          label: condition.label,
+          mrp: parseFloat(condition.mrp) || 0,
+          discountedPrice: parseFloat(condition.discountedPrice) || 0,
+          discountPercent: parseFloat(condition.discountPercent) || 0,
+          ram: condition.ram,
+          storage: condition.storage,
+          color: condition.color,
+          stock: parseInt(condition.stock) || 0,
+          images: condition.images || [],
+        })),
         stock: {
           ...formData.stock,
           quantity: parseInt(formData.stock.quantity) || 0,
@@ -1052,8 +1150,8 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                   )}
                 </div>
 
-                {/* Images */}
-                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                {/* Images - Moved to Condition Options */}
+                {/* <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
                   <button
                     type="button"
                     onClick={() => toggleSection('images')}
@@ -1114,10 +1212,10 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                       )}
                     </div>
                   )}
-                </div>
+                </div> */}
 
-                {/* Pricing */}
-                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                {/* Pricing - Moved to Condition Options */}
+                {/* <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
                   <button
                     type="button"
                     onClick={() => toggleSection('pricing')}
@@ -1196,11 +1294,10 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         </div>
                       </div>
 
-                      {/* Pricing Help Text */}
                       <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                         <p className="text-blue-800 text-sm">
                           💡 <strong>Auto-calculation:</strong> The discount percentage is
-                          automatically calculated when you enter both MRP and discounted price.
+                          automatically calculated when you enter both MRP and discounted mrp.
                           {formData.pricing.mrp && formData.pricing.discountedPrice && (
                             <span className="block mt-1">
                               Current: ₹{formData.pricing.discountedPrice} (₹
@@ -1215,7 +1312,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                       </div>
                     </div>
                   )}
-                </div>
+                </div> */}
 
                 {/* Stock & Condition */}
                 <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
@@ -1287,7 +1384,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         name="stock.originalPrice"
                         value={formData.stock.originalPrice}
                         onChange={handleInputChange}
-                        placeholder="Original purchase price"
+                        placeholder="Original purchase mrp"
                         step="0.01"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
@@ -1479,10 +1576,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                   >
                     <div className="flex items-center gap-3">
                       <Shield className="w-5 h-5 text-blue-600" />
-                      <h3 className="text-lg font-semibold text-gray-900">Condition Options</h3>
-                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                        Set prices for different product conditions
-                      </span>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Condition Options <span className="text-red-500">*</span>
+                      </h3>
                     </div>
                     {openSections.conditionOptions ? (
                       <ChevronUp className="w-5 h-5 text-gray-600" />
@@ -1493,13 +1589,22 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
 
                   {openSections.conditionOptions && (
                     <div className="p-4">
-                      <div className="space-y-3">
+                      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-sm text-blue-800">
+                          <strong>Note:</strong> The first "Excellent" condition option represents the main product listing. Its price and images will be used as the primary product details. This option cannot be removed or renamed.
+                        </p>
+                      </div>
+                      <div className="space-y-4">
                         {formData.conditionOptions?.map((condition: any, index: number) => (
-                          <div key={index} className="p-4 border border-gray-200 rounded-lg">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <div
+                            key={index}
+                            className="p-4 border border-gray-200 rounded-lg bg-gray-50"
+                          >
+                            {/* Pricing Section */}
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  Condition Label
+                                  Condition Label {index === 0 && <span className="text-red-500">*</span>}
                                 </label>
                                 <input
                                   type="text"
@@ -1513,56 +1618,142 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                                       conditionOptions: newConditions,
                                     }));
                                   }}
+                                  disabled={index === 0}
+                                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                    index === 0 ? 'bg-gray-100 cursor-not-allowed' : ''
+                                  }`}
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  MRP (₹) {index === 0 && <span className="text-red-500">*</span>}
+                                </label>
+                                <input
+                                  type="number"
+                                  placeholder="Enter MRP"
+                                  value={condition.mrp || ''}
+                                  onChange={e => {
+                                    const newConditions = [...formData.conditionOptions];
+                                    const mrp = parseFloat(e.target.value) || 0;
+                                    const discountedPrice = newConditions[index].discountedPrice || 0;
+
+                                    let discountPercent = 0;
+                                    if (mrp > 0 && discountedPrice > 0 && discountedPrice < mrp) {
+                                      discountPercent = ((mrp - discountedPrice) / mrp) * 100;
+                                    }
+
+                                    newConditions[index] = {
+                                      ...condition,
+                                      mrp: mrp,
+                                      discountPercent: parseFloat(discountPercent.toFixed(2)),
+                                    };
+
+                                    if (index === 0) {
+                                      setFormData((prev: any) => ({
+                                        ...prev,
+                                        conditionOptions: newConditions,
+                                        pricing: {
+                                          ...prev.pricing,
+                                          mrp: e.target.value,
+                                          discountPercent: discountPercent.toFixed(2),
+                                        },
+                                      }));
+                                    } else {
+                                      setFormData((prev: any) => ({
+                                        ...prev,
+                                        conditionOptions: newConditions,
+                                      }));
+                                    }
+                                  }}
+                                  min="0"
+                                  step="0.01"
                                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                               </div>
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  Price for this Condition (₹)
+                                  Discounted Price (₹)
                                 </label>
                                 <input
                                   type="number"
-                                  placeholder="Enter actual price"
-                                  value={condition.price || ''}
+                                  placeholder="Enter sale price"
+                                  value={condition.discountedPrice || ''}
                                   onChange={e => {
                                     const newConditions = [...formData.conditionOptions];
+                                    const discountedPrice = parseFloat(e.target.value) || 0;
+                                    const mrp = newConditions[index].mrp || 0;
+
+                                    let discountPercent = 0;
+                                    if (mrp > 0 && discountedPrice > 0 && discountedPrice < mrp) {
+                                      discountPercent = ((mrp - discountedPrice) / mrp) * 100;
+                                    }
+
                                     newConditions[index] = {
                                       ...condition,
-                                      price: parseFloat(e.target.value) || 0,
+                                      discountedPrice: discountedPrice,
+                                      discountPercent: parseFloat(discountPercent.toFixed(2)),
                                     };
-                                    setFormData((prev: any) => ({
-                                      ...prev,
-                                      conditionOptions: newConditions,
-                                    }));
+
+                                    if (index === 0) {
+                                      setFormData((prev: any) => ({
+                                        ...prev,
+                                        conditionOptions: newConditions,
+                                        pricing: {
+                                          ...prev.pricing,
+                                          discountedPrice: e.target.value,
+                                          discountPercent: discountPercent.toFixed(2),
+                                        },
+                                      }));
+                                    } else {
+                                      setFormData((prev: any) => ({
+                                        ...prev,
+                                        conditionOptions: newConditions,
+                                      }));
+                                    }
                                   }}
                                   min="0"
+                                  step="0.01"
                                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
-                                {/* <p className="text-xs text-gray-500 mt-1">
-                            {condition.price > 0
-                              ? `Final price: ₹${condition.price.toLocaleString()}`
-                              : 'Enter the selling price'}
-                          </p> */}
                               </div>
-                              <div className="flex items-end">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const newConditions = formData.conditionOptions.filter(
-                                      (_: any, i: number) => i !== index
-                                    );
-                                    setFormData((prev: any) => ({
-                                      ...prev,
-                                      conditionOptions: newConditions,
-                                    }));
-                                  }}
-                                  className="w-full px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center justify-center gap-2"
-                                  disabled={formData.conditionOptions.length <= 1}
-                                >
-                                  <X size={16} />
-                                  Remove
-                                </button>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Discount % <span className="text-xs text-gray-500">(Auto)</span>
+                                </label>
+                                <input
+                                  type="number"
+                                  placeholder="0"
+                                  value={condition.discountPercent || 0}
+                                  readOnly
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                                />
+                                {condition.discountPercent > 0 && (
+                                  <p className="text-green-600 text-xs mt-1">
+                                    ✓ {condition.discountPercent}% off
+                                  </p>
+                                )}
                               </div>
+                            </div>
+
+                            {/* Remove Button - Separate Row */}
+                            <div className="mb-3">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newConditions = formData.conditionOptions.filter(
+                                    (_: any, i: number) => i !== index
+                                  );
+                                  setFormData((prev: any) => ({
+                                    ...prev,
+                                    conditionOptions: newConditions,
+                                  }));
+                                }}
+                                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                disabled={index === 0}
+                              >
+                                <X size={16} />
+                                Remove Condition
+                              </button>
                             </div>
 
                             {/* Variant Fields: RAM, Storage, Color, Stock */}
@@ -1669,6 +1860,55 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                                 />
                               </div>
                             </div>
+
+                            {/* Image Upload for First (Excellent) Condition */}
+                            {index === 0 && (
+                              <div className="mt-3 pt-3 border-t border-gray-300">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Product Images <span className="text-red-500">*</span>
+                                </label>
+                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                  <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={e => handleConditionImageUpload(e, index)}
+                                    className="hidden"
+                                    id={`condition-image-upload-${index}`}
+                                  />
+                                  <label
+                                    htmlFor={`condition-image-upload-${index}`}
+                                    className="cursor-pointer"
+                                  >
+                                    <Camera className="w-10 h-10 text-gray-400 mx-auto mb-2" />
+                                    <p className="text-gray-600 text-sm mb-1">
+                                      Click to upload product images
+                                    </p>
+                                    <p className="text-xs text-gray-500">PNG, JPG up to 5MB each</p>
+                                  </label>
+                                </div>
+                                {condition.images && condition.images.length > 0 && (
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+                                    {condition.images.map((image: string, imgIndex: number) => (
+                                      <div key={imgIndex} className="relative">
+                                        <img
+                                          src={image}
+                                          alt={`Product ${imgIndex + 1}`}
+                                          className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                                        />
+                                        <button
+                                          type="button"
+                                          onClick={() => handleConditionImageRemove(index, imgIndex)}
+                                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                                        >
+                                          <X size={12} />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         ))}
                         <button
@@ -1678,7 +1918,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                               ...prev,
                               conditionOptions: [
                                 ...prev.conditionOptions,
-                                { label: '', price: 0, ram: '', storage: '', color: '', stock: 0 },
+                                { label: '', mrp: 0, discountedPrice: 0, discountPercent: 0, ram: '', storage: '', color: '', stock: 0, images: [] },
                               ],
                             }))
                           }
@@ -1687,13 +1927,6 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                           <Plus size={16} />
                           Add Condition Option
                         </button>
-                      </div>
-                      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                        <p className="text-blue-800 text-sm">
-                          💡 <strong>Condition Options:</strong> Set specific prices for each
-                          product condition. Customers will see these exact prices when selecting
-                          different conditions.
-                        </p>
                       </div>
                     </div>
                   )}

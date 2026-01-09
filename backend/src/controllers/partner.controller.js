@@ -302,11 +302,11 @@ export async function getProductsCatalog(req, res) {
       basePrice: product.pricing?.mrp || product.pricing?.discountedPrice || 0,
       minPrice:
         product.conditionOptions?.length > 0
-          ? Math.min(...product.conditionOptions.map((c) => c.price))
+          ? Math.min(...product.conditionOptions.map((c) => c.discountedPrice || c.mrp || 0))
           : null,
       maxPrice:
         product.conditionOptions?.length > 0
-          ? Math.max(...product.conditionOptions.map((c) => c.price))
+          ? Math.max(...product.conditionOptions.map((c) => c.discountedPrice || c.mrp || 0))
           : null,
       isActive: product.isActive,
       createdAt: product.createdAt,

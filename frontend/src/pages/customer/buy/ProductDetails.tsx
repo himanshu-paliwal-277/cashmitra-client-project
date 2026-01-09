@@ -425,13 +425,15 @@ const ProductDetails = () => {
 
     const imageArray = getImageArray();
     const calculatedPrice =
-      (selectedVariant?.price ||
-        product.pricing?.discountedPrice ||
-        product.pricing?.mrp ||
-        product.minPrice ||
-        product.maxPrice ||
-        product.price ||
-        0) + (selectedCondition?.price || 0);
+      selectedCondition?.discountedPrice ||
+      selectedCondition?.mrp ||
+      selectedVariant?.price ||
+      product.pricing?.discountedPrice ||
+      product.pricing?.mrp ||
+      product.minPrice ||
+      product.maxPrice ||
+      product.price ||
+      0;
 
     // Debug: Log price calculation details
     console.log('Price Calculation Debug:', {
@@ -451,7 +453,8 @@ const ProductDetails = () => {
       _id: product._id,
       name: productName,
       price:
-        selectedCondition?.price ||
+        selectedCondition?.discountedPrice ||
+        selectedCondition?.mrp ||
         selectedVariant?.price ||
         product.pricing?.discountedPrice ||
         product.pricing?.mrp ||
@@ -592,15 +595,25 @@ const ProductDetails = () => {
       </div>
     );
   }
+  // Calculate price - prefer discounted price, fallback to mrp
   const priceNow =
-    selectedCondition?.price ||
+    selectedCondition?.discountedPrice ||
+    selectedCondition?.mrp ||
     selectedVariant?.price ||
     product.pricing?.discountedPrice ||
+    product.pricing?.mrp ||
     product.minPrice ||
     product.maxPrice ||
     product.price ||
     0;
-  const mrp = product.pricing?.mrp || product.originalPrice || null;
+
+  // Get MRP for strikethrough display
+  const mrp =
+    selectedCondition?.mrp ||
+    product.pricing?.mrp ||
+    product.originalPrice ||
+    null;
+
   const discountPct = mrp && priceNow < mrp ? Math.round(((mrp - priceNow) / mrp) * 100) : null;
   const productName = getProductName();
 
@@ -902,9 +915,16 @@ const ProductDetails = () => {
                       disabled={outOfStock}
                     >
                       <span className="font-semibold text-gray-900">{c.label}</span>
-                      <span className="text-lg font-bold text-green-600">
-                        ₹{(c.price || 0).toLocaleString()}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold text-green-600">
+                          ₹{(c.discountedPrice || c.mrp || 0).toLocaleString()}
+                        </span>
+                        {c.discountedPrice && c.mrp && c.discountedPrice < c.mrp && (
+                          <span className="text-sm text-gray-500 line-through">
+                            ₹{c.mrp.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
                       <div className="mt-2 space-y-1 text-xs text-gray-600 w-full">
                         {c.ram && (
                           <div className="flex justify-between">

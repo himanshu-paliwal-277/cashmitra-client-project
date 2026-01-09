@@ -66,11 +66,14 @@ const BuyProductSchema = new mongoose.Schema(
     conditionOptions: [
       {
         label: String,
-        price: Number,
+        mrp: Number,
+        discountedPrice: Number,
+        discountPercent: Number,
         ram: String,
         storage: String,
         color: String,
         stock: { type: Number, default: 0 },
+        images: [String],
       },
     ],
 
