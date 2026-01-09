@@ -74,8 +74,11 @@ const ProductDetails = () => {
   // Single-open accordion key
   const [openKey, setOpenKey] = useState('display');
 
-  // “What is Assured” toggle
+  // "What is Assured" toggle
   const [showAssured, setShowAssured] = useState(false);
+
+  // Grades modal state
+  const [showGradesModal, setShowGradesModal] = useState(false);
 
   // Vertical rail ref for smooth scroll
   const railRef = useRef(null);
@@ -815,6 +818,16 @@ const ProductDetails = () => {
                     </div>
                   )}
                 </div>
+                {/* See Details Button */}
+                {product.categoryId?.superCategory?.grades && (
+                  <button
+                    onClick={() => setShowGradesModal(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all text-sm shadow-md hover:shadow-lg"
+                  >
+                    <Info size={16} />
+                    See Details
+                  </button>
+                )}
               </div>
 
               <div className="space-y-3">
@@ -1614,6 +1627,94 @@ const ProductDetails = () => {
           )}
         </div>
       </div>
+
+      {/* Grades Modal */}
+      {showGradesModal && product.categoryId?.superCategory?.grades && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-end z-50 p-4">
+          <div className="bg-white rounded-lg max-w-[500px] w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center rounded-t-2xl">
+              <h2 className="text-2xl font-bold text-gray-900">Product Grade Information</h2>
+              <button
+                onClick={() => setShowGradesModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X size={24} className="text-gray-600" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-6">
+              {/* Superb Grade */}
+              {product.categoryId.superCategory.grades.superb?.image && (
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold text-lg">
+                      {product.categoryId.superCategory.grades.superb.title || 'Superb'}
+                    </div>
+                    <Award size={24} className="text-green-600" />
+                  </div>
+                  <div className="bg-white rounded-lg p-4 shadow-sm">
+                    <img
+                      src={product.categoryId.superCategory.grades.superb.image}
+                      alt={product.categoryId.superCategory.grades.superb.title || 'Superb'}
+                      className="w-full h-auto rounded-lg"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Very Good Grade */}
+              {product.categoryId.superCategory.grades.veryGood?.image && (
+                <div className="bg-gradient-to-br from-blue-50 to-sky-50 rounded-xl p-6 border-2 border-blue-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-lg">
+                      {product.categoryId.superCategory.grades.veryGood.title || 'Very Good'}
+                    </div>
+                    <Award size={24} className="text-blue-600" />
+                  </div>
+                  <div className="bg-white rounded-lg p-4 shadow-sm">
+                    <img
+                      src={product.categoryId.superCategory.grades.veryGood.image}
+                      alt={product.categoryId.superCategory.grades.veryGood.title || 'Very Good'}
+                      className="w-full h-auto rounded-lg"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Good Grade */}
+              {product.categoryId.superCategory.grades.good?.image && (
+                <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-6 border-2 border-amber-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="bg-amber-600 text-white px-4 py-2 rounded-lg font-bold text-lg">
+                      {product.categoryId.superCategory.grades.good.title || 'Good'}
+                    </div>
+                    <Award size={24} className="text-amber-600" />
+                  </div>
+                  <div className="bg-white rounded-lg p-4 shadow-sm">
+                    <img
+                      src={product.categoryId.superCategory.grades.good.image}
+                      alt={product.categoryId.superCategory.grades.good.title || 'Good'}
+                      className="w-full h-auto rounded-lg"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            {/* <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 rounded-b-2xl">
+              <button
+                onClick={() => setShowGradesModal(false)}
+                className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all shadow-md"
+              >
+                Close
+              </button>
+            </div> */}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

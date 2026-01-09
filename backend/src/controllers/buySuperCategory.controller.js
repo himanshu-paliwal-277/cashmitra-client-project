@@ -71,7 +71,7 @@ export var getSuperCategory = asyncHandler(async (req, res) => {
 });
 
 export var createSuperCategory = asyncHandler(async (req, res) => {
-  const { name, description, image, isActive, sortOrder } = req.body;
+  const { name, description, image, isActive, sortOrder, grades } = req.body;
 
   if (!image) {
     throw new ApiError(400, 'Please provide an image URL');
@@ -85,6 +85,11 @@ export var createSuperCategory = asyncHandler(async (req, res) => {
     sortOrder,
     createdBy: req.user._id,
   };
+
+  // Add grades if provided
+  if (grades) {
+    superCategoryData.grades = grades;
+  }
 
   const superCategory = await BuySuperCategory.create(superCategoryData);
 
@@ -102,7 +107,7 @@ export var updateSuperCategory = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Super category not found');
   }
 
-  const { name, description, image, isActive, sortOrder } = req.body;
+  const { name, description, image, isActive, sortOrder, grades } = req.body;
 
   const updateData = {
     name,
@@ -114,6 +119,11 @@ export var updateSuperCategory = asyncHandler(async (req, res) => {
 
   if (image) {
     updateData.image = image;
+  }
+
+  // Add grades if provided
+  if (grades) {
+    updateData.grades = grades;
   }
 
   superCategory = await BuySuperCategory.findByIdAndUpdate(

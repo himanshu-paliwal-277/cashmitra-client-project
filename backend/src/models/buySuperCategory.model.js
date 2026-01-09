@@ -41,6 +41,38 @@ const buySuperCategorySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
+    grades: {
+      superb: {
+        title: {
+          type: String,
+          default: 'Superb',
+        },
+        image: {
+          type: String,
+          default: '',
+        },
+      },
+      veryGood: {
+        title: {
+          type: String,
+          default: 'Very Good',
+        },
+        image: {
+          type: String,
+          default: '',
+        },
+      },
+      good: {
+        title: {
+          type: String,
+          default: 'Good',
+        },
+        image: {
+          type: String,
+          default: '',
+        },
+      },
+    },
   },
   {
     timestamps: true,

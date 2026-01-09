@@ -111,7 +111,14 @@ export const deleteBuyProduct = async (req, res) => {
 export const getBuyProductById = async (req, res) => {
   try {
     const product = await BuyProduct.findById(req.params.id)
-      .populate('categoryId', 'name')
+      .populate({
+        path: 'categoryId',
+        select: 'name superCategory',
+        populate: {
+          path: 'superCategory',
+          select: 'name grades',
+        },
+      })
       .populate('createdBy', 'name email')
       .populate('updatedBy', 'name email');
 

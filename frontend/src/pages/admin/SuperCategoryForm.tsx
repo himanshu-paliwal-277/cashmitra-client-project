@@ -13,6 +13,14 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState('');
+
+  // Grades state
+  const [gradeImages, setGradeImages] = useState({
+    superb: { file: null as File | null, preview: '' },
+    veryGood: { file: null as File | null, preview: '' },
+    good: { file: null as File | null, preview: '' },
+  });
+
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -26,6 +34,23 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
       });
       if (category.image) {
         setImagePreview(category.image);
+      }
+      // Load existing grade images
+      if (category.grades) {
+        setGradeImages({
+          superb: {
+            file: null,
+            preview: category.grades.superb?.image || '',
+          },
+          veryGood: {
+            file: null,
+            preview: category.grades.veryGood?.image || '',
+          },
+          good: {
+            file: null,
+            preview: category.grades.good?.image || '',
+          },
+        });
       }
     }
   }, [category]);
@@ -84,6 +109,48 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
   const removeImage = () => {
     setImageFile(null);
     setImagePreview('');
+  };
+
+  const handleGradeImageChange = (gradeKey: 'superb' | 'veryGood' | 'good', e: any) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setErrors(prev => ({ ...prev, [`grade_${gradeKey}`]: 'Please select an image file' }));
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors(prev => ({ ...prev, [`grade_${gradeKey}`]: 'Image size should be less than 5MB' }));
+        return;
+      }
+
+      setErrors(prev => ({ ...prev, [`grade_${gradeKey}`]: '' }));
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setGradeImages(prev => ({
+          ...prev,
+          [gradeKey]: {
+            file,
+            preview: reader.result as string,
+          },
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeGradeImage = (gradeKey: 'superb' | 'veryGood' | 'good') => {
+    setGradeImages(prev => ({
+      ...prev,
+      [gradeKey]: {
+        file: null,
+        preview: '',
+      },
+    }));
   };
 
   const validate = () => {
@@ -162,13 +229,73 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
         return;
       }
 
+      // Upload grade images - preserve existing URLs if no new file is uploaded
+      const gradeUrls = {
+        superb: gradeImages.superb.preview || category?.grades?.superb?.image || '',
+        veryGood: gradeImages.veryGood.preview || category?.grades?.veryGood?.image || '',
+        good: gradeImages.good.preview || category?.grades?.good?.image || '',
+      };
+
+      // Upload superb grade image if new file is selected
+      if (gradeImages.superb.file) {
+        try {
+          gradeUrls.superb = await uploadImageToCloudinary(gradeImages.superb.file);
+        } catch (uploadError) {
+          setErrors({ submit: 'Failed to upload Superb grade image: ' + uploadError.message });
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Upload very good grade image if new file is selected
+      if (gradeImages.veryGood.file) {
+        try {
+          gradeUrls.veryGood = await uploadImageToCloudinary(gradeImages.veryGood.file);
+        } catch (uploadError) {
+          setErrors({ submit: 'Failed to upload Very Good grade image: ' + uploadError.message });
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Upload good grade image if new file is selected
+      if (gradeImages.good.file) {
+        try {
+          gradeUrls.good = await uploadImageToCloudinary(gradeImages.good.file);
+        } catch (uploadError) {
+          setErrors({ submit: 'Failed to upload Good grade image: ' + uploadError.message });
+          setLoading(false);
+          return;
+        }
+      }
+
       const payload = {
         name: formData.name,
         description: formData.description,
         image: imageUrl,
         isActive: formData.isActive,
         sortOrder: formData.sortOrder,
+        grades: {
+          superb: {
+            title: 'Superb',
+            image: gradeUrls.superb,
+          },
+          veryGood: {
+            title: 'Very Good',
+            image: gradeUrls.veryGood,
+          },
+          good: {
+            title: 'Good',
+            image: gradeUrls.good,
+          },
+        },
       };
+
+      console.log('=== Super Category Form Debug ===');
+      console.log('Category being edited:', category);
+      console.log('Grade Images State:', gradeImages);
+      console.log('Grade URLs to be sent:', gradeUrls);
+      console.log('Final Payload:', payload);
 
       const apiEndpoint = apiType === 'sell' ? 'sell-super-categories' : 'buy-super-categories';
       const url = category
@@ -205,7 +332,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
   };
 
   return (
-    <div className="bg-white rounded-2xl p-8 max-w-2xl w-full">
+    <div className="bg-white rounded-2xl p-8 w-full">
       {/* Modal Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900">
@@ -345,6 +472,144 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
             </div>
           )}
           {errors.image && <p className="text-sm text-red-500">{errors.image}</p>}
+        </div>
+
+        {/* Grades Section */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-gray-900 pb-2 border-b-2 border-gray-200">
+            Grade Images
+          </h3>
+          <p className="text-sm text-gray-600 -mt-2">
+            Upload images to explain different product grades to customers
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Superb Grade */}
+            <div className="space-y-3">
+              <label className="text-base font-semibold text-gray-900">Superb</label>
+              {gradeImages.superb.preview ? (
+                <div className="relative rounded-xl overflow-hidden border-2 border-gray-200">
+                  <img
+                    src={gradeImages.superb.preview}
+                    alt="Superb grade"
+                    className="w-full h-48 object-cover"
+                  />
+                  <button
+                    onClick={() => removeGradeImage('superb')}
+                    type="button"
+                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50 hover:bg-gray-100 transition-all">
+                  <ImageIcon size={32} className="text-gray-400 mx-auto mb-2" />
+                  <label
+                    htmlFor="superbInput"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg font-semibold cursor-pointer hover:bg-amber-600 transition-all text-sm"
+                  >
+                    <Upload size={16} />
+                    Upload
+                  </label>
+                  <input
+                    id="superbInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleGradeImageChange('superb', e)}
+                    className="hidden"
+                  />
+                </div>
+              )}
+              {errors.grade_superb && (
+                <p className="text-sm text-red-500">{errors.grade_superb}</p>
+              )}
+            </div>
+
+            {/* Very Good Grade */}
+            <div className="space-y-3">
+              <label className="text-base font-semibold text-gray-900">Very Good</label>
+              {gradeImages.veryGood.preview ? (
+                <div className="relative rounded-xl overflow-hidden border-2 border-gray-200">
+                  <img
+                    src={gradeImages.veryGood.preview}
+                    alt="Very Good grade"
+                    className="w-full h-48 object-cover"
+                  />
+                  <button
+                    onClick={() => removeGradeImage('veryGood')}
+                    type="button"
+                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50 hover:bg-gray-100 transition-all">
+                  <ImageIcon size={32} className="text-gray-400 mx-auto mb-2" />
+                  <label
+                    htmlFor="veryGoodInput"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg font-semibold cursor-pointer hover:bg-amber-600 transition-all text-sm"
+                  >
+                    <Upload size={16} />
+                    Upload
+                  </label>
+                  <input
+                    id="veryGoodInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleGradeImageChange('veryGood', e)}
+                    className="hidden"
+                  />
+                </div>
+              )}
+              {errors.grade_veryGood && (
+                <p className="text-sm text-red-500">{errors.grade_veryGood}</p>
+              )}
+            </div>
+
+            {/* Good Grade */}
+            <div className="space-y-3">
+              <label className="text-base font-semibold text-gray-900">Good</label>
+              {gradeImages.good.preview ? (
+                <div className="relative rounded-xl overflow-hidden border-2 border-gray-200">
+                  <img
+                    src={gradeImages.good.preview}
+                    alt="Good grade"
+                    className="w-full h-48 object-cover"
+                  />
+                  <button
+                    onClick={() => removeGradeImage('good')}
+                    type="button"
+                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50 hover:bg-gray-100 transition-all">
+                  <ImageIcon size={32} className="text-gray-400 mx-auto mb-2" />
+                  <label
+                    htmlFor="goodInput"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg font-semibold cursor-pointer hover:bg-amber-600 transition-all text-sm"
+                  >
+                    <Upload size={16} />
+                    Upload
+                  </label>
+                  <input
+                    id="goodInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleGradeImageChange('good', e)}
+                    className="hidden"
+                  />
+                </div>
+              )}
+              {errors.grade_good && (
+                <p className="text-sm text-red-500">{errors.grade_good}</p>
+              )}
+            </div>
+          </div>
         </div>
 
         {errors.submit && (
