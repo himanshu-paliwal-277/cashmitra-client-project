@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginAdmin, getAdminProfile } from '../services/adminService';
-import { getStorageKeys } from '../utils/jwt.utils';
+import { getStorageKeys, isTokenExpired } from '../utils/jwt.utils';
 
 // Create the context
 const AdminAuthContext = createContext();
@@ -52,6 +52,15 @@ export const AdminAuthProvider = ({ children }: any) => {
         const finalUserData = localStorage.getItem(storageKeys.userData);
 
         if (finalToken && finalUserData) {
+          // Check if token is expired before proceeding
+          if (isTokenExpired(finalToken)) {
+            console.log('Admin token expired - clearing auth data');
+            localStorage.removeItem(storageKeys.token);
+            localStorage.removeItem(storageKeys.userData);
+            setIsLoading(false);
+            return;
+          }
+
           const userData = JSON.parse(finalUserData);
           // Check if user is admin
           if (userData.role === 'admin') {
@@ -63,7 +72,12 @@ export const AdminAuthProvider = ({ children }: any) => {
         }
       } catch (error) {
         console.error('Authentication check failed:', error);
-        // logout(); // Clear potentially corrupted auth data
+        // Clear potentially corrupted auth data
+        const storageKeys = getStorageKeys('admin');
+        localStorage.removeItem(storageKeys.token);
+        localStorage.removeItem(storageKeys.userData);
+        setIsAuthenticated(false);
+        setAdminUser(null);
       } finally {
         setIsLoading(false);
       }

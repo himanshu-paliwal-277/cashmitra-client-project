@@ -78,3 +78,51 @@ export const getStorageKeys = (role: 'admin' | 'partner' | 'agent' | 'customer')
     userData: `${role}UserData`,
   };
 };
+
+/**
+ * Get login path based on user role
+ */
+export const getLoginPathByRole = (role: 'admin' | 'partner' | 'agent' | 'customer'): string => {
+  const roleLoginPaths: Record<string, string> = {
+    admin: '/admin/login',
+    partner: '/partner/login',
+    agent: '/agent/login',
+    customer: '/login',
+  };
+
+  return roleLoginPaths[role.toLowerCase()] || '/login';
+};
+
+/**
+ * Check if current user's token is expired and clear if necessary
+ * Returns true if token was cleared, false otherwise
+ */
+export const checkAndClearExpiredToken = (role: 'admin' | 'partner' | 'agent' | 'customer'): boolean => {
+  const storageKeys = getStorageKeys(role);
+  const token = localStorage.getItem(storageKeys.token);
+
+  if (token && isTokenExpired(token)) {
+    console.log(`${role} token expired - clearing auth data`);
+    localStorage.removeItem(storageKeys.token);
+    localStorage.removeItem(storageKeys.userData);
+    return true;
+  }
+
+  return false;
+};
+
+/**
+ * Validate and redirect if token is expired
+ * Should be called on protected route entry
+ */
+export const validateTokenAndRedirect = (role: 'admin' | 'partner' | 'agent' | 'customer'): boolean => {
+  const wasCleared = checkAndClearExpiredToken(role);
+
+  if (wasCleared) {
+    const loginPath = getLoginPathByRole(role);
+    window.location.href = loginPath;
+    return true;
+  }
+
+  return false;
+};

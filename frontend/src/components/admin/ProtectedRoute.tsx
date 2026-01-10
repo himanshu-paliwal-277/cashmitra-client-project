@@ -35,9 +35,9 @@ const ProtectedRoute = () => {
   }
 
   // Redirect to login if not authenticated as admin
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/admin/login" replace />;
-  // }
+  if (!isAuthenticated) {
+    return <Navigate to="/admin/login" replace />;
+  }
 
   // Render child routes if authenticated as admin
   return <Outlet />;

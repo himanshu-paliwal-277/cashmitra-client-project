@@ -28,4 +28,44 @@ api.interceptors.request.use(
   error => Promise.reject(error)
 );
 
+// Add a response interceptor to handle token errors
+api.interceptors.response.use(
+  response => response,
+  error => {
+    // If token is invalid or expired, clear auth data and redirect to login
+    if (error.response?.status === 401) {
+      const message = error.response?.data?.message;
+
+      if (
+        message === 'Invalid token' ||
+        message === 'Token expired' ||
+        message === 'Not authorized, token failed'
+      ) {
+        console.log('Auth token invalid - clearing and redirecting to login');
+
+        // Clear the current role's auth data
+        const currentRole = getRoleFromPath(window.location.pathname);
+        const storageKeys = getStorageKeys(currentRole);
+        localStorage.removeItem(storageKeys.token);
+        localStorage.removeItem(storageKeys.userData);
+
+        // Redirect to role-specific login if not already there
+        if (!window.location.pathname.includes('/login')) {
+          if (currentRole === 'admin') {
+            window.location.href = '/admin/login';
+          } else if (currentRole === 'partner') {
+            window.location.href = '/partner/login';
+          } else if (currentRole === 'agent') {
+            window.location.href = '/agent/login';
+          } else {
+            window.location.href = '/login';
+          }
+        }
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 export default api;

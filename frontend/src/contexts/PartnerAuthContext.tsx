@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { API_BASE_URL } from '../utils/api';
-import { getStorageKeys } from '../utils/jwt.utils';
+import { getStorageKeys, isTokenExpired } from '../utils/jwt.utils';
 
 interface Partner {
   _id: string;
@@ -97,6 +97,15 @@ export const PartnerAuthProvider: React.FC<PartnerAuthProviderProps> = ({ childr
         const finalPartner = localStorage.getItem(storageKeys.userData);
 
         if (finalToken && finalPartner) {
+          // Check if token is expired before proceeding
+          if (isTokenExpired(finalToken)) {
+            console.log('Partner token expired - clearing auth data');
+            localStorage.removeItem(storageKeys.token);
+            localStorage.removeItem(storageKeys.userData);
+            setLoading(false);
+            return;
+          }
+
           const partnerData = JSON.parse(finalPartner);
           // Check if user is partner
           if (partnerData.role === 'partner') {
@@ -112,6 +121,8 @@ export const PartnerAuthProvider: React.FC<PartnerAuthProviderProps> = ({ childr
         const storageKeys = getStorageKeys('partner');
         localStorage.removeItem(storageKeys.token);
         localStorage.removeItem(storageKeys.userData);
+        setPartner(null);
+        setPermissions({ buy: false, sell: false });
       } finally {
         setLoading(false);
       }

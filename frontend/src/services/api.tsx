@@ -48,17 +48,17 @@ api.interceptors.response.use(
         localStorage.removeItem(storageKeys.userData);
 
         // Redirect to role-specific login if not already there
-        // if (!window.location.pathname.includes('/login')) {
-        //   if (currentRole === 'admin') {
-        //     window.location.href = '/admin/login';
-        //   } else if (currentRole === 'partner') {
-        //     window.location.href = '/partner/login';
-        //   } else if (currentRole === 'agent') {
-        //     window.location.href = '/agent/login';
-        //   } else {
-        //     window.location.href = '/login';
-        //   }
-        // }
+        if (!window.location.pathname.includes('/login')) {
+          if (currentRole === 'admin') {
+            window.location.href = '/admin/login';
+          } else if (currentRole === 'partner') {
+            window.location.href = '/partner/login';
+          } else if (currentRole === 'agent') {
+            window.location.href = '/agent/login';
+          } else {
+            window.location.href = '/login';
+          }
+        }
       }
     }
 
