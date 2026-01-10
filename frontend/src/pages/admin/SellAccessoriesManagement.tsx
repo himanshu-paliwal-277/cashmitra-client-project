@@ -3,6 +3,7 @@ import { cn } from '../../utils/utils';
 import useSellAccessories from '../../hooks/useSellAccessories';
 import useAdminCategories from '../../hooks/useAdminCategories';
 import Card from '../../components/ui/Card';
+import AccessoryModal from '../../components/admin/AccessoryModal';
 import { toast } from 'react-toastify';
 import {
   Search,
@@ -78,19 +79,6 @@ const SellAccessoriesManagement = () => {
   const [viewingAccessory, setViewingAccessory] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
 
-  const [formData, setFormData] = useState({
-    categoryId: '',
-    key: '',
-    title: '',
-    delta: {
-      type: 'abs',
-      sign: '+',
-      value: 0,
-    },
-    isActive: true,
-    order: 0,
-  });
-
   useEffect(() => {
     const filters = {
       search: searchTerm,
@@ -108,22 +96,14 @@ const SellAccessoriesManagement = () => {
 
     let filtered = [...accessories];
 
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        accessory =>
-          (accessory.title && accessory.title.toLowerCase().includes(searchLower)) ||
-          (accessory.key && accessory.key.toLowerCase().includes(searchLower)) ||
-          (accessory.categoryId?.name &&
-            accessory.categoryId.name.toLowerCase().includes(searchLower))
-      );
-    }
+    // Note: Search is now handled by the backend API, so we don't need to filter here
+    // The search is applied via the API call in useEffect
 
     // Ensure accessories are sorted by order
     filtered.sort((a, b) => (a.order || 0) - (b.order || 0));
 
     return filtered;
-  }, [accessories, searchTerm]);
+  }, [accessories]);
 
   const handleRefresh = () => {
     const filters = {
@@ -138,41 +118,11 @@ const SellAccessoriesManagement = () => {
 
   const handleCreateAccessory = () => {
     setEditingAccessory(null);
-    setFormData({
-      categoryId: '',
-      key: '',
-      title: '',
-      delta: {
-        type: 'abs',
-        sign: '+',
-        value: 0,
-      },
-      isActive: true,
-      order: accessories ? accessories.length : 0,
-    });
     setShowModal(true);
   };
 
   const handleEditAccessory = (accessory: any) => {
     setEditingAccessory(accessory);
-    // Handle categoryId - it might be populated as an object or just an ID string
-    const categoryIdValue =
-      typeof accessory.categoryId === 'object'
-        ? accessory.categoryId?._id || accessory.categoryId?.id || ''
-        : accessory.categoryId || '';
-
-    setFormData({
-      categoryId: categoryIdValue,
-      key: accessory.key || '',
-      title: accessory.title || '',
-      delta: {
-        type: accessory.delta?.type || 'abs',
-        sign: accessory.delta?.sign || '+',
-        value: accessory.delta?.value || 0,
-      },
-      isActive: accessory.isActive !== undefined ? accessory.isActive : true,
-      order: accessory.order || 0,
-    });
     setShowModal(true);
   };
 
@@ -185,9 +135,11 @@ const SellAccessoriesManagement = () => {
     if (window.confirm('Are you sure you want to delete this accessory?')) {
       try {
         await deleteAccessory(accessoryId);
+        toast.success('Accessory deleted successfully');
         handleRefresh();
       } catch (error) {
         console.error('Failed to delete accessory:', error);
+        toast.error('Failed to delete accessory');
       }
     }
   };
@@ -233,7 +185,7 @@ const SellAccessoriesManagement = () => {
   };
 
   const handleMoveUp = async (accessory: any) => {
-    // Filter accessories by same category and sort by order, then by createdAt for ties
+    // Filter accessories by same category and sort by order
     const sameCategoryAccessories = filteredAccessories.filter(a => {
       const aCategoryId = typeof a.categoryId === 'object' ? a.categoryId?._id : a.categoryId;
       const accessoryCategoryId =
@@ -241,12 +193,9 @@ const SellAccessoriesManagement = () => {
       return aCategoryId === accessoryCategoryId;
     });
 
-    const sortedAccessories = [...sameCategoryAccessories].sort((a, b) => {
-      const orderDiff = (a.order || 0) - (b.order || 0);
-      if (orderDiff !== 0) return orderDiff;
-      // If orders are the same, sort by creation date
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    });
+    const sortedAccessories = [...sameCategoryAccessories].sort(
+      (a, b) => (a.order || 0) - (b.order || 0)
+    );
     const currentIndex = sortedAccessories.findIndex(a => a._id === accessory._id);
 
     if (currentIndex <= 0) return; // Already at top
@@ -255,19 +204,10 @@ const SellAccessoriesManagement = () => {
     const currentOrder = accessory.order || 0;
     const previousOrder = previousAccessory.order || 0;
 
-    console.log('Move Up:', {
-      current: { id: accessory._id, title: accessory.title, order: currentOrder },
-      previous: { id: previousAccessory._id, title: previousAccessory.title, order: previousOrder },
-      swapping: `${currentOrder} <-> ${previousOrder}`,
-    });
-
     try {
       // Swap orders
-      const result1 = await updateAccessory(accessory._id, { order: previousOrder });
-      console.log('Updated current to:', previousOrder, result1);
-
-      const result2 = await updateAccessory(previousAccessory._id, { order: currentOrder });
-      console.log('Updated previous to:', currentOrder, result2);
+      await updateAccessory(accessory._id, { order: previousOrder });
+      await updateAccessory(previousAccessory._id, { order: currentOrder });
 
       // Wait a bit for backend to update
       setTimeout(() => {
@@ -275,11 +215,12 @@ const SellAccessoriesManagement = () => {
       }, 300);
     } catch (error) {
       console.error('Failed to move accessory up:', error);
+      toast.error('Failed to move accessory up');
     }
   };
 
   const handleMoveDown = async (accessory: any) => {
-    // Filter accessories by same category and sort by order, then by createdAt for ties
+    // Filter accessories by same category and sort by order
     const sameCategoryAccessories = filteredAccessories.filter(a => {
       const aCategoryId = typeof a.categoryId === 'object' ? a.categoryId?._id : a.categoryId;
       const accessoryCategoryId =
@@ -287,12 +228,9 @@ const SellAccessoriesManagement = () => {
       return aCategoryId === accessoryCategoryId;
     });
 
-    const sortedAccessories = [...sameCategoryAccessories].sort((a, b) => {
-      const orderDiff = (a.order || 0) - (b.order || 0);
-      if (orderDiff !== 0) return orderDiff;
-      // If orders are the same, sort by creation date
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    });
+    const sortedAccessories = [...sameCategoryAccessories].sort(
+      (a, b) => (a.order || 0) - (b.order || 0)
+    );
     const currentIndex = sortedAccessories.findIndex(a => a._id === accessory._id);
 
     if (currentIndex >= sortedAccessories.length - 1) return; // Already at bottom
@@ -301,19 +239,10 @@ const SellAccessoriesManagement = () => {
     const currentOrder = accessory.order || 0;
     const nextOrder = nextAccessory.order || 0;
 
-    console.log('Move Down:', {
-      current: { id: accessory._id, title: accessory.title, order: currentOrder },
-      next: { id: nextAccessory._id, title: nextAccessory.title, order: nextOrder },
-      swapping: `${currentOrder} <-> ${nextOrder}`,
-    });
-
     try {
       // Swap orders
-      const result1 = await updateAccessory(accessory._id, { order: nextOrder });
-      console.log('Updated current to:', nextOrder, result1);
-
-      const result2 = await updateAccessory(nextAccessory._id, { order: currentOrder });
-      console.log('Updated next to:', currentOrder, result2);
+      await updateAccessory(accessory._id, { order: nextOrder });
+      await updateAccessory(nextAccessory._id, { order: currentOrder });
 
       // Wait a bit for backend to update
       setTimeout(() => {
@@ -321,21 +250,24 @@ const SellAccessoriesManagement = () => {
       }, 300);
     } catch (error) {
       console.error('Failed to move accessory down:', error);
+      toast.error('Failed to move accessory down');
     }
   };
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
+  const handleSubmit = async (formData: any) => {
     try {
       if (editingAccessory) {
         await updateAccessory(editingAccessory._id, formData);
+        toast.success('Accessory updated successfully');
       } else {
         await createAccessory(formData);
+        toast.success('Accessory created successfully');
       }
       setShowModal(false);
       handleRefresh();
     } catch (error) {
       console.error('Failed to save accessory:', error);
+      toast.error('Failed to save accessory');
     }
   };
 
@@ -352,9 +284,11 @@ const SellAccessoriesManagement = () => {
           try {
             await Promise.all(selectedAccessories.map(id => deleteAccessory(id)));
             setSelectedAccessories([]);
+            toast.success(`${selectedAccessories.length} accessories deleted successfully`);
             handleRefresh();
           } catch (error) {
             console.error('Failed to delete accessories:', error);
+            toast.error('Failed to delete accessories');
           }
         }
         break;
@@ -362,9 +296,11 @@ const SellAccessoriesManagement = () => {
         try {
           await Promise.all(selectedAccessories.map(id => updateAccessory(id, { isActive: true })));
           setSelectedAccessories([]);
+          toast.success(`${selectedAccessories.length} accessories activated successfully`);
           handleRefresh();
         } catch (error) {
           console.error('Failed to activate accessories:', error);
+          toast.error('Failed to activate accessories');
         }
         break;
       case 'deactivate':
@@ -373,9 +309,11 @@ const SellAccessoriesManagement = () => {
             selectedAccessories.map(id => updateAccessory(id, { isActive: false }))
           );
           setSelectedAccessories([]);
+          toast.success(`${selectedAccessories.length} accessories deactivated successfully`);
           handleRefresh();
         } catch (error) {
           console.error('Failed to deactivate accessories:', error);
+          toast.error('Failed to deactivate accessories');
         }
         break;
       default:
@@ -415,7 +353,15 @@ const SellAccessoriesManagement = () => {
         <Card.Header className="bg-gray-50">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <IconComponent size={18} className="text-amber-600" />
+              {accessory.image ? (
+                <img
+                  src={accessory.image}
+                  alt={accessory.title}
+                  className="w-5 h-5 object-cover rounded"
+                />
+              ) : (
+                <IconComponent size={18} className="text-amber-600" />
+              )}
               <span className="font-semibold text-gray-900">{accessory.title || 'No Title'}</span>
             </div>
             <span
@@ -429,7 +375,15 @@ const SellAccessoriesManagement = () => {
           </div>
         </Card.Header>
         <Card.Body className="flex-1">
-          <p className="text-sm text-gray-600 mb-4">Key: {accessory.key || 'No Key'}</p>
+          {accessory.image && (
+            <div className="mb-4">
+              <img
+                src={accessory.image}
+                alt={accessory.title}
+                className="w-full h-32 object-cover rounded-lg"
+              />
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -444,12 +398,9 @@ const SellAccessoriesManagement = () => {
 
           <div className="bg-green-50 border border-green-200 rounded-lg p-3">
             <div className="text-xs font-medium text-green-700 uppercase tracking-wide mb-1">
-              Price Delta
+              Price Impact
             </div>
-            <div className="text-lg font-bold text-green-600">
-              {accessory.delta?.sign || '+'}
-              {accessory.delta?.value || 0} {accessory.delta?.type === 'percent' ? '%' : '₹'}
-            </div>
+            <div className="text-lg font-bold text-green-600">+₹{accessory.delta?.value || 0}</div>
           </div>
         </Card.Body>
         <Card.Footer className="bg-gray-50">
@@ -528,11 +479,18 @@ const SellAccessoriesManagement = () => {
         </td>
         <td className="px-4 py-3">
           <div className="flex items-center gap-2">
-            <IconComponent size={16} className="text-amber-600" />
+            {accessory.image ? (
+              <img
+                src={accessory.image}
+                alt={accessory.title}
+                className="w-4 h-4 object-cover rounded"
+              />
+            ) : (
+              <IconComponent size={16} className="text-amber-600" />
+            )}
             <span className="text-sm text-gray-900">{accessory.title || 'No Title'}</span>
           </div>
         </td>
-        <td className="px-4 py-3 text-sm text-gray-600">{accessory.key || 'No Key'}</td>
         <td className="px-4 py-3 text-sm text-gray-600">
           {accessory.categoryId?.name || 'No Category'}
         </td>
@@ -548,8 +506,7 @@ const SellAccessoriesManagement = () => {
         </td>
         <td className="px-4 py-3">
           <span className="text-sm font-medium text-green-600">
-            {accessory.delta?.sign || '+'}
-            {accessory.delta?.value || 0} {accessory.delta?.type === 'percent' ? '%' : '₹'}
+            +₹{accessory.delta?.value || 0}
           </span>
         </td>
         <td className="px-4 py-3 text-sm text-gray-600">{accessory.order || 0}</td>
@@ -664,7 +621,7 @@ const SellAccessoriesManagement = () => {
               />
               <input
                 type="text"
-                placeholder="Search by name, description, or category..."
+                placeholder="Search by title or category..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
@@ -712,9 +669,9 @@ const SellAccessoriesManagement = () => {
               className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
             >
               <option value="order">Order</option>
-              <option value="name">Name</option>
-              <option value="category">Category</option>
-              <option value="priceBonus">Price Bonus</option>
+              <option value="title">Title</option>
+              <option value="categoryId">Category</option>
+              <option value="delta.value">Price Impact</option>
               <option value="createdAt">Created Date</option>
             </select>
           </div>
@@ -802,16 +759,13 @@ const SellAccessoriesManagement = () => {
                         Title
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b border-gray-200">
-                        Key
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b border-gray-200">
                         Category
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b border-gray-200">
                         Status
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b border-gray-200">
-                        Price Delta
+                        Price Impact
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b border-gray-200">
                         Order
@@ -874,187 +828,14 @@ const SellAccessoriesManagement = () => {
         </>
       )}
 
-      {/* Modal */}
-      {showModal && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          onClick={e => e.target === e.currentTarget && setShowModal(false)}
-        >
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {editingAccessory ? 'Edit Accessory' : 'Add New Accessory'}
-              </h2>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X size={20} className="text-gray-600" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-                  {categoriesLoading ? (
-                    <div className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-500">
-                      Loading categories...
-                    </div>
-                  ) : (
-                    <select
-                      value={formData.categoryId}
-                      onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
-                      required
-                      className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                    >
-                      <option value="">Select a category</option>
-                      {categories &&
-                        categories.map((category: any) => (
-                          <option key={category._id} value={category._id}>
-                            {category.superCategory?.name
-                              ? `${category.superCategory.name} > ${category.displayName || category.name}`
-                              : category.displayName || category.name}
-                          </option>
-                        ))}
-                    </select>
-                  )}
-                  {categoriesLoading && (
-                    <small className="text-gray-500">Loading categories...</small>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Key *</label>
-                  <input
-                    type="text"
-                    placeholder="Enter accessory key (lowercase, numbers, underscores only)"
-                    value={formData.key}
-                    onChange={e => setFormData({ ...formData, key: e.target.value })}
-                    pattern="^[a-z0-9_]+$"
-                    title="Key must contain only lowercase letters, numbers, and underscores"
-                    required
-                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                  />
-                  <small className="text-gray-500">
-                    Use lowercase letters, numbers, and underscores only (e.g., wireless_charger)
-                  </small>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
-                  <input
-                    type="text"
-                    placeholder="Enter accessory title"
-                    value={formData.title}
-                    onChange={e => setFormData({ ...formData, title: e.target.value })}
-                    maxLength={200}
-                    required
-                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Price Delta
-                  </label>
-                  <div className="flex gap-2 items-center">
-                    <select
-                      value={formData.delta.type}
-                      onChange={e =>
-                        setFormData({
-                          ...formData,
-                          delta: { ...formData.delta, type: e.target.value },
-                        })
-                      }
-                      className="w-32 px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                    >
-                      <option value="abs">Absolute (₹)</option>
-                      <option value="percent">Percentage (%)</option>
-                    </select>
-
-                    <select
-                      value={formData.delta.sign}
-                      onChange={e =>
-                        setFormData({
-                          ...formData,
-                          delta: { ...formData.delta, sign: e.target.value },
-                        })
-                      }
-                      className="w-20 px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                    >
-                      <option value="+">+</option>
-                      <option value="-">-</option>
-                    </select>
-
-                    <input
-                      type="number"
-                      placeholder="Enter value"
-                      value={formData.delta.value}
-                      onChange={e =>
-                        setFormData({
-                          ...formData,
-                          delta: { ...formData.delta, value: parseFloat(e.target.value) || 0 },
-                        })
-                      }
-                      min="0"
-                      step="0.01"
-                      className="flex-1 px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                    />
-                  </div>
-                  <small className="text-gray-500">
-                    Price adjustment: {formData.delta.sign}
-                    {formData.delta.value} {formData.delta.type === 'percent' ? '%' : '₹'}
-                  </small>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Order</label>
-                  <input
-                    type="number"
-                    placeholder="Enter display order"
-                    value={formData.order}
-                    onChange={e =>
-                      setFormData({ ...formData, order: parseInt(e.target.value) || 0 })
-                    }
-                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                  />
-                </div>
-
-                <div>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={formData.isActive}
-                      onChange={e => setFormData({ ...formData, isActive: e.target.checked })}
-                      className="rounded border-gray-300 text-amber-500 focus:ring-amber-500"
-                    />
-                    <span className="text-sm text-gray-700">Active</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition-all"
-                >
-                  <X size={16} />
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition-all"
-                >
-                  <Save size={16} />
-                  {editingAccessory ? 'Update' : 'Create'} Accessory
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Simplified Modal */}
+      <AccessoryModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSubmit={handleSubmit}
+        accessory={editingAccessory}
+        loading={loading}
+      />
 
       {/* View Modal */}
       {showViewModal && viewingAccessory && (
@@ -1074,6 +855,17 @@ const SellAccessoriesManagement = () => {
             </div>
 
             <div className="space-y-4">
+              {viewingAccessory.image && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                  <img
+                    src={viewingAccessory.image}
+                    alt={viewingAccessory.title}
+                    className="w-full h-48 object-cover rounded-lg border border-gray-300"
+                  />
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
@@ -1099,13 +891,6 @@ const SellAccessoriesManagement = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Key</label>
-                <p className="text-sm text-gray-900 bg-gray-50 px-3 py-2 rounded-lg font-mono">
-                  {viewingAccessory.key}
-                </p>
-              </div>
-
-              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
                 <p className="text-sm text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">
                   {viewingAccessory.title}
@@ -1113,30 +898,12 @@ const SellAccessoriesManagement = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price Delta</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Price Impact</label>
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <div className="flex items-center gap-4">
-                    <div>
-                      <p className="text-xs text-green-700 mb-1">Type</p>
-                      <p className="text-sm font-medium text-green-900">
-                        {viewingAccessory.delta?.type === 'abs' ? 'Absolute (₹)' : 'Percentage (%)'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-green-700 mb-1">Sign</p>
-                      <p className="text-sm font-medium text-green-900">
-                        {viewingAccessory.delta?.sign === '+' ? 'Increase (+)' : 'Decrease (-)'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-green-700 mb-1">Value</p>
-                      <p className="text-lg font-bold text-green-600">
-                        {viewingAccessory.delta?.sign}
-                        {viewingAccessory.delta?.value}{' '}
-                        {viewingAccessory.delta?.type === 'percent' ? '%' : '₹'}
-                      </p>
-                    </div>
+                  <div className="text-lg font-bold text-green-600">
+                    +₹{viewingAccessory.delta?.value || 0}
                   </div>
+                  <p className="text-xs text-green-700">Fixed amount added to device value</p>
                 </div>
               </div>
 

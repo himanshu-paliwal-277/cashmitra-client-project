@@ -7,12 +7,18 @@ const sellQuestionSchema = new mongoose.Schema(
       ref: 'Category',
       required: [true, 'Category ID is required'],
     },
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'SellProduct',
+      required: false,
+    },
     section: {
       type: String,
       required: [true, 'Section is required'],
       trim: true,
       minlength: [1, 'Section must be at least 1 character'],
       maxlength: [100, 'Section cannot exceed 100 characters'],
+      default: 'general',
     },
     order: {
       type: Number,
@@ -21,7 +27,6 @@ const sellQuestionSchema = new mongoose.Schema(
     },
     key: {
       type: String,
-      required: [true, 'Question key is required'],
       trim: true,
       minlength: [1, 'Key must be at least 1 character'],
       maxlength: [100, 'Key cannot exceed 100 characters'],
@@ -151,6 +156,16 @@ const sellQuestionSchema = new mongoose.Schema(
 );
 
 sellQuestionSchema.pre('save', function (next) {
+  // Auto-generate key if not provided
+  if (!this.key && this.title) {
+    this.key = this.title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, '_')
+      .substring(0, 50);
+  }
+
+  // Clean up options
   this.options = this.options.map((opt) => ({
     ...opt,
     showIf: opt.showIf === null ? undefined : opt.showIf,
@@ -158,7 +173,13 @@ sellQuestionSchema.pre('save', function (next) {
   next();
 });
 
-sellQuestionSchema.index({ categoryId: 1, key: 1 }, { unique: true });
+sellQuestionSchema.index(
+  { categoryId: 1, key: 1 },
+  {
+    unique: true,
+    sparse: true, // Allow multiple documents with null/undefined key
+  }
+);
 
 sellQuestionSchema.index({ categoryId: 1, section: 1, order: 1 });
 
@@ -168,10 +189,18 @@ sellQuestionSchema.virtual('activeOptions').get(function () {
   return this.options.filter((option) => option.isActive !== false);
 });
 
-sellQuestionSchema.statics.getForCategory = function (categoryId) {
+sellQuestionSchema.statics.getForCategory = function (
+  categoryId,
+  productId = null
+) {
   const query = {
     categoryId,
     isActive: true,
+    $or: [
+      { productId: { $exists: false } }, // General questions
+      { productId: null }, // General questions
+      ...(productId ? [{ productId }] : []), // Product-specific questions if productId provided
+    ],
   };
 
   return this.find(query).sort({ section: 1, order: 1 });
@@ -188,7 +217,7 @@ sellQuestionSchema.statics.getForVariants = async function (
     return [];
   }
 
-  return this.getForCategory(product.categoryId);
+  return this.getForCategory(product.categoryId, productId);
 };
 
 export const SellQuestion = mongoose.model('SellQuestion', sellQuestionSchema);

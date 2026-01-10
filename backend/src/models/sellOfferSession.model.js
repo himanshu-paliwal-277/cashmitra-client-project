@@ -6,6 +6,7 @@ const sellOfferSessionSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: [true, 'User ID is required'],
     },
     productId: {
       type: mongoose.Schema.Types.ObjectId,

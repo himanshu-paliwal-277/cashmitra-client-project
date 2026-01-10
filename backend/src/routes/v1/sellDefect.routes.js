@@ -4,6 +4,7 @@ import {
   bulkCreateDefects,
   createDefect,
   deleteDefect,
+  getAllDefects,
   getDefect,
   getDefectCategories,
   getDefects,
@@ -25,6 +26,7 @@ router.use(isAuthenticated);
 router.use(authorize('admin'));
 
 router.post('/', createDefect);
+router.get('/all', getAllDefects); // New paginated endpoint for admin
 router.get('/', getDefects);
 router.get('/:id', getDefect);
 router.put('/:id', updateDefect);

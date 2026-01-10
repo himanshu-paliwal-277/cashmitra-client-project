@@ -32,7 +32,7 @@ const useSellQuestions = () => {
         ...filters,
       });
 
-      const response = await api.get(`/sell-questions?${queryParams}`, {
+      const response = await api.get(`/sell-questions/all?${queryParams}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -44,10 +44,10 @@ const useSellQuestions = () => {
       setQuestions(list);
 
       setPagination({
-        page: response.data?.page ?? 1,
-        limit: response.data?.limit ?? list?.length ?? 0,
-        total: response.data?.total ?? list?.length ?? 0,
-        totalPages: response.data?.totalPages ?? 1,
+        page: response.data?.pagination?.page ?? 1,
+        limit: response.data?.pagination?.limit ?? list?.length ?? 0,
+        total: response.data?.pagination?.total ?? list?.length ?? 0,
+        totalPages: response.data?.pagination?.totalPages ?? 1,
       });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch questions');

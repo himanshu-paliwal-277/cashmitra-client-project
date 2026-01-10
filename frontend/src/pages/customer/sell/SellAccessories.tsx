@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import sellService from '../../../services/sellService';
+import { getProductById } from '../../../services/productService';
 import {
   Home,
   ChevronRight,
@@ -17,6 +18,7 @@ const SellAccessories = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
+  const { productId: urlProductId, variantId: urlVariantId } = useParams();
 
   const {
     product,
@@ -29,8 +31,8 @@ const SellAccessories = () => {
     screenDefects,
   } = location.state || {};
 
-  const currentProductId = productId || id || product?.id || product?._id;
-  const currentVariantId = variantId || selectedVariant?.id || selectedVariant?._id;
+  const currentProductId = productId || urlProductId || id || product?.id || product?._id;
+  const currentVariantId = variantId || urlVariantId || selectedVariant?.id || selectedVariant?._id;
   const finalSelectedDefects = selectedDefects || screenDefects || [];
   const finalAnswers = answers || deviceEvaluation || {};
 
@@ -38,31 +40,59 @@ const SellAccessories = () => {
   const [selectedAccessories, setSelectedAccessories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [productData, setProductData] = useState(product);
 
   useEffect(() => {
-    const categoryId =
-      product?.categoryId || product?.data?.categoryId?._id || product?.data?.categoryId;
+    const initializeData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-    if (!categoryId) {
-      setError('Product category not found');
-      setLoading(false);
-      return;
-    }
+        // If we don't have product data, try to fetch it
+        if (!productData && currentProductId) {
+          try {
+            const fetchedProduct = await getProductById(currentProductId);
+            setProductData(fetchedProduct);
+          } catch (err) {
+            console.error('Error fetching product:', err);
+            setError('Product not found. Please start from the beginning.');
+            setLoading(false);
+            return;
+          }
+        }
 
-    fetchAccessories();
-  }, [product]);
+        const categoryId =
+          productData?.categoryId ||
+          productData?.data?.categoryId?._id ||
+          productData?.data?.categoryId ||
+          product?.categoryId ||
+          product?.data?.categoryId?._id ||
+          product?.data?.categoryId;
 
-  const fetchAccessories = async () => {
+        if (!categoryId) {
+          setError('Product category not found');
+          setLoading(false);
+          return;
+        }
+
+        await fetchAccessories(categoryId);
+      } catch (err) {
+        console.error('Error initializing data:', err);
+        setError('Failed to load data. Please try again.');
+        setLoading(false);
+      }
+    };
+
+    initializeData();
+  }, [productData, product, currentProductId]);
+
+  const fetchAccessories = async (categoryId: string) => {
     try {
-      setLoading(true);
-      setError(null);
-      const categoryId =
-        product?.categoryId || product?.data?.categoryId?._id || product?.data?.categoryId;
       const accessoriesData = await sellService.getCustomerAccessories(categoryId);
       setAccessories(accessoriesData || []);
     } catch (err) {
       console.error('Error fetching accessories:', err);
-      setError('Failed to load accessories. Please try again.');
+      throw new Error('Failed to load accessories. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -80,6 +110,31 @@ const SellAccessories = () => {
   };
 
   const handleContinue = () => {
+    // Check if user is logged in
+    const userData = JSON.parse(localStorage.getItem('customerUserData') || '{}');
+    const userToken = localStorage.getItem('customerToken');
+
+    if (!userData?.id && !userToken) {
+      // User is not logged in, redirect to login with return URL
+      const currentPath = window.location.pathname;
+      const returnUrl = encodeURIComponent(currentPath);
+      navigate(`/login?returnUrl=${returnUrl}`, {
+        state: {
+          message: 'Please login to continue selling your device',
+          assessmentData: {
+            productId: currentProductId,
+            variantId: currentVariantId,
+            selectedVariant,
+            answers: finalAnswers,
+            selectedDefects: finalSelectedDefects,
+            selectedAccessories,
+            productDetails: currentProduct,
+          },
+        },
+      });
+      return;
+    }
+
     // Extract category from URL params
     const pathParts = window.location.pathname.split('/');
     const category = pathParts[2]; // /sell/Mobile/Apple/model/accessories
@@ -93,20 +148,20 @@ const SellAccessories = () => {
           answers: finalAnswers,
           selectedDefects: finalSelectedDefects,
           selectedAccessories,
-          productDetails: product,
+          productDetails: currentProduct,
         },
         product: {
           data: {
             id: currentProductId,
             _id: currentProductId,
-            ...product,
+            ...currentProduct,
           },
         },
       },
     });
   };
 
-  if (!product) {
+  if (!productData && !product) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
@@ -126,8 +181,9 @@ const SellAccessories = () => {
     );
   }
 
-  const brandName = product.category || product.data?.brand || 'Brand';
-  const productName = product.name || product.data?.name || 'Product';
+  const currentProduct = productData || product;
+  const brandName = currentProduct?.category || currentProduct?.data?.brand || 'Brand';
+  const productName = currentProduct?.name || currentProduct?.data?.name || 'Product';
   const originalBasePrice = selectedVariant?.basePrice || 2160;
 
   // Calculate cumulative price including evaluation answers and defects
@@ -168,16 +224,24 @@ const SellAccessories = () => {
 
   // Handle image - check if it's an array or object
   let productImage = null;
-  if (product.images) {
-    if (Array.isArray(product.images) && product.images.length > 0) {
-      productImage = product.images[0];
-    } else if (typeof product.images === 'object') {
-      productImage = product.images.main || product.images.gallery || product.images.thumbnail;
+  if (currentProduct?.images) {
+    if (Array.isArray(currentProduct.images) && currentProduct.images.length > 0) {
+      productImage = currentProduct.images[0];
+    } else if (typeof currentProduct.images === 'object') {
+      productImage =
+        currentProduct.images.main ||
+        currentProduct.images.gallery ||
+        currentProduct.images.thumbnail;
     }
   }
   if (!productImage) {
     productImage = '/placeholder-phone.jpg';
   }
+
+  // Check if user is logged in
+  const userData = JSON.parse(localStorage.getItem('customerUserData') || '{}');
+  const userToken = localStorage.getItem('customerToken');
+  const isLoggedIn = !!(userData?.id || userToken);
 
   // Calculate total accessory value
   const totalAccessoryValue = selectedAccessories.reduce(
@@ -275,7 +339,18 @@ const SellAccessories = () => {
                     <div>
                       <p className="text-red-900 font-semibold mb-1">{error}</p>
                       <button
-                        onClick={fetchAccessories}
+                        onClick={() => {
+                          const categoryId =
+                            productData?.categoryId ||
+                            productData?.data?.categoryId?._id ||
+                            productData?.data?.categoryId ||
+                            product?.categoryId ||
+                            product?.data?.categoryId?._id ||
+                            product?.data?.categoryId;
+                          if (categoryId) {
+                            fetchAccessories(categoryId);
+                          }
+                        }}
                         className="text-sm text-red-700 hover:text-red-900 underline"
                       >
                         Try again
@@ -303,13 +378,20 @@ const SellAccessories = () => {
                         }`}
                       >
                         <div className="flex flex-col items-center text-center">
+                          {/* Accessory Image or Icon */}
                           <div
-                            className={`w-20 h-20 rounded-xl flex items-center justify-center mb-4 ${
+                            className={`w-20 h-20 rounded-xl flex items-center justify-center mb-4 overflow-hidden ${
                               isSelected ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-600'
                             }`}
                           >
                             {isSelected ? (
                               <CheckCircle className="w-10 h-10" />
+                            ) : accessory.image ? (
+                              <img
+                                src={accessory.image}
+                                alt={accessory.title}
+                                className="w-full h-full object-cover rounded-xl"
+                              />
                             ) : (
                               <Box className="w-10 h-10" />
                             )}
@@ -356,14 +438,24 @@ const SellAccessories = () => {
                 className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2 ${
                   loading || currentBasePrice + totalAccessoryValue === 0
                     ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:scale-105'
+                    : isLoggedIn
+                      ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:scale-105'
+                      : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl hover:scale-105'
                 }`}
               >
                 {currentBasePrice + totalAccessoryValue === 0
                   ? 'Device Not Eligible'
-                  : 'Get Final Quote'}
+                  : isLoggedIn
+                    ? 'Get Final Quote'
+                    : 'Login to Get Quote'}
                 <ArrowRight className="w-5 h-5" />
               </button>
+
+              {!isLoggedIn && currentBasePrice + totalAccessoryValue > 0 && (
+                <p className="text-sm text-blue-600 text-center mt-2">
+                  You'll be redirected to login to continue with your device assessment
+                </p>
+              )}
 
               {currentBasePrice + totalAccessoryValue === 0 && (
                 <p className="text-sm text-red-600 text-center mt-2">

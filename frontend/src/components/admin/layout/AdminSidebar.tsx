@@ -89,12 +89,12 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
           icon: Package,
           label: 'Accessories Management',
         },
-        { to: '/admin/sell-sessions', icon: Clock, label: 'Sessions Management' },
-        {
-          to: '/admin/sell-configuration',
-          icon: Settings,
-          label: 'Configuration Management',
-        },
+        // { to: '/admin/sell-sessions', icon: Clock, label: 'Sessions Management' },
+        // {
+        //   to: '/admin/sell-configuration',
+        //   icon: Settings,
+        //   label: 'Configuration Management',
+        // },
       ],
     },
     {

@@ -9,7 +9,14 @@ import { SellAccessory } from '../models/sellAccessory.model.js';
 import { SellProduct } from '../models/sellProduct.model.js';
 
 export var createAccessory = asyncHandler(async (req, res) => {
-  const { categoryId, key, title, delta } = req.body;
+  const { categoryId, title, delta, image, isActive = true } = req.body;
+
+  // Auto-generate key from title
+  const key = title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, '_')
+    .trim();
 
   // Category is already imported at the top
   const category = await Category.findById(categoryId);
@@ -34,7 +41,9 @@ export var createAccessory = asyncHandler(async (req, res) => {
     categoryId,
     key,
     title,
-    delta,
+    delta: delta || { type: 'abs', sign: '+', value: 0 },
+    image,
+    isActive,
     order,
     createdBy: req.user.id,
   });
@@ -49,21 +58,56 @@ export var createAccessory = asyncHandler(async (req, res) => {
 });
 
 export var getAccessories = asyncHandler(async (req, res) => {
-  const { categoryId, isActive } = req.query;
+  const {
+    categoryId,
+    isActive,
+    page = 1,
+    limit = 10,
+    search,
+    sortBy = 'order',
+    sortOrder = 'asc',
+  } = req.query;
 
   const query = {};
 
-  if (categoryId) query.categoryId = categoryId;
-  if (isActive !== undefined) query.isActive = isActive === 'true';
+  if (categoryId && categoryId !== 'undefined') query.categoryId = categoryId;
+  if (isActive !== undefined && isActive !== 'undefined')
+    query.isActive = isActive === 'true';
 
-  const accessories = await SellAccessory.find(query)
-    .populate('categoryId', 'name')
-    .populate('createdBy', 'name email')
-    .sort({ order: 1 });
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { key: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  const pageNum = parseInt(page);
+  const limitNum = parseInt(limit);
+  const skip = (pageNum - 1) * limitNum;
+
+  // Build sort object
+  const sort = {};
+  sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+
+  const [accessories, total] = await Promise.all([
+    SellAccessory.find(query)
+      .populate('categoryId', 'name displayName superCategory')
+      .populate('createdBy', 'name email')
+      .sort(sort)
+      .skip(skip)
+      .limit(limitNum),
+    SellAccessory.countDocuments(query),
+  ]);
 
   res.json({
     success: true,
     data: accessories,
+    pagination: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages: Math.ceil(total / limitNum),
+    },
   });
 });
 
@@ -114,15 +158,23 @@ export var getAccessory = asyncHandler(async (req, res) => {
 });
 
 export var updateAccessory = asyncHandler(async (req, res) => {
-  // const { key, title, delta, isActive, order } = req.body;
-  const { key } = req.body;
+  const { title, delta, isActive, order, image } = req.body;
 
   const accessory = await SellAccessory.findById(req.params.id);
   if (!accessory) {
     throw new ApiError(404, 'Accessory not found');
   }
 
-  if (key && key !== accessory.key) {
+  // Auto-generate key from title if title is provided
+  let key = accessory.key;
+  if (title && title !== accessory.title) {
+    key = title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, '_')
+      .trim();
+
+    // Check if the new key conflicts with existing accessories
     const existingAccessory = await SellAccessory.findOne({
       categoryId: accessory.categoryId,
       key,
@@ -136,12 +188,22 @@ export var updateAccessory = asyncHandler(async (req, res) => {
     }
   }
 
+  const updateData = {
+    ...(title && { title }),
+    ...(key && { key }),
+    ...(delta && { delta }),
+    ...(isActive !== undefined && { isActive }),
+    ...(order !== undefined && { order }),
+    ...(image !== undefined && { image }),
+    updatedBy: req.user._id,
+  };
+
   const updatedAccessory = await SellAccessory.findByIdAndUpdate(
     req.params.id,
-    { ...req.body, updatedBy: req.user._id },
+    updateData,
     { new: true, runValidators: true }
   )
-    .populate('categoryId', 'name')
+    .populate('categoryId', 'name displayName superCategory')
     .populate('createdBy', 'name email');
 
   res.json({

@@ -39,6 +39,10 @@ const sellAccessorySchema = new mongoose.Schema(
       required: [true, 'Order is required'],
       min: [0, 'Order cannot be negative'],
     },
+    image: {
+      type: String,
+      trim: true,
+    },
     isActive: {
       type: Boolean,
       default: true,

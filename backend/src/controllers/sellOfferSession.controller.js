@@ -23,10 +23,13 @@ export var createSession = asyncHandler(async (req, res) => {
     accessoriesLength: accessories ? accessories.length : 0,
   });
 
-  const finalUserId = req.user?.id || userId;
+  const finalUserId = req.user.id;
 
   if (!finalUserId) {
-    throw new ApiError(400, 'User ID is required');
+    throw new ApiError(
+      401,
+      'Authentication required to create sell offer session'
+    );
   }
 
   const product = await SellProduct.findById(productId);

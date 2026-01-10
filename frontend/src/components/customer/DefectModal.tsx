@@ -23,31 +23,16 @@ const DefectModal = ({
 
   const [formData, setFormData] = useState({
     categoryId: '',
-    section: '',
-    key: '',
     title: '',
-    icon: '',
     delta: {
-      type: 'percent',
-      sign: '-',
+      type: 'abs', // Default to fixed amount
+      sign: '-', // Default to decrease price
       value: 0,
     },
-    order: 0,
     isActive: true,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const sections = [
-    'screen',
-    'body',
-    'functional',
-    'battery',
-    'camera',
-    'sensor',
-    'buttons',
-    'others',
-  ];
 
   const fetchCategories = async () => {
     try {
@@ -73,27 +58,23 @@ const DefectModal = ({
 
       setFormData({
         categoryId: categoryIdValue,
-        section: defect.section || '',
-        key: defect.key || '',
         title: defect.title || '',
-        icon: defect.icon || '',
-        delta: defect.delta || { type: 'percent', sign: '-', value: 0 },
-        order: defect.order || 0,
+        delta: {
+          type: 'abs', // Always use fixed amount for simplicity
+          sign: defect.delta?.sign || '-',
+          value: defect.delta?.value || 0,
+        },
         isActive: defect.isActive !== undefined ? defect.isActive : true,
       });
     } else {
       setFormData({
         categoryId: '',
-        section: '',
-        key: '',
         title: '',
-        icon: '',
         delta: {
-          type: 'percent',
+          type: 'abs',
           sign: '-',
           value: 0,
         },
-        order: 0,
         isActive: true,
       });
     }
@@ -113,28 +94,12 @@ const DefectModal = ({
       newErrors.categoryId = 'Please select a category';
     }
 
-    if (!formData.section) {
-      newErrors.section = 'Section is required';
-    }
-
-    if (!formData.key.trim()) {
-      newErrors.key = 'Key is required';
-    } else if (!/^[a-z0-9_]+$/.test(formData.key)) {
-      newErrors.key = 'Key must contain only lowercase letters, numbers, and underscores';
-    }
-
     if (!formData.title.trim()) {
       newErrors.title = 'Title is required';
     }
 
-    if (!formData.delta.type || !['abs', 'percent'].includes(formData.delta.type)) {
-      newErrors.deltaType = 'Delta type must be either abs or percent';
-    }
-    if (!formData.delta.sign || !['+', '-'].includes(formData.delta.sign)) {
-      newErrors.deltaSign = 'Delta sign must be either + or -';
-    }
     if (formData.delta.value < 0) {
-      newErrors.deltaValue = 'Delta value must be a non-negative number';
+      newErrors.deltaValue = 'Price impact value must be a non-negative number';
     }
 
     setErrors(newErrors);
@@ -148,7 +113,37 @@ const DefectModal = ({
       return;
     }
 
-    onSave(formData);
+    // Auto-generate key from title
+    const key = formData.title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, '_')
+      .substring(0, 50);
+
+    // Auto-assign section based on common patterns
+    const section = 'general';
+
+    // Auto-assign order (will be handled by backend)
+    const order = 0;
+
+    // Auto-assign icon based on title keywords
+    let icon = '💔'; // Default icon
+    const titleLower = formData.title.toLowerCase();
+    if (titleLower.includes('screen') || titleLower.includes('display')) icon = '📱';
+    else if (titleLower.includes('battery')) icon = '🔋';
+    else if (titleLower.includes('camera')) icon = '📷';
+    else if (titleLower.includes('crack') || titleLower.includes('broken')) icon = '💥';
+    else if (titleLower.includes('scratch')) icon = '⚠️';
+
+    const submitData = {
+      ...formData,
+      key,
+      section,
+      order,
+      icon,
+    };
+
+    onSave(submitData);
   };
 
   const handleInputChange = (field: string, value: any) => {
@@ -188,7 +183,24 @@ const DefectModal = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">Defect Title *</label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={e => handleInputChange('title', e.target.value)}
+              placeholder="e.g., Screen Crack, Battery Issue, Camera Not Working"
+              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            />
+            {errors.title && (
+              <div className="flex items-center gap-2 text-red-600 text-sm mt-1">
+                <AlertCircle size={16} />
+                {errors.title}
+              </div>
+            )}
+          </div>
+
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-gray-700">Category *</label>
             {categoriesLoading ? (
@@ -224,149 +236,12 @@ const DefectModal = ({
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-700">Section *</label>
-            <select
-              value={formData.section}
-              onChange={e => handleInputChange('section', e.target.value)}
-              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-            >
-              <option value="">Select section</option>
-              {sections.map(section => (
-                <option key={section} value={section}>
-                  {section.charAt(0).toUpperCase() + section.slice(1)}
-                </option>
-              ))}
-            </select>
-            {errors.section && (
-              <div className="flex items-center gap-2 text-red-600 text-sm mt-1">
-                <AlertCircle size={16} />
-                {errors.section}
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-700">Key *</label>
-            <input
-              type="text"
-              value={formData.key}
-              onChange={e => handleInputChange('key', e.target.value.toLowerCase())}
-              placeholder="Enter key (lowercase, numbers, underscores only)"
-              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-            />
-            {errors.key && (
-              <div className="flex items-center gap-2 text-red-600 text-sm mt-1">
-                <AlertCircle size={16} />
-                {errors.key}
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-700">Title *</label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={e => handleInputChange('title', e.target.value)}
-              placeholder="Enter defect title"
-              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-            />
-            {errors.title && (
-              <div className="flex items-center gap-2 text-red-600 text-sm mt-1">
-                <AlertCircle size={16} />
-                {errors.title}
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-gray-700">
-              Icon
-              <span className="ml-1 text-xs text-gray-500">(Visual representation)</span>
+              Price Impact (Fixed Amount) *
             </label>
-            <div className="space-y-3">
-              {/* Icon Preview */}
-              {formData.icon && (
-                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg border">
-                  <span className="text-lg">{formData.icon}</span>
-                  <span className="text-sm text-gray-600">Preview</span>
-                </div>
-              )}
-
-              {/* Predefined Icons */}
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-gray-600 mb-2 block">Quick Select:</label>
-                <div className="grid grid-cols-8 gap-2">
-                  {[
-                    '📱',
-                    '💻',
-                    '🎧',
-                    '⌚',
-                    '📷',
-                    '🔋',
-                    '📺',
-                    '🖥️',
-                    '💔',
-                    '🔧',
-                    '⚡',
-                    '🔴',
-                    '❌',
-                    '⚠️',
-                    '🚫',
-                    '💥',
-                  ].map(emoji => (
-                    <button
-                      key={emoji}
-                      type="button"
-                      onClick={() => handleInputChange('icon', emoji)}
-                      className={`p-2 text-lg border rounded-lg hover:bg-amber-50 hover:border-amber-300 transition-colors ${
-                        formData.icon === emoji
-                          ? 'bg-amber-100 border-amber-400'
-                          : 'bg-white border-gray-300'
-                      }`}
-                      title={`Select ${emoji}`}
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Custom Icon Input */}
-              <div>
-                <label className="text-xs text-gray-600 mb-1 block">Or enter custom:</label>
-                <input
-                  type="text"
-                  value={formData.icon}
-                  onChange={e => handleInputChange('icon', e.target.value)}
-                  placeholder="Enter emoji or icon name (e.g., 📱, 💔, broken-screen)"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Use emojis for visual appeal or text for icon names
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-700">Delta Configuration *</label>
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className="text-xs text-gray-600 mb-1 block">Type</label>
-                <select
-                  value={formData.delta.type}
-                  onChange={e =>
-                    handleInputChange('delta', { ...formData.delta, type: e.target.value })
-                  }
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                >
-                  <option value="percent">Percentage</option>
-                  <option value="abs">Absolute</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-xs text-gray-600 mb-1 block">Sign</label>
+                <label className="text-xs text-gray-600 mb-1 block">Impact Type</label>
                 <select
                   value={formData.delta.sign}
                   onChange={e =>
@@ -374,12 +249,12 @@ const DefectModal = ({
                   }
                   className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
-                  <option value="-">- (Decrease)</option>
-                  <option value="+">+ (Increase)</option>
+                  <option value="-">➖ Decrease Price</option>
+                  <option value="+">➕ Increase Price</option>
                 </select>
               </div>
               <div>
-                <label className="text-xs text-gray-600 mb-1 block">Value</label>
+                <label className="text-xs text-gray-600 mb-1 block">Amount</label>
                 <input
                   type="number"
                   min="0"
@@ -391,28 +266,21 @@ const DefectModal = ({
                       value: parseFloat(e.target.value) || 0,
                     })
                   }
-                  placeholder="Enter value"
+                  placeholder="Enter amount"
                   className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 />
               </div>
             </div>
-            {(errors.deltaType || errors.deltaSign || errors.deltaValue) && (
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.delta.sign === '+' ? 'Adds' : 'Subtracts'} {formData.delta.value || 0}{' '}
+              to/from the device price
+            </p>
+            {errors.deltaValue && (
               <div className="flex items-center gap-2 text-red-600 text-sm mt-1">
                 <AlertCircle size={16} />
-                {errors.deltaType || errors.deltaSign || errors.deltaValue}
+                {errors.deltaValue}
               </div>
             )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-700">Order</label>
-            <input
-              type="number"
-              value={formData.order}
-              onChange={e => handleInputChange('order', parseInt(e.target.value) || 0)}
-              placeholder="Display order (0 for default)"
-              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-            />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -422,8 +290,8 @@ const DefectModal = ({
               onChange={e => handleInputChange('isActive', e.target.value === 'true')}
               className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             >
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
+              <option value="true">🟢 Active - Visible to users</option>
+              <option value="false">🔴 Inactive - Hidden from users</option>
             </select>
           </div>
 

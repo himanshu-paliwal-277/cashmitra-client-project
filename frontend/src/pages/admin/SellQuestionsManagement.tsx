@@ -16,7 +16,6 @@ import {
   List,
   SortAsc,
   SortDesc,
-  Download,
   Tag,
   AlertCircle,
   X,
@@ -51,7 +50,6 @@ const SellQuestionsManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'create' | 'edit' | 'view'>('create');
-  const [showModal, setShowModal] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -167,14 +165,12 @@ const SellQuestionsManagement = () => {
     setModalType('create');
     setSelectedQuestion(null);
     setIsQuestionModalOpen(true);
-    setShowModal(true);
   };
 
   const handleEditQuestion = (question: any) => {
     setModalType('edit');
     setSelectedQuestion(question);
     setIsQuestionModalOpen(true);
-    setShowModal(true);
   };
 
   const handleSaveQuestion = async (questionData: any) => {
@@ -185,7 +181,6 @@ const SellQuestionsManagement = () => {
         await createQuestion(questionData);
       }
       setIsQuestionModalOpen(false);
-      setShowModal(false);
       setSelectedQuestion(null);
       fetchQuestions();
     } catch (error) {
@@ -196,7 +191,6 @@ const SellQuestionsManagement = () => {
 
   const handleCloseModal = () => {
     setIsQuestionModalOpen(false);
-    setShowModal(false);
     setSelectedQuestion(null);
   };
 
@@ -384,7 +378,6 @@ const SellQuestionsManagement = () => {
               setModalType('view');
               setSelectedQuestion(question);
               setIsQuestionModalOpen(true);
-              setShowModal(true);
             }}
             className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
           >
@@ -543,7 +536,6 @@ const SellQuestionsManagement = () => {
                       setModalType('view');
                       setSelectedQuestion(question);
                       setIsQuestionModalOpen(true);
-                      setShowModal(true);
                     }}
                     className="p-2 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
                     title="View"

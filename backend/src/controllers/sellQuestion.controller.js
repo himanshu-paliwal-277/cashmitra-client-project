@@ -10,15 +10,15 @@ import { SellSuperCategory } from '../models/sellSuperCategory.model.js';
 export var createQuestion = asyncHandler(async (req, res) => {
   const {
     categoryId,
-    section,
-    key,
+    productId,
     title,
-    description,
-    uiType,
-    multiSelect,
-    options,
+    uiType = 'radio', // Default to radio (Yes/No)
+    required = true,
+    isActive = true,
+    options = [],
   } = req.body;
 
+  // Validate category exists
   let category = await Category.findById(categoryId);
   if (!category) {
     category = await SellSuperCategory.findById(categoryId);
@@ -27,29 +27,77 @@ export var createQuestion = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Category not found');
   }
 
-  const existingQuestion = await SellQuestion.findOne({ categoryId, key });
-  if (existingQuestion) {
-    throw new ApiError(
-      400,
-      'Question with this key already exists for this category'
-    );
+  // Validate product if provided
+  if (productId) {
+    const product = await SellProduct.findById(productId);
+    if (!product) {
+      throw new ApiError(404, 'Product not found');
+    }
   }
 
+  // Generate a unique key from title
+  const baseKey = title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, '_')
+    .substring(0, 50);
+
+  let key = baseKey;
+  let counter = 1;
+
+  // Ensure key is unique for this category
+  while (await SellQuestion.findOne({ categoryId, key })) {
+    key = `${baseKey}_${counter}`;
+    counter++;
+  }
+
+  // Default section based on common patterns
+  const section = 'general';
+
+  // Get next order number
   const lastQuestion = await SellQuestion.findOne({ categoryId, section }).sort(
     { order: -1 }
   );
   const order = lastQuestion ? lastQuestion.order + 1 : 1;
 
+  // Ensure options have proper structure for Yes/No questions
+  const processedOptions =
+    options.length > 0
+      ? options
+      : [
+          {
+            key: 'yes',
+            label: 'Yes',
+            value: 'yes',
+            delta: {
+              type: 'abs',
+              sign: '+',
+              value: 0,
+            },
+          },
+          {
+            key: 'no',
+            label: 'No',
+            value: 'no',
+            delta: {
+              type: 'abs',
+              sign: '-',
+              value: 0,
+            },
+          },
+        ];
+
   const question = new SellQuestion({
     categoryId,
+    productId: productId || undefined,
     section,
     order,
     key,
     title,
-    description,
     uiType,
-    multiSelect: multiSelect || false,
-    options: options || [],
+    required,
+    isActive,
+    options: processedOptions,
     createdBy: req.user.id,
   });
 
@@ -99,15 +147,93 @@ export var getQuestions = asyncHandler(async (req, res) => {
   });
 });
 
+export var getAllQuestions = asyncHandler(async (req, res) => {
+  const {
+    page = 1,
+    limit = 12,
+    search,
+    uiType,
+    isActive,
+    categoryId,
+    section,
+    sortBy = 'order',
+    sortOrder = 'asc',
+  } = req.query;
+
+  // Build query
+  const query = {};
+
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { description: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  if (uiType) query.uiType = uiType;
+  if (isActive !== undefined) query.isActive = isActive === 'true';
+  if (categoryId) query.categoryId = categoryId;
+  if (section) query.section = section;
+
+  // Build sort
+  const sort = {};
+  sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+
+  // Execute query with pagination
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+
+  const [questions, total] = await Promise.all([
+    SellQuestion.find(query)
+      .populate('categoryId', 'name displayName')
+      .populate('productId', 'name')
+      .sort(sort)
+      .skip(skip)
+      .limit(parseInt(limit)),
+    SellQuestion.countDocuments(query),
+  ]);
+
+  // Populate category with super category info
+  const populatedQuestions = await Promise.all(
+    questions.map(async (question) => {
+      const questionObj = question.toObject();
+      if (questionObj.categoryId && !questionObj.categoryId.name) {
+        let category = await Category.findById(questionObj.categoryId).select(
+          '_id name displayName'
+        );
+
+        if (!category) {
+          category = await SellSuperCategory.findById(
+            questionObj.categoryId
+          ).select('_id name displayName');
+        }
+        questionObj.categoryId = category || questionObj.categoryId;
+      }
+      return questionObj;
+    })
+  );
+
+  res.json({
+    success: true,
+    data: populatedQuestions,
+    pagination: {
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages: Math.ceil(total / parseInt(limit)),
+    },
+  });
+});
+
 export var getQuestionsForCustomer = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
+  const { productId } = req.query;
 
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
   }
 
-  const questions = await SellQuestion.getForCategory(categoryId);
+  const questions = await SellQuestion.getForCategory(categoryId, productId);
 
   const groupedQuestions = questions.reduce((acc, question) => {
     if (!acc[question.section]) {
@@ -142,7 +268,7 @@ export var getCustomerQuestions = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Category not found');
   }
 
-  const questions = await SellQuestion.getForCategory(categoryId);
+  const questions = await SellQuestion.getForCategory(categoryId, productId);
 
   const groupedQuestions = questions.reduce((acc, question) => {
     if (!acc[question.section]) {
@@ -178,45 +304,15 @@ export var getQuestion = asyncHandler(async (req, res) => {
 });
 
 export var updateQuestion = asyncHandler(async (req, res) => {
-  const {
-    categoryId,
-    section,
-    key,
-    title,
-    description,
-    uiType,
-    multiSelect,
-    options,
-    isActive,
-    order,
-    required,
-    showIf,
-  } = req.body;
+  const { categoryId, productId, title, uiType, required, isActive, options } =
+    req.body;
 
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
     throw new ApiError(404, 'Question not found');
   }
 
-  if (key && key !== question.key) {
-    const existingQuestion = await SellQuestion.findOne({
-      categoryId: question.categoryId,
-      key,
-      _id: { $ne: req.params.id },
-    });
-    if (existingQuestion) {
-      throw new ApiError(
-        400,
-        'Question with this key already exists for this category'
-      );
-    }
-  }
-
-  const transformedOptions = options?.map(({ ...opt }) => ({
-    ...opt,
-    showIf: opt.showIf === null ? undefined : opt.showIf,
-  }));
-
+  // Validate category if provided
   if (categoryId !== undefined) {
     let category = await Category.findById(categoryId);
     if (!category) {
@@ -227,18 +323,64 @@ export var updateQuestion = asyncHandler(async (req, res) => {
     }
     question.categoryId = categoryId;
   }
-  if (section) question.section = section;
-  if (key) question.key = key;
-  if (title) question.title = title;
-  if (description !== undefined) question.description = description;
-  if (uiType) question.uiType = uiType;
-  if (multiSelect !== undefined) question.multiSelect = multiSelect;
-  if (options !== undefined) question.options = transformedOptions;
-  if (isActive !== undefined) question.isActive = isActive;
-  if (order !== undefined) question.order = order;
+
+  // Validate product if provided
+  if (productId !== undefined) {
+    if (productId) {
+      const product = await SellProduct.findById(productId);
+      if (!product) {
+        throw new ApiError(404, 'Product not found');
+      }
+    }
+    question.productId = productId || undefined;
+  }
+
+  // Update key if title changes
+  if (title && title !== question.title) {
+    const baseKey = title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, '_')
+      .substring(0, 50);
+
+    let key = baseKey;
+    let counter = 1;
+
+    // Ensure key is unique for this category (excluding current question)
+    while (
+      await SellQuestion.findOne({
+        categoryId: question.categoryId,
+        key,
+        _id: { $ne: req.params.id },
+      })
+    ) {
+      key = `${baseKey}_${counter}`;
+      counter++;
+    }
+
+    question.key = key;
+    question.title = title;
+  }
+
+  // Update other fields
+  if (uiType !== undefined) question.uiType = uiType;
   if (required !== undefined) question.required = required;
-  if (showIf !== undefined)
-    question.showIf = showIf === null ? undefined : showIf;
+  if (isActive !== undefined) question.isActive = isActive;
+
+  // Process options to ensure proper structure
+  if (options !== undefined) {
+    const processedOptions = options.map((opt) => ({
+      key: opt.key,
+      label: opt.label,
+      value: opt.value,
+      delta: {
+        type: opt.delta?.type || 'abs',
+        sign: opt.delta?.sign || '+',
+        value: opt.delta?.value || 0,
+      },
+    }));
+    question.options = processedOptions;
+  }
 
   await question.save();
 

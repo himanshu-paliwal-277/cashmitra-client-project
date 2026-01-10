@@ -18,12 +18,13 @@ const sellDefectSchema = new mongoose.Schema(
         'sensor',
         'buttons',
         'others',
+        'general',
       ],
       required: [true, 'Defect section is required'],
+      default: 'general',
     },
     key: {
       type: String,
-      required: [true, 'Defect key is required'],
       trim: true,
     },
     title: {
@@ -74,7 +75,25 @@ const sellDefectSchema = new mongoose.Schema(
   }
 );
 
-sellDefectSchema.index({ categoryId: 1, key: 1 }, { unique: true });
+sellDefectSchema.pre('save', function (next) {
+  // Auto-generate key if not provided
+  if (!this.key && this.title) {
+    this.key = this.title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, '_')
+      .substring(0, 50);
+  }
+  next();
+});
+
+sellDefectSchema.index(
+  { categoryId: 1, key: 1 },
+  {
+    unique: true,
+    sparse: true, // Allow multiple documents with null/undefined key
+  }
+);
 
 sellDefectSchema.index({ categoryId: 1, section: 1, order: 1 });
 

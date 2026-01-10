@@ -5,6 +5,7 @@ import {
   createQuestion,
   deleteOption,
   deleteQuestion,
+  getAllQuestions,
   getCustomerQuestions,
   getQuestion,
   getQuestions,
@@ -27,6 +28,7 @@ router.use(authorize('admin'));
 router.put('/reorder', reorderQuestions);
 
 router.post('/', createQuestion);
+router.get('/all', getAllQuestions); // New paginated endpoint for admin
 router.get('/', getQuestions);
 router.get('/:id', getQuestion);
 router.put('/:id', updateQuestion);

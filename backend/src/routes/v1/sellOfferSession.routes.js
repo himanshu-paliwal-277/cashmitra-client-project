@@ -21,13 +21,14 @@ import {
 
 const router = express.Router();
 
-router.post('/create', createSession);
+// Public routes (no authentication required)
 router.get('/:sessionId', getSession);
 router.get('/:sessionId/price', getCurrentPrice);
 
+// Protected routes (authentication required)
 router.use(isAuthenticated);
 
-router.post('/', createSession);
+router.post('/create', createSession);
 router.get('/my-sessions', getUserSessions);
 router.put('/:sessionId/answers', updateAnswers);
 router.put('/:sessionId/defects', updateDefects);
@@ -35,6 +36,7 @@ router.put('/:sessionId/accessories', updateAccessories);
 router.post('/:sessionId/extend', extendSession);
 router.delete('/:sessionId', deleteSession);
 
+// Admin routes
 router.get('/admin/all', authorize('admin'), getAllSessions);
 router.patch(
   '/admin/:sessionId/status',

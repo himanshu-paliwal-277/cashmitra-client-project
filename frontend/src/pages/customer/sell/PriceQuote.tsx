@@ -107,7 +107,6 @@ const PriceQuote = () => {
       const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
       const offerData = {
-        userId: userData?.id || userData?._id,
         productId: product.data?.id || product.data?._id,
         variantId: variantId,
         answers: assessmentData.answers || {},

@@ -49,43 +49,26 @@ const useSellAccessories = () => {
         },
       });
 
-      // Handle different response structures
+      // Handle the response structure with pagination
       const responseData = response.data;
-      if (Array.isArray(responseData)) {
-        // If response.data is directly an array
-        setAccessories(responseData);
-        setPagination({
-          page: 1,
-          limit: responseData.length,
-          total: responseData.length,
-          totalPages: 1,
-        });
-      } else if (responseData && Array.isArray(responseData.accessories)) {
-        // If accessories are nested in response.data.accessories
-        setAccessories(responseData.accessories);
-        setPagination({
-          page: responseData.page || 1,
-          limit: responseData.limit || 10,
-          total: responseData.total || 0,
-          totalPages: responseData.totalPages || 0,
-        });
-      } else if (responseData && Array.isArray(responseData.data)) {
-        // If accessories are nested in response.data.data
-        setAccessories(responseData.data);
-        setPagination({
-          page: responseData.page || 1,
-          limit: responseData.limit || 10,
-          total: responseData.total || 0,
-          totalPages: responseData.totalPages || 0,
-        });
+      if (responseData && responseData.success) {
+        setAccessories(responseData.data || []);
+        setPagination(
+          responseData.pagination || {
+            page: 1,
+            limit: 10,
+            total: 0,
+            totalPages: 0,
+          }
+        );
       } else {
-        // Fallback to empty array
-        setAccessories([]);
+        // Fallback for old response structure
+        setAccessories(Array.isArray(responseData) ? responseData : []);
         setPagination({
           page: 1,
-          limit: 10,
-          total: 0,
-          totalPages: 0,
+          limit: responseData.length || 0,
+          total: responseData.length || 0,
+          totalPages: 1,
         });
       }
     } catch (err) {

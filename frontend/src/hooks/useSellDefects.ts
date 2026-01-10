@@ -25,13 +25,25 @@ const useSellDefects = () => {
     setError(null);
     try {
       const token = localStorage.getItem('adminToken');
+
+      // Filter out undefined values from filters
+      const cleanFilters = Object.entries(filters).reduce(
+        (acc, [key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            acc[key] = value;
+          }
+          return acc;
+        },
+        {} as Record<string, any>
+      );
+
       const queryParams = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
-        ...filters,
+        ...cleanFilters,
       });
 
-      const response = await api.get(`/sell-defects?${queryParams}`, {
+      const response = await api.get(`/sell-defects/all?${queryParams}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -39,10 +51,10 @@ const useSellDefects = () => {
 
       setDefects(response.data.data || []);
       setPagination({
-        page: response.data.page || 1,
-        limit: response.data.limit || 10,
-        total: response.data.total || 0,
-        totalPages: response.data.totalPages || 0,
+        page: response.data.pagination?.page || 1,
+        limit: response.data.pagination?.limit || 10,
+        total: response.data.pagination?.total || 0,
+        totalPages: response.data.pagination?.totalPages || 0,
       });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch defects');
