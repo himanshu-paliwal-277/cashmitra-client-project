@@ -23,7 +23,7 @@ const HomeBanner = () => {
           Sell your device in minutes
         </h1>
 
-        <p className="md:text-lg text-gray-600 mb-8 max-w-[600px] mx-auto leading-relaxed">
+        <p className="text-sm sm:text-lg text-gray-600 mb-8 max-w-[600px] mx-auto leading-relaxed">
           Get the best price for your mobile, tablet, or laptop through our network of verified
           local partner shops. Safe, fast, and hassle-free.
         </p>
@@ -46,23 +46,23 @@ const HomeBanner = () => {
 
         {/* Trust Badges */}
         <div className="flex justify-center items-center sm:gap-8 gap-4 flex-wrap opacity-80">
-          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
-            <Shield size={20} />
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 font-medium">
+            <Shield size={18} />
             <span>100% Safe & Secure</span>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
-            <Clock size={20} />
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 font-medium">
+            <Clock size={18} />
             <span>Instant Payment</span>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
-            <Truck size={20} />
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 font-medium">
+            <Truck size={18} />
             <span>Free Pickup</span>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
-            <Users size={20} />
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 font-medium">
+            <Users size={18} />
             <span>50,000+ Happy Customers</span>
           </div>
         </div>
