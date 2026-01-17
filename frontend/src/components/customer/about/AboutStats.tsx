@@ -81,19 +81,19 @@ const AboutStats = () => {
             <Zap className="w-4 h-4 text-primary-600" />
             <span className="text-sm font-semibold text-primary-700">Impact That Matters</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-grey-900 mb-4">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-grey-900 mb-4">
             Our Impact in{' '}
             <span className="bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
               Numbers
             </span>
           </h2>
-          <p className="text-lg text-grey-600">
+          <p className="sm:text-lg text-grey-600">
             See how we're making a difference in the device trading ecosystem
           </p>
         </div>
 
         {/* Stats Grid with Enhanced Design */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 mb-12">
           {stats.map((stat, index) => {
             const colors = getColorClasses(stat.color);
             const Icon = stat.icon;
@@ -101,7 +101,7 @@ const AboutStats = () => {
             return (
               <div key={index} className="group relative">
                 {/* Glassmorphism Card */}
-                <div className="relative bg-white/70 backdrop-blur-lg rounded-3xl p-8 border-2 border-white shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 overflow-hidden">
+                <div className="relative bg-white/70 backdrop-blur-lg sm:rounded-3xl rounded-lg sm:p-8 p-4 border-2 border-white shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 overflow-hidden">
                   {/* Animated Background Gradient */}
                   <div
                     className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
@@ -113,21 +113,23 @@ const AboutStats = () => {
                   <div className="relative ">
                     {/* Icon with Pulse Effect */}
                     <div
-                      className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${stat.gradient} mb-6 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 relative`}
+                      className={`inline-flex p-4 sm:rounded-2xl rounded-lg bg-gradient-to-br ${stat.gradient} mb-6 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 relative`}
                     >
-                      <Icon className="w-8 h-8 text-white" />
+                      <Icon className="sm:w-8 sm:h-8 w-4 h-4 text-white" />
                       <div
                         className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${stat.gradient} animate-ping opacity-20`}
                       ></div>
                     </div>
 
                     {/* Value with Counter Animation */}
-                    <div className="text-4xl lg:text-5xl font-bold text-grey-900 mb-2 group-hover:scale-105 transition-transform duration-300">
+                    <div className="text-lg sm:text-4xl lg:text-5xl font-bold text-grey-900 mb-2 group-hover:scale-105 transition-transform duration-300">
                       {stat.value}
                     </div>
 
                     {/* Label */}
-                    <div className="text-lg font-semibold text-grey-800 mb-2">{stat.label}</div>
+                    <div className="text-sm sm:text-lg font-semibold text-grey-800 mb-2">
+                      {stat.label}
+                    </div>
 
                     {/* Description */}
                     <div className="text-sm text-grey-600 leading-relaxed">{stat.description}</div>
@@ -182,10 +184,10 @@ const AboutStats = () => {
 
                 {/* Text Content */}
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-grey-900 mb-2">
+                  <h3 className="sm:text-xl text-lg font-bold text-grey-900 mb-2">
                     Trusted by Leading Brands Nationwide
                   </h3>
-                  <p className="text-grey-600">
+                  <p className="text-grey-600 sm:text-md text-sm">
                     Partnered with certified retailers and backed by industry-leading security
                     standards
                   </p>

@@ -108,19 +108,19 @@ const AboutFeatures = () => {
             <Star className="w-4 h-4 text-primary-600 animate-pulse" />
             <span className="text-sm font-semibold text-primary-700">Why Choose Us</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-grey-900 mb-4">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-grey-900 mb-4">
             Built for Your{' '}
             <span className="bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
               Convenience
             </span>
           </h2>
-          <p className="text-lg text-grey-600">
+          <p className="text-base sm:text-lg text-grey-600">
             Experience the perfect blend of technology, trust, and transparency
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-12 ">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8 mb-12 ">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             const isActive = activeFeature === index;
@@ -139,7 +139,7 @@ const AboutFeatures = () => {
 
                 {/* Main Card */}
                 <div
-                  className={`relative bg-white rounded-2xl p-6 border-2 transition-all duration-500 overflow-hidden ${
+                  className={`relative bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 transition-all duration-500 overflow-hidden ${
                     isActive
                       ? 'border-transparent shadow-2xl -translate-y-2'
                       : 'border-grey-100 shadow-lg hover:shadow-xl'
@@ -159,30 +159,30 @@ const AboutFeatures = () => {
 
                   <div className="relative ">
                     {/* Icon */}
-                    <div className="relative mb-5">
+                    <div className="relative mb-3 sm:mb-5">
                       <div
-                        className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} rounded-xl blur-lg opacity-0 group-hover:opacity-50 transition-opacity duration-500`}
+                        className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} rounded-lg sm:rounded-xl blur-lg opacity-0 group-hover:opacity-50 transition-opacity duration-500`}
                       ></div>
                       <div
-                        className={`relative inline-flex p-3 bg-gradient-to-br ${feature.gradient} rounded-xl shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}
+                        className={`relative inline-flex p-2 sm:p-3 bg-gradient-to-br ${feature.gradient} rounded-lg sm:rounded-xl shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}
                       >
-                        <Icon className="w-7 h-7 text-white" />
+                        <Icon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                       </div>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-lg font-bold text-grey-900 mb-2 group-hover:text-primary-600 transition-colors duration-300">
+                    <h3 className="text-sm sm:text-lg font-bold text-grey-900 mb-1 sm:mb-2 group-hover:text-primary-600 transition-colors duration-300">
                       {feature.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="text-sm text-grey-600 leading-relaxed mb-4">
+                    <p className="text-xs sm:text-sm text-grey-600 leading-relaxed mb-2 sm:mb-4 hidden sm:block">
                       {feature.description}
                     </p>
 
                     {/* Benefits - Show on Hover */}
                     <div
-                      className={`overflow-hidden transition-all duration-500 ${
+                      className={`overflow-hidden transition-all duration-500 hidden sm:block ${
                         isActive ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
                       }`}
                     >
@@ -200,7 +200,7 @@ const AboutFeatures = () => {
 
                     {/* Expand Indicator */}
                     <div
-                      className={`text-xs font-medium mt-3 transition-all duration-300 ${
+                      className={`text-xs font-medium mt-2 sm:mt-3 transition-all duration-300 hidden sm:block ${
                         isActive ? 'text-primary-600' : 'text-grey-400'
                       }`}
                     >
@@ -231,34 +231,34 @@ const AboutFeatures = () => {
 
         {/* Bottom Section - Social Proof */}
         <div className="max-w-4xl mx-auto">
-          <div className="relative bg-gradient-to-br from-grey-50 to-white rounded-3xl p-8 md:p-12 border-2 border-grey-100 shadow-xl overflow-hidden">
+          <div className="relative bg-gradient-to-br from-grey-50 to-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-12 border-2 border-grey-100 shadow-xl overflow-hidden">
             {/* Background Decoration */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary-100 to-accent-100 rounded-full blur-3xl opacity-30"></div>
 
             <div className="relative ">
-              <div className="text-center mb-8">
-                <h3 className="text-2xl md:text-3xl font-bold text-grey-900 mb-3">
+              <div className="text-center mb-6 sm:mb-8">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-grey-900 mb-2 sm:mb-3">
                   Join Thousands of Satisfied Customers
                 </h3>
-                <p className="text-grey-600">
+                <p className="text-sm sm:text-base text-grey-600">
                   Experience the difference that quality service makes
                 </p>
               </div>
 
               {/* Customer Avatars */}
-              <div className="flex flex-col items-center gap-4">
-                <div className="flex -space-x-4">
+              <div className="flex flex-col items-center gap-3 sm:gap-4">
+                <div className="flex -space-x-3 sm:-space-x-4">
                   {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
                     <div
                       key={i}
-                      className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-accent-500 border-4 border-white flex items-center justify-center text-white text-xs font-bold shadow-lg hover:scale-125 transition-transform duration-300"
+                      className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary-400 to-accent-500 border-2 sm:border-4 border-white flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-lg hover:scale-125 transition-transform duration-300"
                     >
                       {i === 8 ? '50K+' : ''}
                     </div>
                   ))}
                 </div>
 
-                <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-grey-600">
+                <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-grey-600">
                   <div className="flex items-center gap-2">
                     <div className="flex text-warning-500">
                       {[1, 2, 3, 4, 5].map(i => (

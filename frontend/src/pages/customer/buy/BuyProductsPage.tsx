@@ -1,17 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import {
-  Search,
-  Grid,
-  List,
-  Star,
-  Eye,
-  Package,
-  Filter,
-  TrendingUp,
-  AlertCircle,
-  ArrowLeft,
-} from 'lucide-react';
+import { Search, Grid, List, Star, Package, AlertCircle } from 'lucide-react';
 import { useCart } from '../../../contexts/CartContext';
 import productService from '../../../services/productService';
 import ProductItemCard from './ProductItemCard';

@@ -95,12 +95,12 @@ const ProductRowCard = ({
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* Wishlist */}
-          <button
+          {/* <button
             onClick={e => {
               e.stopPropagation();
               toggleWishlist(productId);
             }}
-            className={`p-2 rounded-lg transition ${
+          className={`p-2 rounded-lg transition ${
               wishlist.has(productId)
                 ? 'bg-red-500 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-red-500 hover:text-white'
@@ -108,7 +108,7 @@ const ProductRowCard = ({
             title="Add to wishlist"
           >
             <Heart size={16} fill={wishlist.has(productId) ? 'currentColor' : 'none'} />
-          </button>
+          </button> */}
 
           {/* View */}
           <button
