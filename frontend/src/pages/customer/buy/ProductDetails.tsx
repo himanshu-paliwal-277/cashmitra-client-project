@@ -662,12 +662,12 @@ const ProductDetails = () => {
         {/* Top area */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Gallery with thumbnail rail */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-6">
+          <div className="bg-white rounded-2xl shadow-lg p-6 sm:sticky sm:top-6">
             <div className="flex gap-4">
               {/* Thumbnail Rail */}
               <div className="flex flex-col gap-2">
                 <button
-                  className="p-2 flex justify-center items-center rounded-lg bg-white hover:bg-green-50 border border-gray-200 hover:border-green-500 transition-all shadow-sm hover:shadow-md disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-200"
+                  className="sm:p-2 p-1 flex justify-center items-center rounded-lg bg-white hover:bg-green-50 border border-gray-200 hover:border-green-500 transition-all shadow-sm hover:shadow-md disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-200"
                   onClick={() => scrollRail(-1)}
                   disabled={!canScrollUp}
                   aria-label="Scroll up"
@@ -684,7 +684,7 @@ const ProductDetails = () => {
                     return finalImages.map((img, i) => (
                       <button
                         key={i}
-                        className={`w-20 h-20 rounded-lg border-2 overflow-hidden transition-all ${
+                        className={`sm:w-20 sm:h-20 w-12 h-12 rounded-lg border-2 overflow-hidden transition-all ${
                           i === selectedImageIndex
                             ? 'border-green-500 ring-2 ring-green-200 shadow-md'
                             : 'border-gray-200 hover:border-green-300 hover:shadow-sm'
@@ -701,7 +701,7 @@ const ProductDetails = () => {
                   })()}
                 </div>
                 <button
-                  className="p-2 flex justify-center items-center rounded-lg bg-white hover:bg-green-50 border border-gray-200 hover:border-green-500 transition-all shadow-sm hover:shadow-md disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-200"
+                  className="sm:p-2 p-1 flex justify-center items-center rounded-lg bg-white hover:bg-green-50 border border-gray-200 hover:border-green-500 transition-all shadow-sm hover:shadow-md disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-200"
                   onClick={() => scrollRail(1)}
                   disabled={!canScrollDown}
                   aria-label="Scroll down"
@@ -719,9 +719,9 @@ const ProductDetails = () => {
                 />
 
                 {/* Cashmitra Assured Badge */}
-                <div className="absolute top-4 left-4 flex items-center gap-2 bg-green-600 text-white px-3 py-1.5 rounded-full shadow-lg">
+                <div className="absolute top-1 left-1 flex items-center gap-2 bg-green-600 text-white px-2 py-1 rounded-full shadow-lg">
                   <Shield size={16} />
-                  <span className="text-sm font-semibold">Cashmitra Assured</span>
+                  <span className="sm:text-sm text-xs font-semibold">Cashmitra Assured</span>
                 </div>
 
                 {/* Navigation Buttons - Only show if more than 1 image */}
@@ -777,7 +777,7 @@ const ProductDetails = () => {
 
             {/* Title */}
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-2">
                 {productName} <span className="text-gray-500 font-normal">– Refurbished</span>
               </h1>
 
@@ -809,11 +809,11 @@ const ProductDetails = () => {
                       -{discountPct}% OFF
                     </span>
                   )}
-                  <div className="text-4xl font-bold text-gray-900 mb-1">
+                  <div className="text-2xl sm:text-4xl font-bold text-gray-900 mb-1">
                     ₹{priceNow.toLocaleString()}
                   </div>
                   {mrp && (
-                    <div className="text-lg text-gray-500 line-through">
+                    <div className="sm:text-lg text-gray-500 line-through">
                       ₹{mrp.toLocaleString()}
                     </div>
                   )}
@@ -864,7 +864,7 @@ const ProductDetails = () => {
                     return (
                       <button
                         key={c._id || i}
-                        className={`flex flex-col items-start px-4 py-3 rounded-lg border-2 transition-all min-w-[200px] ${
+                        className={`flex flex-col items-start sm:px-4 px-3 py-3 rounded-lg border-2 transition-all sm:min-w-[200px] min-w-[130px] ${
                           active
                             ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
                             : outOfStock
@@ -926,7 +926,7 @@ const ProductDetails = () => {
             ) : null}
 
             {/* Trust strip */}
-            <div className="grid grid-cols-3 gap-4 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                   <Shield size={20} className="text-green-600" />
@@ -1064,7 +1064,7 @@ const ProductDetails = () => {
                 </button>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex sm:flex-row flex-col gap-3 sm:mt-0 mt-5">
               {/* <button
                 className={`p-3 rounded-lg border-2 transition-all ${
                   isWishlisted
@@ -1634,12 +1634,14 @@ const ProductDetails = () => {
           <div className="bg-white rounded-lg max-w-[500px] w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center rounded-t-2xl">
-              <h2 className="text-2xl font-bold text-gray-900">Product Grade Information</h2>
+              <h2 className="sm:text-2xl text-lg font-bold text-gray-900">
+                Product Grade Information
+              </h2>
               <button
                 onClick={() => setShowGradesModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <X size={24} className="text-gray-600" />
+                <X size={20} className="text-gray-600" />
               </button>
             </div>
 

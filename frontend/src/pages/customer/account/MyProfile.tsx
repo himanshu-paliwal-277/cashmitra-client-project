@@ -182,7 +182,7 @@ const MyProfile = () => {
                     onClick={handleEdit}
                   >
                     <Edit3 size={16} />
-                    Edit
+                    <span className="sm:inline hidden">Edit</span>
                   </button>
                 )}
               </div>
