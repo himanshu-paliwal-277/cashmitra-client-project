@@ -29,7 +29,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
       {assuredChipVisible && (
         <div className="absolute top-3 left-3 z-10 bg-gradient-to-r from-teal-500 to-teal-600 text-white flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold tracking-wide shadow-sm">
           <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-            <span className="text-teal-600 text-[10px] font-black">ⓒ</span>
+            <span className="text-teal-600 text-xs sm:text-[10px] font-black">ⓒ</span>
           </div>
           <span>Cashmitra</span>
           <span className="text-[9px] font-semibold opacity-90">ASSURED</span>
@@ -38,7 +38,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
 
       {/* Image Container */}
       <div className="relative bg-white px-4 pt-12 pb-4 flex items-center justify-center">
-        <div className="w-full h-[200px] flex items-center justify-center relative">
+        <div className="sm:w-full w-auto sm:h-[200px] h-[120px] flex items-center justify-center relative">
           <img
             src={product.images?.main || '/placeholder-phone.png'}
             alt={product.name}
@@ -49,24 +49,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
       </div>
 
       {/* Product Info */}
-      <div className="p-4 pt-2 flex flex-col gap-2 flex-1">
+      <div className="p-4 pt-2 flex flex-col sm:gap-2 gap-1 flex-1">
         {/* Discount Amount */}
         {discountAmount > 0 && (
-          <div className="text-sm font-bold text-green-600">₹{rupee(discountAmount)} OFF</div>
+          <div className="sm:text-sm text-xs font-bold text-green-600">
+            ₹{rupee(discountAmount)} OFF
+          </div>
         )}
 
         {/* Product Name */}
-        <h3 className="text-base font-bold line-clamp-2 text-gray-900 leading-tight m-0">
+        <h3 className="sm:text-base text-sm font-bold line-clamp-2 text-gray-900 leading-tight m-0">
           {truncate(product.name, 70)}
         </h3>
 
         {/* Price Section */}
-        <div className="flex items-baseline gap-2 mt-1">
+        <div className="flex items-baseline xl:flex-row flex-col xl:gap-2 mt-1">
           {percent > 0 && <span className="text-sm font-bold text-red-500">-{percent}%</span>}
-          <span className="text-xl font-bold text-gray-900">₹{rupee(discounted)}</span>
-          {mrp > discounted && (
-            <span className="text-sm text-gray-400 line-through font-medium">₹{rupee(mrp)}</span>
-          )}
+          <div className="flex gap-2 items-center">
+            <span className="sm:text-xl font-bold text-gray-900">₹{rupee(discounted)}</span>
+            {mrp > discounted && (
+              <span className="sm:text-sm text-xs text-gray-400 line-through font-medium">
+                ₹{rupee(mrp)}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </article>

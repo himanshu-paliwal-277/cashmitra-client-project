@@ -377,7 +377,7 @@ const Header = () => {
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0 lg:gap-4">
           {/* Location - Hidden on mobile and tablet */}
-          <button className="hidden xl:flex items-center gap-1.5 px-3 py-2 bg-transparent border border-gray-300 rounded-md text-sm font-medium text-gray-800 transition-all hover:bg-gray-50 hover:border-gray-400">
+          <button className="hidden lg:flex items-center gap-1.5 px-3 py-2 bg-transparent border border-gray-300 rounded-md text-sm font-medium text-gray-800 transition-all hover:bg-gray-50 hover:border-gray-400">
             <MapPin size={16} />
             Mumbai
             <ChevronDown size={14} />
@@ -462,7 +462,10 @@ const Header = () => {
 
       {/* Bottom Navigation Bar - Hidden on mobile */}
       <nav className="hidden lg:block bg-white w-full border-b border-gray-200 shadow-sm">
-        <div ref={navDropdownRef} className="w-full main-container flex items-center gap-2">
+        <div
+          ref={navDropdownRef}
+          className="w-full overflow-auto main-container flex items-center gap-2"
+        >
           {navItems.map(item => (
             <div
               key={item.id}
