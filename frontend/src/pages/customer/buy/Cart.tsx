@@ -210,14 +210,14 @@ const Cart = ({ onBack }: any) => {
     return (
       <div className="min-h-screen bg-[#f7f8fa] text-[#0f172a]">
         <header className="bg-white border-b border-[#e6e8ee]">
-          <div className=" mx-auto px-4 h-[68px] flex items-center justify-between">
-            <button
+          <div className=" mx-auto main-container h-[68px] flex items-center justify-between">
+            {/* <button
               className="inline-flex items-center gap-2 bg-none border-none text-[#0ea5e9] font-semibold cursor-pointer hover:underline"
               onClick={handleBack}
             >
               <ArrowLeft size={16} />
               Continue Shopping
-            </button>
+            </button> */}
             <h1 className="flex items-center gap-2.5 text-xl font-extrabold text-[#0f172a]">
               <ShoppingBag size={22} />
               Shopping Cart{' '}
@@ -262,14 +262,14 @@ const Cart = ({ onBack }: any) => {
     return (
       <div className="min-h-screen bg-[#f7f8fa] text-[#0f172a]">
         <header className="bg-white border-b border-[#e6e8ee]">
-          <div className=" mx-auto px-4 h-[68px] flex items-center justify-between">
-            <button
+          <div className=" mx-auto main-container h-[68px] flex items-center justify-between">
+            {/* <button
               className="inline-flex items-center gap-2 bg-none border-none text-[#0ea5e9] font-semibold cursor-pointer hover:underline"
               onClick={handleBack}
             >
               <ArrowLeft size={16} />
               Continue Shopping
-            </button>
+            </button> */}
             <h1 className="flex items-center gap-2.5 text-xl font-extrabold text-[#0f172a]">
               <ShoppingBag size={22} />
               Shopping Cart{' '}
@@ -304,14 +304,14 @@ const Cart = ({ onBack }: any) => {
   return (
     <div className="min-h-screen bg-[#f7f8fa] text-[#0f172a]">
       <header className="bg-white border-b border-[#e6e8ee]">
-        <div className="max-w-[1200px] mx-auto px-4 h-[68px] flex items-center justify-between">
-          <button
+        <div className="max-w-[1200px] mx-auto main-container h-[68px] flex items-center justify-between">
+          {/* <button
             className="inline-flex items-center gap-2 bg-none border-none text-[#0ea5e9] font-semibold cursor-pointer hover:underline"
             onClick={handleBack}
           >
             <ArrowLeft size={16} />
             Continue Shopping
-          </button>
+          </button> */}
 
           <h1 className="flex items-center gap-2.5 text-xl font-extrabold text-[#0f172a]">
             <ShoppingBag size={22} />

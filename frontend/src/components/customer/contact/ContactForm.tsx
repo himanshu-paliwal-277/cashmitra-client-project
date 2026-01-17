@@ -72,8 +72,8 @@ const ContactForm = () => {
       <div className="relative">
         {/* Header */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-grey-900 mb-3">Send us a Message</h2>
-          <p className="text-grey-600">
+          <h2 className="sm:text-3xl text-xl font-bold text-grey-900 mb-3">Send us a Message</h2>
+          <p className="text-grey-600 sm:text-md text-sm">
             Fill out the form below and we'll get back to you as soon as possible.
           </p>
         </div>

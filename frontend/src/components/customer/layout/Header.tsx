@@ -14,6 +14,7 @@ import {
   Search,
   Info,
   ChevronDown,
+  Phone,
 } from 'lucide-react';
 import SellPhoneDropdown from './SellPhoneDropdown';
 import PhoneDropdown from './PhoneDropdown';
@@ -273,7 +274,7 @@ const Header = () => {
 
   const mobileOnlyLinks = [
     { to: '/about', label: 'About Us', icon: <Info /> },
-    // { to: '/orders', label: 'Track Orders', icon: <Package /> },
+    { to: '/contact', label: 'Contact Us', icon: <Phone /> },
     { to: '/help', label: 'Help & Support', icon: <HelpCircle /> },
   ];
 
@@ -592,12 +593,40 @@ const Header = () => {
             {isAuthenticated ? (
               <>
                 <Link
+                  to="/cart"
+                  onClick={() => handleLinkClick('/cart')}
+                  className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 no-underline rounded-lg transition-colors hover:bg-gray-100 hover:text-green-600"
+                >
+                  <ShoppingCart /> Cart
+                </Link>
+                <Link
                   to="/account/profile"
                   onClick={() => handleLinkClick('/account/profile')}
                   className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 no-underline rounded-lg transition-colors hover:bg-gray-100 hover:text-green-600"
                 >
                   <Settings /> My Profile
                 </Link>
+                <Link
+                  to="/account/orders"
+                  onClick={() => handleLinkClick('/account/orders')}
+                  className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 no-underline rounded-lg transition-colors hover:bg-gray-100 hover:text-green-600"
+                >
+                  <Package /> My Orders
+                </Link>
+                <Link
+                  to="/account/addresses"
+                  onClick={() => handleLinkClick('/account/addresses')}
+                  className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 no-underline rounded-lg transition-colors hover:bg-gray-100 hover:text-green-600"
+                >
+                  <MapPin /> Saved Addresses
+                </Link>
+                {/* <Link
+                  to="/account/wallet"
+                  onClick={() => handleLinkClick('/account/wallet')}
+                  className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 no-underline rounded-lg transition-colors hover:bg-gray-100 hover:text-green-600"
+                >
+                  <Wallet /> Wallet
+                </Link> */}
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-4 py-3 border-none bg-transparent text-red-600 text-[15px] font-medium text-left cursor-pointer rounded-lg transition-colors hover:bg-gray-50"

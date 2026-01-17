@@ -625,7 +625,7 @@ const SellScreenDefects = () => {
                       : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:scale-105'
                   }`}
                 >
-                  Continue to Accessories
+                  Continue <span className="sm:inline hidden">to Accessories</span>
                   <ArrowRight className="w-5 h-5" />
                 </button>
               </div>

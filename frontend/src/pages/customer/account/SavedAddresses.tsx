@@ -158,7 +158,7 @@ const SavedAddresses = () => {
 
   return (
     <div
-      className="min-h-screen py-10"
+      className="min-h-screen sm:py-10 py-6"
       style={{
         background: `radial-gradient(1200px 800px at 10% -10%, rgba(37, 99, 235, 0.07), transparent 40%), radial-gradient(800px 600px at 110% 10%, rgba(22, 163, 74, 0.05), transparent 45%), #ffffff`,
       }}
@@ -166,17 +166,14 @@ const SavedAddresses = () => {
       <div className="main-container">
         <header className="flex justify-between items-center gap-4 mb-10">
           <div>
-            <h1
-              className="m-0 mb-1 text-gray-900 leading-tight tracking-tight"
-              style={{ fontSize: 'clamp(1.6rem, 2.2vw, 2rem)' }}
-            >
+            <h1 className="m-0 mb-1 text-xl sm:text-2xl text-gray-900 font-semibold leading-tight tracking-tight">
               Saved Addresses
             </h1>
-            <p className="m-0 text-gray-600">Manage your delivery addresses</p>
+            <p className="m-0 sm:inline hidden text-gray-600">Manage your delivery addresses</p>
           </div>
-          <Button variant="primary" onClick={handleAddAddress}>
+          <Button className="px-2 sm:px-4" variant="primary" onClick={handleAddAddress}>
             <Plus size={18} />
-            <span>Add New Address</span>
+            <span className="sm:inline hidden">Add New Address</span>
           </Button>
         </header>
 
@@ -202,7 +199,7 @@ const SavedAddresses = () => {
               return (
                 <Card
                   key={id}
-                  className={`relative p-7 bg-gradient-to-b from-white to-gray-50 border border-gray-200 rounded-[18px] shadow-[0_10px_25px_rgba(2,6,23,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-600/35 hover:shadow-[0_18px_40px_rgba(2,6,23,0.08)] ${
+                  className={`relative sm:p-7 p-5 bg-gradient-to-b from-white to-gray-50 border border-gray-200 sm:rounded-[18px] rounded-lg shadow-[0_10px_25px_rgba(2,6,23,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-600/35 hover:shadow-[0_18px_40px_rgba(2,6,23,0.08)] ${
                     address.isDefault
                       ? 'border-blue-600/50 shadow-[0_20px_45px_rgba(37,99,235,0.12),0_10px_25px_rgba(2,6,23,0.06)]'
                       : ''

@@ -151,7 +151,7 @@ const ProductVariantSelection = ({ onContinue, onBack }: any) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 py-8 px-4 sm:py-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 py-8 sm:py-12">
       <div className="main-container">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 mb-8 text-sm text-slate-600 flex-wrap">
@@ -176,13 +176,13 @@ const ProductVariantSelection = ({ onContinue, onBack }: any) => {
         </nav>
 
         {/* Back Button */}
-        <button
+        {/* <button
           onClick={handleBackClick}
           className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 hover:border-slate-400 transition-all mb-8 group"
         >
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           Back to Products
-        </button>
+        </button> */}
 
         {/* Product Header */}
         <div className="text-center mb-12">

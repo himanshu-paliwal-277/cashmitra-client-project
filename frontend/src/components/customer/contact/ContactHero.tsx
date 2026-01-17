@@ -32,7 +32,7 @@ const ContactHero = () => {
           </p>
 
           {/* Quick Contact Options */}
-          <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {[
               { icon: Phone, label: 'Call Us', value: '+91 9876543210', color: 'primary' },
               { icon: Mail, label: 'Email Us', value: 'support@cashmitra.com', color: 'accent' },
@@ -43,7 +43,7 @@ const ContactHero = () => {
               return (
                 <div
                   key={index}
-                  className="group relative bg-white/70 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-white shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer"
+                  className="group relative bg-white/70 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-white shadow-lg hover:shadow-2xl transition-all duration-500 sm:hover:-translate-y-2 cursor-pointer"
                 >
                   {/* Icon */}
                   <div
