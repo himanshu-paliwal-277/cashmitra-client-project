@@ -43,7 +43,14 @@
       "Bash(do echo \"✓ $file\")",
       "Bash(echo:*)",
       "Bash(npx tsc:*)",
-      "Bash(npx prettier:*)"
+      "Bash(npx prettier:*)",
+      "Bash(tasklist:*)",
+      "Read(//c/**)",
+      "Bash(wmic process get:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(powershell \"Get-Process | Sort-Object WorkingSet64 -Descending | Select-Object -First 25 Name, Id, @{N=''MemMB'';E={[int]\\($_WorkingSet64/1MB\\)}} | Format-Table -AutoSize\")",
+      "Bash(powershell:*)",
+      "Bash(code --list-extensions)"
     ],
     "deny": [],
     "ask": []

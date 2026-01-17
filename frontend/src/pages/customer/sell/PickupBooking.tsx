@@ -398,7 +398,7 @@ const PickupBooking = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] py-10 relative">
-      <div className="flex max-w-[1400px] mx-auto px-5 py-5 gap-[30px] relative z-[1] lg:flex-col lg:px-4">
+      <div className="flex max-w-[1400px] mx-auto px-5 py-5 gap-[30px] relative z-[1] flex-col lg:px-4">
         <div className="flex-1 animate-[fadeInUp_0.6s_ease-out]">
           <h1 className="text-[32px] font-bold text-white mb-3 [text-shadow:0_2px_4px_rgba(0,0,0,0.1)] tracking-[-0.5px]">
             You're almost done
@@ -443,7 +443,7 @@ const PickupBooking = () => {
             </div>
           </div>
 
-          <div className="bg-white border-0 rounded-[20px] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.15)] animate-[slideIn_0.4s_ease-out]">
+          <div className="bg-white border-0 sm:rounded-[20px] rounded-lg sm:p-8 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.15)] animate-[slideIn_0.4s_ease-out]">
             {currentStep === 1 && (
               <div className="flex flex-col gap-5">
                 <div className="bg-[#e3f2fd] p-3 rounded-lg mb-5 border border-[#bbdefb]">
@@ -627,8 +627,10 @@ const PickupBooking = () => {
                   )}
                 </div>
 
-                <div className="flex items-center gap-4 mt-2 p-5 bg-[#f8f9fa] rounded-xl">
-                  <div className="text-sm font-semibold text-[#2c3e50]">Save As</div>
+                <div className="flex flex-wrap items-center gap-4 mt-2 p-5 bg-[#f8f9fa] rounded-xl">
+                  <div className="text-sm font-semibold text-[#2c3e50] sm:w-auto w-full">
+                    Save As
+                  </div>
                   <label className="flex items-center gap-2 cursor-pointer py-2 px-4 rounded-lg transition-colors duration-200 font-medium text-[#495057] hover:bg-[rgba(102,126,234,0.1)]">
                     <input
                       type="radio"
@@ -784,7 +786,7 @@ const PickupBooking = () => {
         </div>
 
         <div className="flex-[0_0_380px] flex flex-col gap-5 animate-[fadeInUp_0.6s_ease-out_0.2s_both] lg:flex-1">
-          <div className="bg-white border-0 rounded-[20px] p-7 text-center shadow-[0_10px_40px_rgba(0,0,0,0.1)] relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-[#667eea] before:to-[#764ba2]">
+          <div className="bg-white border-0 rounded-lg sm:rounded-[20px] p-7 text-center shadow-[0_10px_40px_rgba(0,0,0,0.1)] relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-[#667eea] before:to-[#764ba2]">
             <Smartphone size={24} className="text-[#667eea] mb-3" />
             <img
               className="w-[140px] h-[280px] object-contain rounded-xl my-0 mx-auto mb-4 [filter:drop-shadow(0_8px_16px_rgba(0,0,0,0.1))]"
@@ -800,7 +802,7 @@ const PickupBooking = () => {
             </div>
           </div>
 
-          <div className="bg-white border-0 rounded-[20px] p-7 shadow-[0_10px_40px_rgba(0,0,0,0.1)]">
+          <div className="bg-white border-0 rounded-lg sm:rounded-[20px] p-7 shadow-[0_10px_40px_rgba(0,0,0,0.1)]">
             <div className="text-lg font-bold mb-5 text-[#2c3e50] tracking-[-0.3px]">
               Price Summary
             </div>

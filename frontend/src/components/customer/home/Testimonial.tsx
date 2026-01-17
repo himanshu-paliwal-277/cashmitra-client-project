@@ -30,11 +30,11 @@ const testimonials = [
 
 const Testimonial: React.FC = () => {
   return (
-    <section className="py-20 bg-white main-container">
-      <h2 className="text-3xl font-semibold text-center mb-4 text-gray-900">
+    <section className="py-8 sm:py-20 bg-white main-container">
+      <h2 className="text-2xl sm:text-3xl font-semibold text-center mb-4 text-gray-900">
         What our customers say
       </h2>
-      <p className="text-lg text-gray-600 text-center mb-12 max-w-[600px] mx-auto">
+      <p className="text-md sm:text-lg text-gray-600 text-center mb-12 max-w-[600px] mx-auto">
         Join thousands of satisfied customers who have sold their devices through Cashmitra
       </p>
 
@@ -42,7 +42,7 @@ const Testimonial: React.FC = () => {
         {testimonials.map(testimonial => (
           <div
             key={testimonial.id}
-            className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow"
+            className="bg-white border border-gray-200 rounded-md sm:rounded-xl sm:p-6 p-3 shadow-sm sm:hover:shadow-lg transition-shadow"
           >
             <div className="flex gap-1 mb-3 text-yellow-500">
               {[...Array(testimonial.rating)].map((_, i) => (
@@ -50,15 +50,19 @@ const Testimonial: React.FC = () => {
               ))}
             </div>
 
-            <p className="italic mb-4 leading-relaxed text-gray-700">"{testimonial.text}"</p>
+            <p className="italic mb-4 leading-relaxed text-gray-700 sm:text-md text-xs">
+              "{testimonial.text}"
+            </p>
 
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+              <div className="text-xs sm:text-md sm:w-12 sm:h-12 h-8 w-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
                 {testimonial.avatar}
               </div>
               <div>
-                <h4 className="text-base font-medium text-gray-900 m-0">{testimonial.author}</h4>
-                <p className="text-sm text-gray-500 m-0">{testimonial.location}</p>
+                <h4 className="text-sm sm:text-base font-medium text-gray-900 m-0">
+                  {testimonial.author}
+                </h4>
+                <p className="text-xs sm:text-sm text-gray-500 m-0">{testimonial.location}</p>
               </div>
             </div>
           </div>

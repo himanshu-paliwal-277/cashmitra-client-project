@@ -134,7 +134,6 @@ export var getAllDefects = asyncHandler(async (req, res) => {
     search,
     status,
     category,
-    impact,
     sortBy = 'order',
     sortOrder = 'asc',
   } = req.query;

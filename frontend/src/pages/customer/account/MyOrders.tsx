@@ -179,7 +179,7 @@ const MyOrders = () => {
 
   return (
     <div
-      className="min-h-screen py-12"
+      className="min-h-screen sm:py-12 py-5"
       style={{
         background: `radial-gradient(1000px 700px at 10% -10%, rgba(37, 99, 235, 0.05), transparent 45%), radial-gradient(800px 600px at 110% 10%, rgba(22, 163, 74, 0.04), transparent 45%), #fafafa`,
       }}

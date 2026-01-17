@@ -51,13 +51,13 @@ const ContactFAQ = () => {
               <HelpCircle className="w-4 h-4 text-primary-600" />
               <span className="text-sm font-semibold text-primary-700">Quick Answers</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-grey-900 mb-4">
+            <h2 className="text-2xl sm:text-4xl font-bold text-grey-900 mb-4">
               Frequently Asked{' '}
               <span className="bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
                 Questions
               </span>
             </h2>
-            <p className="text-lg text-grey-600">
+            <p className="sm:text-lg text-grey-600">
               Find answers to common questions about contacting our support team
             </p>
           </div>
@@ -70,7 +70,7 @@ const ContactFAQ = () => {
               return (
                 <div
                   key={index}
-                  className="group relative bg-white rounded-2xl border-2 border-grey-100 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+                  className="group relative bg-white sm:rounded-2xl rounded-lg border-2 border-grey-100 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
                 >
                   {/* Gradient Border on Hover */}
                   <div
@@ -80,10 +80,10 @@ const ContactFAQ = () => {
                   {/* Question Button */}
                   <button
                     onClick={() => toggleFAQ(index)}
-                    className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
+                    className="w-full px-4 sm:px-6 sm:py-5 py-3 flex items-center justify-between text-left focus:outline-none"
                   >
                     <span
-                      className={`font-semibold text-lg pr-8 transition-colors duration-300 ${isOpen ? 'text-primary-600' : 'text-grey-900'}`}
+                      className={`font-semibold text-sm sm:text-lg pr-8 transition-colors duration-300 ${isOpen ? 'text-primary-600' : 'text-grey-900'}`}
                     >
                       {faq.question}
                     </span>
@@ -108,7 +108,9 @@ const ContactFAQ = () => {
                   >
                     <div className="px-6 pb-5 pt-2">
                       <div className="border-t-2 border-grey-100 pt-4">
-                        <p className="text-grey-600 leading-relaxed">{faq.answer}</p>
+                        <p className="text-grey-600 leading-relaxed sm:text-md text-sm">
+                          {faq.answer}
+                        </p>
                       </div>
                     </div>
                   </div>

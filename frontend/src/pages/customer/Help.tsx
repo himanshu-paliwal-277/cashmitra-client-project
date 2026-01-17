@@ -77,9 +77,11 @@ const Help: React.FC = () => {
   return (
     <div className="min-h-screen main-container bg-gradient-to-b from-gray-50 to-white py-10">
       {/* Header */}
-      <div className="text-center space-y-3 mb-20 mt-12">
-        <h1 className="text-4xl font-bold text-gray-900 tracking-tight">How can we help you?</h1>
-        <p className="text-lg text-gray-500">Browse FAQs or connect with customer care</p>
+      <div className="text-center  mb-20 mt-12">
+        <h1 className="sm:text-4xl text-2xl mb-2 font-bold text-gray-900 tracking-tight">
+          How can we help you?
+        </h1>
+        <p className="sm:text-lg text-gray-500  mb-5">Browse FAQs or connect with customer care</p>
 
         {/* Search */}
         <div className="relative max-w-xl mx-auto">
@@ -99,7 +101,7 @@ const Help: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* FAQ */}
         <div className="lg:col-span-2">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-900">FAQs</h2>
+          <h2 className="text-lg sm:text-2xl font-semibold mb-4 text-gray-900">FAQs</h2>
 
           <Accordion type="single" collapsible className="space-y-4">
             {filteredFAQs.length ? (
@@ -109,10 +111,10 @@ const Help: React.FC = () => {
                   value={faq.id}
                   className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition"
                 >
-                  <AccordionTrigger className="px-6 py-4 text-lg text-left font-medium text-gray-900">
+                  <AccordionTrigger className="px-6 py-4 sm:text-lg text-left font-medium text-gray-900">
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="px-6 pb-4 text-gray-600 leading-relaxed text-base">
+                  <AccordionContent className="px-6 pb-4 text-gray-600 leading-relaxed sm:text-base">
                     {faq.answer}
                   </AccordionContent>
                 </AccordionItem>
@@ -125,7 +127,7 @@ const Help: React.FC = () => {
 
         {/* Contact */}
         <div>
-          <h2 className="text-2xl font-semibold mb-4 text-gray-900">Contact Support</h2>
+          <h2 className="text-lg sm:text-2xl font-semibold mb-4 text-gray-900">Contact Support</h2>
 
           <div className="space-y-6">
             {contactOptions.map((option, i) => (
@@ -136,9 +138,9 @@ const Help: React.FC = () => {
                 <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 text-primary rounded-full flex items-center justify-center">
                   {option.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900">{option.title}</h3>
-                <p className="text-gray-500 mb-1">{option.description}</p>
-                <p className="text-sm text-gray-400 mb-4">{option.available}</p>
+                <h3 className="sm:text-xl font-semibold text-gray-900">{option.title}</h3>
+                <p className="text-gray-500 mb-1 sm:text-md text-sm">{option.description}</p>
+                <p className="sm:text-sm text-xs text-gray-400 mb-4">{option.available}</p>
                 <Button className="w-full">{option.action}</Button>
               </Card>
             ))}

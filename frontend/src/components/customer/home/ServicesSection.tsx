@@ -121,10 +121,10 @@ const ServicesSection = () => {
   ];
 
   return (
-    <div className="py-12 md:py-12 bg-gray-100">
-      <div className="max-w-6xl mx-auto px-4">
+    <div className="py-12 md:py-12 bg-gray-100 main-container">
+      <div className="">
         {/* Our Services */}
-        <div className="mb-16">
+        <div className="sm:mb-16">
           <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-8 text-center">
             Our Services
           </h2>

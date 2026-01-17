@@ -516,13 +516,13 @@ const SellDeviceEvaluation = () => {
                   return (
                     <div
                       key={question.id}
-                      className={`p-6 rounded-xl border-2 transition-all ${
+                      className={`sm:p-6 p-4 rounded-xl border-2 transition-all ${
                         isAnswered ? 'border-green-300 bg-green-50' : 'border-slate-200 bg-white'
                       }`}
                     >
                       <div className="flex items-start gap-4 mb-4">
                         <div
-                          className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                          className={`sm:w-12 sm:h-12 w-10 h-10 sm:rounded-xl rounded-lg flex items-center justify-center flex-shrink-0 ${
                             isAnswered ? 'bg-green-500 text-white' : 'bg-blue-100 text-blue-600'
                           }`}
                         >
@@ -639,7 +639,7 @@ const SellDeviceEvaluation = () => {
                       : 'bg-slate-300 text-slate-500 cursor-not-allowed'
                   }`}
                 >
-                  Continue to Next Step
+                  Continue <span className="sm:inline hidden">to Next Step</span>
                   <ArrowRight className="w-5 h-5" />
                 </button>
               </div>

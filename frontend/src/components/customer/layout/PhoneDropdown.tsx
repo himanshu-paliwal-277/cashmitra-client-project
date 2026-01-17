@@ -101,7 +101,7 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
   if (!isVisible) return null;
 
   return (
-    <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-2xl border border-gray-100 z-[1000] min-w-[560px] max-w-[600px] overflow-hidden backdrop-blur-sm animate-in fade-in slide-in-from-top-2 duration-200">
+    <div className="absolute top-36 sm:top-full left-0 mt-2 bg-white rounded-md shadow-2xl border border-gray-100 z-[1000] sm:min-w-[560px] sm:max-w-[600px] min-w-full overflow-hidden backdrop-blur-sm animate-in fade-in slide-in-from-top-2 duration-200">
       {/* Header with gradient */}
       <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-100">
         <div className="flex justify-between items-center">
@@ -113,7 +113,7 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
             className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
             onClick={handleViewAllClick}
           >
-            View All Categories
+            View All <span className="sm:inline hidden">Categories</span>
           </button>
         </div>
       </div>
@@ -161,7 +161,7 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
         {/* Categories Grid */}
         {!loading && !error && categories.length > 0 && (
           <>
-            <div className="grid grid-cols-2 gap-3 max-h-[420px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[420px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
               {categories.map(category => {
                 const imageUrl = category.image || getCategoryImage(category.name);
 

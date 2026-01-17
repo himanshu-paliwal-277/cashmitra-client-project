@@ -106,14 +106,16 @@ const OrderConfirmation = ({ orderData = null, onContinueShopping = null, onGoHo
         <div className="max-w-4xl mx-auto text-center">
           {/* Success Icon */}
           <div className="inline-flex items-center justify-center w-24 h-24 mb-6 rounded-full bg-white shadow-lg">
-            <CheckCircle size={48} className="text-green-600" />
+            <CheckCircle size={40} className="text-green-600" />
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 text-white">Order Confirmed!</h1>
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 text-white">
+            Order Confirmed!
+          </h1>
 
           {/* Subtitle */}
-          <p className="text-lg md:text-xl text-blue-100 mb-6 max-w-2xl mx-auto">
+          <p className="sm:text-lg md:text-xl text-blue-100 mb-6 max-w-2xl mx-auto">
             Thank you for your purchase. We'll send you updates about your order.
           </p>
 
@@ -123,7 +125,7 @@ const OrderConfirmation = ({ orderData = null, onContinueShopping = null, onGoHo
               <span className="block text-xs text-blue-100 uppercase tracking-wide font-medium">
                 Order Number
               </span>
-              <span className="block text-lg font-semibold font-mono text-white">
+              <span className="block text-xs sm:text-lg font-semibold font-mono text-white">
                 {order?._id || order?.orderId || 'ORD1234567890'}
               </span>
             </div>
@@ -135,7 +137,7 @@ const OrderConfirmation = ({ orderData = null, onContinueShopping = null, onGoHo
       <section className="main-container py-12">
         <div className="space-y-8">
           {/* Order Timeline */}
-          <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200">
+          <div className="bg-white sm:rounded-2xl sm:p-6 md:p-8 sm:shadow-sm sm:border sm:border-gray-200">
             <h2 className="flex items-center gap-3 text-xl font-semibold text-gray-900 mb-6">
               <div className="p-2 bg-blue-50 rounded-lg">
                 <Package size={20} className="text-blue-600" />
@@ -185,7 +187,7 @@ const OrderConfirmation = ({ orderData = null, onContinueShopping = null, onGoHo
           </div>
 
           {/* Order Items */}
-          <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200">
+          <div className="bg-white sm:rounded-2xl sm:p-6 md:p-8 sm:shadow-sm sm:border sm:border-gray-200">
             <h2 className="flex items-center gap-3 text-xl font-semibold text-gray-900 mb-6">
               <div className="p-2 bg-blue-50 rounded-lg">
                 <ShoppingBag size={20} className="text-blue-600" />
@@ -279,7 +281,7 @@ const OrderConfirmation = ({ orderData = null, onContinueShopping = null, onGoHo
           </div>
 
           {/* Order Information */}
-          <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200">
+          <div className="bg-white sm:rounded-2xl sm:p-6 md:p-8 sm:shadow-sm sm:border sm:border-gray-200">
             <h2 className="flex items-center gap-3 text-xl font-semibold text-gray-900 mb-6">
               <div className="p-2 bg-blue-50 rounded-lg">
                 <MapPin size={20} className="text-blue-600" />

@@ -47,16 +47,16 @@ const AboutHero = () => {
       <div className="main-container relative ">
         <div className="max-w-5xl mx-auto text-center">
           {/* Animated Badge */}
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-primary-100 mb-8 hover:scale-105 transition-transform duration-300 cursor-pointer group">
+          <div className="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-primary-100 mb-8 hover:scale-105 transition-transform duration-300 cursor-pointer group">
             <Sparkles className="w-4 h-4 text-accent-500 animate-pulse" />
-            <span className="text-sm font-semibold text-grey-700 group-hover:text-primary-600 transition-colors">
+            <span className="text-xs sm:text-sm font-semibold text-grey-700 group-hover:text-primary-600 transition-colors">
               India's Most Trusted Device Trading Platform
             </span>
             <div className="w-2 h-2 bg-accent-500 rounded-full animate-ping"></div>
           </div>
 
           {/* Main Heading with Advanced Animation */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-grey-900 mb-6 leading-tight animate-fade-in-up">
+          <h1 className="text-2xl sm:text-5xl lg:text-6xl font-bold text-grey-900 mb-6 leading-tight animate-fade-in-up">
             Revolutionizing the Way You
             <span className="block mt-3 bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 bg-clip-text text-transparent animate-gradient-x">
               Buy & Sell Devices
@@ -64,7 +64,7 @@ const AboutHero = () => {
           </h1>
 
           {/* Enhanced Description */}
-          <p className="text-lg sm:text-xl text-grey-600 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200">
+          <p className="text-md sm:text-xl text-grey-600 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200">
             At Cashmitra, we're on a mission to create a{' '}
             <span className="font-semibold text-primary-600">sustainable marketplace</span> where
             technology meets trust. Get the best value for your devices and discover quality
@@ -95,7 +95,7 @@ const AboutHero = () => {
               stats.map((stat, index) => (
                 <div
                   key={index}
-                  className="group relative bg-white/60 backdrop-blur-md rounded-2xl p-6 border border-white shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer animate-fade-in-up"
+                  className="group relative bg-white/60 backdrop-blur-md sm:rounded-2xl rounded-lg p-6 border border-white shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer animate-fade-in-up"
                   style={{ animationDelay: `${600 + index * 100}ms` }}
                 >
                   {/* Icon Badge */}
@@ -105,7 +105,7 @@ const AboutHero = () => {
 
                   {/* Value */}
                   <div
-                    className={`text-3xl md:text-4xl font-bold bg-gradient-to-br !text-black bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300`}
+                    className={`text-xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-br !text-black bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300`}
                   >
                     {stat.value}
                   </div>

@@ -34,17 +34,19 @@ const BuyProductsList = () => {
   return (
     <section className="pt-[45px] pb-[45px] text-[#111827] main-container bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       <div className="flex items-center justify-between mb-3.5">
-        <h2 className="text-[28px] font-extrabold text-[#0f172a] m-0">Buy Refurbished Devices</h2>
+        <h2 className="sm:text-[28px] text-xl font-extrabold text-[#0f172a] m-0">
+          Buy Refurbished Devices
+        </h2>
         <Link
           to="/buy"
-          className="inline-flex items-center gap-1.5 bg-none border-none text-[#0ea5e9] font-semibold cursor-pointer"
+          className="inline-flex sm:text-base text-sm items-center gap-1.5 bg-none border-none text-[#0ea5e9] font-semibold cursor-pointer"
         >
-          View All <ArrowRight size={16} />
+          <span className="hidden sm:flex">View All</span> <ArrowRight size={16} />
         </Link>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-[18px]">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-[18px]">
           {Array.from({ length: 6 }).map((_, i) => (
             <div className="border border-[#e5e7eb] rounded-xl px-3.5 pb-3.5 pt-2.5" key={i}>
               <div className="h-[190px] rounded-xl bg-[linear-gradient(90deg,#f1f5f9_25%,#e2e8f0_37%,#f1f5f9_63%)] bg-[length:400%_100%] animate-[shimmer_1.2s_infinite]" />
@@ -73,7 +75,7 @@ const BuyProductsList = () => {
           <p>Check back later for amazing deals on refurbished devices!</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-[18px]">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-[18px]">
           {products.map(p => (
             <ProductCard key={p._id} product={p} onClick={handleProductClick} />
           ))}
