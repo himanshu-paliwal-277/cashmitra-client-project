@@ -46,7 +46,7 @@ const SellPhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }
   if (!isVisible) return null;
 
   return (
-    <div className="absolute top-full left-0 bg-white border border-gray-200 rounded-md shadow-[0_10px_40px_rgba(0,0,0,0.15)] z-[1000] min-w-[500px] max-w-[600px] max-h-[500px] overflow-y-auto animate-fadeInDown [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb:hover]:bg-gray-500">
+    <div className="absolute sm:top-full top-[300px] left-0 bg-white border border-gray-200 rounded-md shadow-[0_10px_40px_rgba(0,0,0,0.15)] z-[1000] sm:min-w-[500px] min-w-full sm:max-w-[600px] max-h-[500px] overflow-y-auto animate-fadeInDown [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb:hover]:bg-gray-500">
       <div className="p-6 md:p-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-200">
@@ -55,7 +55,7 @@ const SellPhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }
             onClick={handleViewAllClick}
             className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors"
           >
-            View All Categories
+            View All <span className="sm:inline hidden">Categories</span>
           </button>
         </div>
 
@@ -83,7 +83,7 @@ const SellPhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }
         {/* Super Categories Grid */}
         {!loading && superCategories.length > 0 && (
           <>
-            <div className="grid grid-cols-2 gap-3 mb-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
               {superCategories.map((superCategory: any) => {
                 const imageUrl = superCategory.image || getSuperCategoryImage(superCategory.name);
 
